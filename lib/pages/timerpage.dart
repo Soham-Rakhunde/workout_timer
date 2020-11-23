@@ -5,8 +5,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:workout_timer/constants.dart';
-import 'file:///D:/Software/Coding/workout_timer/lib/services/customWidgets/NeuButton.dart';
-import 'file:///D:/Software/Coding/workout_timer/lib/services/customWidgets/progressBuilder.dart';
+import 'package:workout_timer/services/NeuButton.dart';
+import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 

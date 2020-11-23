@@ -6,10 +6,10 @@ import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/GenericFunctions.dart';
-import 'file:///D:/Software/Coding/workout_timer/lib/services/customWidgets/NeuButton.dart';
-import 'file:///D:/Software/Coding/workout_timer/lib/services/animIcon/gradientIcon.dart';
+import 'package:workout_timer/services/NeuButton.dart';
+import 'package:workout_timer/services/animIcon/gradientIcon.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
-import 'file:///D:/Software/Coding/workout_timer/lib/services/customWidgets/myTextField.dart';
+import 'package:workout_timer/services/myTextField.dart';
 
 class HomePage extends StatefulWidget {
   @override

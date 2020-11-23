@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../constants.dart';
+import '../constants.dart';
 
 class myTextField extends StatelessWidget {
   int temp;
@@ -18,7 +18,6 @@ class myTextField extends StatelessWidget {
         fontSize: 25,
         color: textColor,
         decorationColor: textColor,
-        fontFamily: 'MontserratBold',
       ),
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.digitsOnly
@@ -34,7 +33,7 @@ class myTextField extends StatelessWidget {
         func(val);
       }),
       keyboardType: TextInputType.number,
-      // decoration: kInputDecor,
+      decoration: kInputDecor,
     );
   }
 }

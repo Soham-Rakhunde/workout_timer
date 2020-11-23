@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
-import '../../constants.dart';
-import '../innerShadow.dart';
+import '../constants.dart';
+import 'innerShadow.dart';
 
 class buildStack extends StatefulWidget {
   ValueNotifier<int> i;
