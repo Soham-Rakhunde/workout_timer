@@ -7,14 +7,22 @@ class savedPage extends StatefulWidget {
 }
 
 class _savedPageState extends State<savedPage> {
-
-  // SharedPref _data = SharedPref();
-  // List list;
+  SharedPref _data = SharedPref();
+  List list = [];
+  String varia;
 
   @override
   Widget build(BuildContext context) {
-    // list = _data.read('List');
-    // print('list');
-    return Scaffold();
+    return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: (() async {
+          list = await _data.read();
+          setState(() {
+            print('$list');
+            varia = '$list';
+          });
+        }),
+      ),
+    );
   }
 }

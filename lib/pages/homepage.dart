@@ -1,15 +1,18 @@
+import 'dart:convert';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
+import 'package:workout_timer/pages/savedAccesspage.dart';
 import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/GenericFunctions.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/animIcon/gradientIcon.dart';
-import 'package:workout_timer/services/timeValueHandler.dart';
 import 'package:workout_timer/services/myTextField.dart';
+import 'package:workout_timer/services/timeValueHandler.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -18,7 +21,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
   AnimationController playGradientControl;
-  Animation<Color> colAnim1,colAnim2;
+  Animation<Color> colAnim1, colAnim2;
   ValueNotifier<String> _titleName = ValueNotifier<String>('Timer');
   TextEditingController dialogController = TextEditingController();
   double _opacity = 0;
@@ -26,14 +29,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
-  // List<String> savedList = [];
-  // SharedPref savedData = SharedPref();
-  // TimeClass periodTime, breakTime;
+  List<String> savedList = List<String>();
+  SharedPref savedData = SharedPref();
 
   @override
   void initState() {
     super.initState();
-    for(String controllerName in controller.keys){
+    for (String controllerName in controller.keys) {
       initListenerMaker(controllerName);
     }
     playGradientControl = AnimationController(
@@ -113,22 +115,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       controller[_controllerName].text = v;
     });
   }
-  //
-  // loadSharedPrefs() async {
-  //   try {
-  //     savedList = await savedData.read("user");
-  //   } catch (Excepetion) {
-  //     Scaffold.of(context).showSnackBar(SnackBar(
-  //         content: new Text("Nothing found!"),
-  //         duration: const Duration(milliseconds: 500)));
-  //   }
-  // }
 
   double adjusted(double val) => val*screenWidth*perPixel;
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -248,11 +236,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   child: Column(
                     children: [
                       Container(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'TIME / SET',
-                          style: kTextStyle,
-                        )
+                          alignment: Alignment.center,
+                          child: Text(
+                            'TIME / SET',
+                            style: kTextStyle,
+                          )
                       ),
                       Container(
                         margin:EdgeInsets.only(top: 10),
@@ -280,13 +268,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ),
                             ),
                             Container(
-                              child:Text(
-                                ':',
-                                style: kTextStyle.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25
-                                ),
-                              )
+                                child:Text(
+                                  ':',
+                                  style: kTextStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25
+                                  ),
+                                )
                             ),
                             Container(
                               width:40,
@@ -350,26 +338,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ),
                             ),
                             Container(
-                                child:Text(
-                                  ':',
-                                  style: kTextStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25
-                                  ),
+                              child:Text(
+                                ':',
+                                style: kTextStyle.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25
                                 ),
+                              ),
                             ),
                             Container(
-                              width:40,
-                              alignment: Alignment.center,
-                              child: myTextField(
-                                controllerName: 'breakSec',
-                                func: (val) {
-                                  setState(() {
-                                    retain['breakSec'] = val;
-                                    controller['breakSec'].text = val;
-                                  });
-                                },
-                              )
+                                width:40,
+                                alignment: Alignment.center,
+                                child: myTextField(
+                                  controllerName: 'breakSec',
+                                  func: (val) {
+                                    setState(() {
+                                      retain['breakSec'] = val;
+                                      controller['breakSec'].text = val;
+                                    });
+                                  },
+                                )
                             ),
                             NeuButton(
                               ico: Icon(Icons.add_rounded,size: 30,color: textColor,),
@@ -439,9 +427,33 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       Hero(
                         tag: 'leftButton',
                         child: NeuButton(
-                          ico: Icon(Icons.bookmark_border_rounded,size: 30,color: textColor,),
-                          onPress: (() {
-                            addRemove(true,'sets');
+                          ico: Icon(
+                            Icons.bookmark_border_rounded,
+                            size: 30,
+                            color: textColor,
+                          ),
+                          onPress: (() async {
+                            await Navigator.push(
+                                context,
+                                PageRouteBuilder(
+                                    transitionDuration:
+                                        Duration(milliseconds: 700),
+                                    reverseTransitionDuration:
+                                        Duration(milliseconds: 250),
+                                    transitionsBuilder: (BuildContext context,
+                                        Animation<double> animation,
+                                        Animation<double> secAnimation,
+                                        Widget child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                    pageBuilder: (BuildContext context,
+                                        Animation<double> animation,
+                                        Animation<double> secAnimation) {
+                                      return savedPage();
+                                    }));
                           }),
                         ),
                       ),
@@ -453,11 +465,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               icon:Icons.play_arrow_rounded,
                               size: 55,
                               gradient: RadialGradient(
-                                colors: <Color>[
-                                  colAnim1.value,
-                                  colAnim2.value,
-                                ],
-                                focal: Alignment.center
+                                  colors: <Color>[
+                                    colAnim1.value,
+                                    colAnim2.value,
+                                  ],
+                                  focal: Alignment.center
                               ),
                             ),
                             length: screenWidth/4.6,
@@ -467,25 +479,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               if(controller['periodSec'] == ''){
                                 controller['periodSec'] = '30';
                               }
-                              if(controller['periodMin'] == ''){
+                              if (controller['periodMin'] == '') {
                                 controller['periodMin'] = '0';
                               }
-                              if(controller['periodSec'] == ''){
+                              if (controller['periodSec'] == '') {
                                 controller['periodSec'] = '30';
                               }
-                              if(controller['breakMin'] == ''){
+                              if (controller['breakMin'] == '') {
                                 controller['breakMin'] = '0';
                               }
-                              if(controller['sets'] == ''){
-                                controller['breakMin'] = '3';
+                              if (controller['breakSec'] == '') {
+                                controller['breakSec'] = '30';
+                              }
+                              if (controller['sets'] == '') {
+                                controller['sets'] = '3';
                               }
                               final periodTime = TimeClass(
                                 name: 'Workout',
-                                sec: int.parse(controller['periodMin'].text)*60 + int.parse(controller['periodSec'].text),
+                                sec: int.parse(controller['periodMin'].text) *
+                                    60 +
+                                    int.parse(controller['periodSec'].text),
                               );
                               final breakTime = TimeClass(
                                 name: 'Break',
-                                sec: int.parse(controller['breakMin'].text)*60 + int.parse(controller['breakSec'].text),
+                                sec: int.parse(controller['breakMin'].text) *
+                                    60 + int.parse(controller['breakSec'].text),
                               );
                               await Navigator.push(context, PageRouteBuilder(
                                   transitionDuration: Duration(milliseconds:700),
@@ -513,8 +531,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         child: NeuButton(
                           ico: Icon(Icons.save_outlined,size: 30,color: textColor,),
                           onPress: (() async {
-                                //await createDialog(context);
-                              }),
+                            await createDialog(context);
+                            if (controller['periodSec'] == '') {
+                              controller['periodSec'] = '30';
+                            }
+                            if (controller['periodMin'] == '') {
+                              controller['periodMin'] = '0';
+                            }
+                            if (controller['periodSec'] == '') {
+                              controller['periodSec'] = '30';
+                            }
+                            if (controller['breakMin'] == '') {
+                              controller['breakMin'] = '0';
+                            }
+                            if (controller['breakSec'] == '') {
+                              controller['breakSec'] = '30';
+                            }
+                            if (controller['sets'] == '') {
+                              controller['sets'] = '3';
+                            }
+                            savedList = await savedData.read();
+                            print('old data $savedList');
+                            SavedWorkout _data = SavedWorkout(
+                              name: dialogController.text,
+                              pSec: int.parse(controller['periodSec'].text),
+                              pMin: int.parse(controller['periodMin'].text),
+                              bSec: int.parse(controller['breakSec'].text),
+                              bMin: int.parse(controller['breakMin'].text),
+                              setsCount: int.parse(controller['sets'].text),
+                            );
+                            print('Encoded ${jsonEncode(_data.toMap())}');
+                            savedList.add(jsonEncode(_data.toMap()));
+                            print('new data $savedList');
+                            await savedData.save(savedList);
+                          }),
                         ),
                       ),
                     ],
@@ -582,43 +632,43 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
           ),
           content: AnimatedBuilder(
-            animation: playGradientControl,
-            builder: (BuildContext context, Widget child) {
-              return Container(
-                height: 150,
-                alignment: Alignment.center,
-                padding: EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                  colors: <Color>[
-                    colAnim1.value,
-                    colAnim2.value,
-                  ],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(color: shadowColor, offset: Offset(8, 6), blurRadius: 12),
-                  BoxShadow(
-                    color: lightShadowColor,
-                    offset: Offset(-8, -6),
-                    blurRadius: 12),
-                  ],
-                ),
-                child: TextField(
-                  controller: dialogController,
-                  style: kTextStyle.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 40,
-                    color: Colors.white,
+              animation: playGradientControl,
+              builder: (BuildContext context, Widget child) {
+                return Container(
+                  height: 150,
+                  alignment: Alignment.center,
+                  padding: EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: <Color>[
+                        colAnim1.value,
+                        colAnim2.value,
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(color: shadowColor, offset: Offset(8, 6), blurRadius: 12),
+                      BoxShadow(
+                          color: lightShadowColor,
+                          offset: Offset(-8, -6),
+                          blurRadius: 12),
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                  decoration: kInputDecor,
-                  cursorColor: Colors.grey,
-                ),
-              );
-            }
+                  child: TextField(
+                    controller: dialogController,
+                    style: kTextStyle.copyWith(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 40,
+                      color: Colors.white,
+                    ),
+                    textAlign: TextAlign.center,
+                    decoration: kInputDecor,
+                    cursorColor: Colors.grey,
+                  ),
+                );
+              }
           ),
           actions: [
             Center(
