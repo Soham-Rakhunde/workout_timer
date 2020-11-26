@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
+ValueNotifier<int> indexOfMenu =
+    ValueNotifier<int>(0); //Timer,Stats,Donate,About,Rate
 Map retain = {
-  'sets' : '-1',
-  'breakMin' : '-1',
-  'breakSec' : '-1',
-  'periodMin' : '-1',
-  'periodSec' : '-1'
+  'sets': '-1',
+  'breakMin': '-1',
+  'breakSec': '-1',
+  'periodMin': '-1',
+  'periodSec': '-1'
 };
 Map controller = {
   'sets': TextEditingController(text: '3'),
-  'breakSec' : TextEditingController(text: '30'),
+  'breakSec': TextEditingController(text: '30'),
   'breakMin': TextEditingController(text: '30'),
   'periodSec': TextEditingController(text: '30'),
   'periodMin': TextEditingController(text: '30'),
@@ -47,3 +49,16 @@ const redGradient = [
   Color.fromRGBO(254, 154, 92, 1),
   Color.fromRGBO(255, 93, 91, 1),
 ];
+
+List<List<Color>> gradientList = [
+  sunset,
+  sea,
+  mango,
+  sky,
+  fire,
+];
+List<Color> sky = [Color(0xFF6448FE), Color(0xFF5FC6FF)];
+List<Color> sunset = [Color(0xFFFE6197), Color(0xFFFFB463)];
+List<Color> sea = [Color(0xFF61A3FE), Color(0xFF63FFD5)];
+List<Color> mango = [Color(0xFFFFA738), Color(0xFFFFE130)];
+List<Color> fire = [Color(0xFFFF5DCD), Color(0xFFFF8484)];
