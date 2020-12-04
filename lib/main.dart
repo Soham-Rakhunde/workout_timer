@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:workout_timer/constants.dart';
+import 'package:workout_timer/pages/DonatePage.dart';
 import 'package:workout_timer/pages/aboutPage.dart';
 import 'package:workout_timer/pages/drawerPage.dart';
 import 'package:workout_timer/pages/homepage.dart';
+import 'package:workout_timer/pages/settingsPage.dart';
+import 'package:workout_timer/pages/statisticsPage.dart';
 import 'package:workout_timer/pages/timerpage.dart';
 
 bool isDrawerOpen = false;
 bool isHomeOpen = true;
 bool isAboutOpen = false;
+bool isStatsOpen = false;
+bool isDonateOpen = false;
+bool isSettingsOpen = false;
 const perPixel = 0.0025641025641026;
 
 void main() {
@@ -121,10 +127,11 @@ class _mainPageState extends State<mainPage>
                 index: indexOfMenu.value,
                 children: [
                   HomePage(),
-                  Container(color: Colors.red,),
-                  Container(color: Colors.blue,),
+                  StatisticsPage(),
+                  DonatePage(),
                   AboutPage(),
                   Container(color: Colors.green,),
+                  SettingsPage(),
                 ],
               );
             },

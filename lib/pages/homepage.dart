@@ -145,30 +145,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         curve: Curves.easeInOutQuart,
         transform: Matrix4.translationValues(xOffset, yOffset, 100)
           ..scale(scaleFactor),
-        height: MediaQuery
-            .of(context)
-            .size
-            .height,
-        width: MediaQuery
-            .of(context)
-            .size
-            .width,
+        height: MediaQuery.of(context).size.height,
+        width: double.infinity,
         onEnd: (() {
           if (isHomeOpen && indexOfMenu.value == 0) {
             print('3animhome');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
               statusBarColor: isHomeOpen ? backgroundColor : drawerColor,
-              statusBarIconBrightness: isHomeOpen ? Brightness.dark : Brightness
-                  .light,
-              systemNavigationBarColor: isHomeOpen
-                  ? backgroundColor
-                  : drawerColor,
-              systemNavigationBarIconBrightness: isHomeOpen
-                  ? Brightness.dark
-                  : Brightness.light,
-              systemNavigationBarDividerColor: isHomeOpen
-                  ? backgroundColor
-                  : drawerColor,
+              statusBarIconBrightness:
+                  isHomeOpen ? Brightness.dark : Brightness.light,
+              systemNavigationBarColor:
+                  isHomeOpen ? backgroundColor : drawerColor,
+              systemNavigationBarIconBrightness:
+                  isHomeOpen ? Brightness.dark : Brightness.light,
+              systemNavigationBarDividerColor:
+                  isHomeOpen ? backgroundColor : drawerColor,
             ));
           }
         }),
@@ -199,9 +190,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               });
             }
           }),
-          child: Scaffold(
+          child:
+          Scaffold(
             backgroundColor: backgroundColor,
-            body: AnimatedOpacity(
+            body:
+            AnimatedOpacity(
               duration: Duration(milliseconds: 200),
               opacity: _opacity,
               child: Column(
