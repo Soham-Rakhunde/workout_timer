@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 
+//particles: 10,
+//   foregroundColor: Color(0xff59ab5b),
+//   backgroundColor: Color(0xff0a5a55),
+//   size: 0.62,
+//   speed: 7.69,
+//   offset: 0.37,
+//   blendMode: BlendMode.plus,
 ValueNotifier<int> indexOfMenu =
     ValueNotifier<int>(0); //Timer,Stats,Donate,About,Rate
 Map retain = {
@@ -62,3 +69,13 @@ List<Color> sunset = [Color(0xFFFE6197), Color(0xFFFFB463)];
 List<Color> sea = [Color(0xFF61A3FE), Color(0xFF63FFD5)];
 List<Color> mango = [Color(0xFFFFA738), Color(0xFFFFE130)];
 List<Color> fire = [Color(0xFFFF5DCD), Color(0xFFFF8484)];
+final List<String> voiceModels = [
+  'Amy',
+  'Brian',
+  'Emma',
+  'Joanna',
+  'Joey',
+  'Matthew',
+  'Olivia',
+  'Salli'
+];

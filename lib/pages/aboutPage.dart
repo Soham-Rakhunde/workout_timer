@@ -59,7 +59,7 @@ class _AboutPageState extends State<AboutPage>
         return child;
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 450),
         curve: Curves.easeInOutQuart,
         transform: Matrix4.translationValues(xOffset, yOffset, 100)
           ..scale(scaleFactor),
@@ -69,15 +69,15 @@ class _AboutPageState extends State<AboutPage>
           if (isAboutOpen && indexOfMenu.value == 3) {
             print('5animabout');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: isAboutOpen ? backgroundColor : drawerColor,
+              statusBarColor: Colors.transparent,
               statusBarIconBrightness:
-              isAboutOpen ? Brightness.dark : Brightness.light,
+                  isAboutOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
-              isAboutOpen ? backgroundColor : drawerColor,
+                  isAboutOpen ? backgroundColor : drawerColor,
               systemNavigationBarIconBrightness:
-              isAboutOpen ? Brightness.dark : Brightness.light,
+                  isAboutOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarDividerColor:
-              isAboutOpen ? backgroundColor : drawerColor,
+                  isAboutOpen ? backgroundColor : drawerColor,
             ));
           }
         }),
@@ -149,9 +149,7 @@ class _AboutPageState extends State<AboutPage>
                               isAboutOpen = false;
                               SystemChrome.setSystemUIOverlayStyle(
                                   SystemUiOverlayStyle(
-                                    statusBarColor: isAboutOpen
-                                        ? backgroundColor
-                                        : drawerColor,
+                                    statusBarColor: Colors.transparent,
                                     statusBarIconBrightness:
                                     isAboutOpen ? Brightness.dark : Brightness
                                         .light,
@@ -187,7 +185,27 @@ class _AboutPageState extends State<AboutPage>
                       ],
                     ),
                   ),
-
+                  Padding(
+                    padding: const EdgeInsets.only(top: 40, bottom: 5),
+                    child: Text(
+                      'Developed by',
+                      style: kTextStyle.copyWith(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 15),
+                    child: Text(
+                      'Soham Rakhunde',
+                      style: kTextStyle.copyWith(),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20, bottom: 5),
+                    child: Text(
+                      'Version 1.0',
+                      style: kTextStyle.copyWith(),
+                    ),
+                  ),
                 ],
               ),
             ),

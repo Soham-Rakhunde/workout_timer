@@ -42,7 +42,7 @@ class _StatisticsPageState extends State<StatisticsPage> {
             isDrawerOpen = true;
             isStatsOpen = false;
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: isStatsOpen ? backgroundColor : drawerColor,
+              statusBarColor: Colors.transparent,
               statusBarIconBrightness:
                   isStatsOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
@@ -57,24 +57,30 @@ class _StatisticsPageState extends State<StatisticsPage> {
         return false;
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 450),
         curve: Curves.easeInOutQuart,
         transform: Matrix4.translationValues(xOffset, yOffset, 100)
           ..scale(scaleFactor),
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
+        width: MediaQuery
+            .of(context)
+            .size
+            .width,
         onEnd: (() {
           if (isStatsOpen && indexOfMenu.value == 1) {
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: isStatsOpen ? backgroundColor : drawerColor,
+              statusBarColor: Colors.transparent,
               statusBarIconBrightness:
-                  isStatsOpen ? Brightness.dark : Brightness.light,
+              isStatsOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
-                  isStatsOpen ? backgroundColor : drawerColor,
+              isStatsOpen ? backgroundColor : drawerColor,
               systemNavigationBarIconBrightness:
-                  isStatsOpen ? Brightness.dark : Brightness.light,
+              isStatsOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarDividerColor:
-                  isStatsOpen ? backgroundColor : drawerColor,
+              isStatsOpen ? backgroundColor : drawerColor,
             ));
           }
         }),

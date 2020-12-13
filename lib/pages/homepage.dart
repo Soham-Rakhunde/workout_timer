@@ -64,7 +64,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       }
     });
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: isHomeOpen ? backgroundColor : drawerColor,
+      statusBarColor: Colors.transparent,
+      // isHomeOpen
+      //     ? backgroundColor
+      //     : drawerColor,
       statusBarIconBrightness: isHomeOpen ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: isHomeOpen ? backgroundColor : drawerColor,
       systemNavigationBarIconBrightness:
@@ -141,25 +144,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       },
       child: AnimatedContainer(
         padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 450),
         curve: Curves.easeInOutQuart,
         transform: Matrix4.translationValues(xOffset, yOffset, 100)
           ..scale(scaleFactor),
-        height: MediaQuery.of(context).size.height,
+        height: MediaQuery
+            .of(context)
+            .size
+            .height,
         width: double.infinity,
         onEnd: (() {
           if (isHomeOpen && indexOfMenu.value == 0) {
             print('3animhome');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: isHomeOpen ? backgroundColor : drawerColor,
+              statusBarColor: Colors.transparent,
+              // isHomeOpen
+              //     ? backgroundColor
+              //     : drawerColor,
               statusBarIconBrightness:
-                  isHomeOpen ? Brightness.dark : Brightness.light,
+              isHomeOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
-                  isHomeOpen ? backgroundColor : drawerColor,
+              isHomeOpen ? backgroundColor : drawerColor,
               systemNavigationBarIconBrightness:
-                  isHomeOpen ? Brightness.dark : Brightness.light,
+              isHomeOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarDividerColor:
-                  isHomeOpen ? backgroundColor : drawerColor,
+              isHomeOpen ? backgroundColor : drawerColor,
             ));
           }
         }),
@@ -236,9 +245,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               print('4opthome');
                               SystemChrome.setSystemUIOverlayStyle(
                                   SystemUiOverlayStyle(
-                                    statusBarColor: isHomeOpen
-                                        ? backgroundColor
-                                        : drawerColor,
+                                    statusBarColor: Colors.transparent,
+                                    // isHomeOpen
+                                    //     ? backgroundColor
+                                    //     : drawerColor,
                                     statusBarIconBrightness: isHomeOpen
                                         ? Brightness.dark
                                         : Brightness.light,

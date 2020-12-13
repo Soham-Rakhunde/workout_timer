@@ -55,7 +55,7 @@ class _DonatePageState extends State<DonatePage>
         return child;
       },
       child: AnimatedContainer(
-        duration: Duration(milliseconds: 200),
+        duration: Duration(milliseconds: 450),
         curve: Curves.easeInOutQuart,
         transform: Matrix4.translationValues(xOffset, yOffset, 100)
           ..scale(scaleFactor),
@@ -65,7 +65,7 @@ class _DonatePageState extends State<DonatePage>
           if (isDonateOpen && indexOfMenu.value == 2) {
             print('5animabout');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: isDonateOpen ? backgroundColor : drawerColor,
+              statusBarColor: Colors.transparent,
               statusBarIconBrightness:
                   isDonateOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
@@ -149,23 +149,21 @@ class _DonatePageState extends State<DonatePage>
                                 isDonateOpen = false;
                                 SystemChrome.setSystemUIOverlayStyle(
                                     SystemUiOverlayStyle(
-                                  statusBarColor: isDonateOpen
-                                      ? backgroundColor
-                                      : drawerColor,
-                                  statusBarIconBrightness: isDonateOpen
-                                      ? Brightness.dark
-                                      : Brightness.light,
-                                  systemNavigationBarColor: isDonateOpen
-                                      ? backgroundColor
-                                      : drawerColor,
-                                  systemNavigationBarIconBrightness:
+                                      statusBarColor: Colors.transparent,
+                                      statusBarIconBrightness: isDonateOpen
+                                          ? Brightness.dark
+                                          : Brightness.light,
+                                      systemNavigationBarColor: isDonateOpen
+                                          ? backgroundColor
+                                          : drawerColor,
+                                      systemNavigationBarIconBrightness:
                                       isDonateOpen
                                           ? Brightness.dark
                                           : Brightness.light,
-                                  systemNavigationBarDividerColor: isDonateOpen
-                                      ? backgroundColor
-                                      : drawerColor,
-                                ));
+                                      systemNavigationBarDividerColor: isDonateOpen
+                                          ? backgroundColor
+                                          : drawerColor,
+                                    ));
                               });
                             }),
                           ),

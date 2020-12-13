@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:simple_animations/simple_animations.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/DonatePage.dart';
 import 'package:workout_timer/pages/aboutPage.dart';
@@ -20,7 +21,10 @@ const perPixel = 0.0025641025641026;
 void main() {
   Future.delayed(Duration(milliseconds: 1)).then(
       (value) => SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-            statusBarColor: Color(0xFFF1F2F6),
+            statusBarColor: Colors.transparent,
+            // isHomeOpen
+            //     ? backgroundColor
+            //     : drawerColor,
             statusBarIconBrightness: Brightness.dark,
             systemNavigationBarColor: Color(0xFFF1F2F6),
             systemNavigationBarIconBrightness: Brightness.dark,
@@ -130,7 +134,19 @@ class _mainPageState extends State<mainPage>
                   StatisticsPage(),
                   DonatePage(),
                   AboutPage(),
-                  Container(color: Colors.green,),
+                  Plasma(
+                    particles: 10,
+                    foregroundColor: Color(0x38e0fe06),
+                    backgroundColor: Color(0xff1e6d5e),
+                    size: 0.67,
+                    speed: 4.03,
+                    offset: 0.00,
+                    blendMode: BlendMode.plus,
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                    ), // your UI here
+                  ),
                   SettingsPage(),
                 ],
               );

@@ -46,6 +46,27 @@ class SharedPref {
     }
   }
 
+  Future<String> readString(String str) async {
+    //Voice
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getString(str) == null) {
+      return 'amy';
+    } else {
+      return prefs.getString(str);
+    }
+  }
+
+  Future<bool> readBool(String str) async {
+    //isVoice
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getBool(str) == null) {
+      return true;
+    } else {
+      print('$str   ${prefs.getBool(str)}');
+      return prefs.getBool(str);
+    }
+  }
+
   reset(String key, List value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setStringList("List", []);
@@ -56,6 +77,17 @@ class SharedPref {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("List", value);
     // prefs.setString(key, json.encode(value));
+  }
+
+  saveString(String prefName, String val) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString(prefName, val);
+    print('$prefName   $val');
+  }
+
+  saveBool(String prefName, bool val) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setBool(prefName, val);
   }
 
   remove(String key) async {
