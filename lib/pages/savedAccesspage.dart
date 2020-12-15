@@ -264,13 +264,15 @@ class _savedPageState extends State<savedPage> {
                               borderRadius: BorderRadius.circular(25),
                               boxShadow: [
                                 BoxShadow(
-                                    color: shadowColor,
+                                    color: gradientList[index % 5][1]
+                                        .withOpacity(0.22),
                                     offset: Offset(8, 6),
-                                    blurRadius: 12),
+                                    blurRadius: 15),
                                 BoxShadow(
-                                    color: lightShadowColor,
+                                    color: gradientList[index % 5][0]
+                                        .withOpacity(0.22),
                                     offset: Offset(-8, -6),
-                                    blurRadius: 12),
+                                    blurRadius: 15),
                               ],
                             ),
                           ),

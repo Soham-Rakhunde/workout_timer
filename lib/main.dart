@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:simple_animations/simple_animations.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/DonatePage.dart';
 import 'package:workout_timer/pages/aboutPage.dart';
@@ -80,9 +79,14 @@ class _mainPageState extends State<mainPage>
     );
   }
 
+  double screenWidth;
+
+  double adjusted(double val) => val * screenWidth * perPixel;
+
   @override
   Widget build(BuildContext context) {
     print('1main');
+    screenWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       backgroundColor: drawerColor,
       body: Stack(
@@ -92,10 +96,7 @@ class _mainPageState extends State<mainPage>
             left: 200,
             top: 180,
             child: Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * .6,
+                height: MediaQuery.of(context).size.height * .6,
                 width: MediaQuery
                     .of(context)
                     .size
@@ -126,7 +127,6 @@ class _mainPageState extends State<mainPage>
           ValueListenableBuilder<int>(
             valueListenable: indexOfMenu,
             builder: (context, value, _) {
-              print('2stackmain');
               return IndexedStack(
                 index: indexOfMenu.value,
                 children: [
@@ -134,19 +134,6 @@ class _mainPageState extends State<mainPage>
                   StatisticsPage(),
                   DonatePage(),
                   AboutPage(),
-                  Plasma(
-                    particles: 10,
-                    foregroundColor: Color(0x38e0fe06),
-                    backgroundColor: Color(0xff1e6d5e),
-                    size: 0.67,
-                    speed: 4.03,
-                    offset: 0.00,
-                    blendMode: BlendMode.plus,
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                    ), // your UI here
-                  ),
                   SettingsPage(),
                 ],
               );

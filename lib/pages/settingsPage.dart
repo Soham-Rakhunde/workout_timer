@@ -76,18 +76,18 @@ class _SettingsPageState extends State<SettingsPage>
             .size
             .width,
         onEnd: (() {
-          if (isSettingsOpen && indexOfMenu.value == 5) {
+          if (isSettingsOpen && indexOfMenu.value == 4) {
             print('5animabout');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
               statusBarIconBrightness:
-              isSettingsOpen ? Brightness.dark : Brightness.light,
+                  isSettingsOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor:
-              isSettingsOpen ? backgroundColor : drawerColor,
+                  isSettingsOpen ? backgroundColor : drawerColor,
               systemNavigationBarIconBrightness:
-              isSettingsOpen ? Brightness.dark : Brightness.light,
+                  isSettingsOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarDividerColor:
-              isSettingsOpen ? backgroundColor : drawerColor,
+                  isSettingsOpen ? backgroundColor : drawerColor,
             ));
           }
         }),
@@ -97,7 +97,7 @@ class _SettingsPageState extends State<SettingsPage>
         ),
         child: GestureDetector(
           onTap: (() {
-            if (!isSettingsOpen && indexOfMenu.value == 5) {
+            if (!isSettingsOpen && indexOfMenu.value == 4) {
               setState(() {
                 xOffset = 0;
                 yOffset = 0;
@@ -108,7 +108,7 @@ class _SettingsPageState extends State<SettingsPage>
             }
           }),
           onHorizontalDragEnd: ((_) {
-            if (!isSettingsOpen && indexOfMenu.value == 5) {
+            if (!isSettingsOpen && indexOfMenu.value == 4) {
               setState(() {
                 xOffset = 0;
                 yOffset = 0;
@@ -548,7 +548,7 @@ class _SettingsPageState extends State<SettingsPage>
                             ),
                             Center(
                               child: Padding(
-                                padding: const EdgeInsets.all(40),
+                                padding: const EdgeInsets.only(bottom: 30),
                                 child: Text(
                                   'Coming Soon!',
                                   style: TextStyle(

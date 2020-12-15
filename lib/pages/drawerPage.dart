@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:store_redirect/store_redirect.dart';
 import 'package:workout_timer/main.dart';
 
 import '../constants.dart';
@@ -233,8 +234,7 @@ class _drawerPageState extends State<drawerPage> {
                             GestureDetector(
                               onTap: (() {
                                 setState(() {
-                                  indexOfMenu.value = 4;
-                                  print('${indexOfMenu.value}');
+                                  StoreRedirect.redirect();
                                 });
                               }),
                               child: Row(
@@ -243,16 +243,14 @@ class _drawerPageState extends State<drawerPage> {
                                   Icon(
                                     Icons.star_border_rounded,
                                     size: 25,
-                                    color: Colors.teal[
-                                        indexOfMenu.value == 4 ? 200 : 500],
+                                    color: Colors.teal[500],
                                   ),
                                   SizedBox(width: 15),
                                   Text(
                                     'Rate',
                                     style: TextStyle(
                                       fontFamily: 'MontserratBold',
-                                      color: Colors.teal[
-                                          indexOfMenu.value == 4 ? 200 : 500],
+                                      color: Colors.teal[500],
                                       letterSpacing: 1.5,
                                       fontSize: 22,
                                       fontWeight: FontWeight.w900,
@@ -270,7 +268,7 @@ class _drawerPageState extends State<drawerPage> {
                       GestureDetector(
                         onTap: (() {
                           setState(() {
-                            indexOfMenu.value = 5;
+                            indexOfMenu.value = 4;
                           });
                           print('${indexOfMenu.value}');
                         }),
@@ -284,7 +282,7 @@ class _drawerPageState extends State<drawerPage> {
                                   Icons.settings,
                                   size: 23,
                                   color: Colors
-                                      .teal[indexOfMenu.value == 5 ? 200 : 500],
+                                      .teal[indexOfMenu.value == 4 ? 200 : 500],
                                 ),
                                 SizedBox(
                                   width: 10,
@@ -294,7 +292,7 @@ class _drawerPageState extends State<drawerPage> {
                                   style: TextStyle(
                                     fontFamily: 'MontserratBold',
                                     color: Colors.teal[
-                                        indexOfMenu.value == 5 ? 200 : 500],
+                                        indexOfMenu.value == 4 ? 200 : 500],
                                     letterSpacing: 1.5,
                                     fontSize: 22,
                                     fontWeight: FontWeight.bold,
