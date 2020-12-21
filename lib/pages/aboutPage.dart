@@ -1,5 +1,6 @@
 import 'dart:ui';
 
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -23,15 +24,13 @@ class _AboutPageState extends State<AboutPage>
   double scaleFactor = 1;
   AnimationController playGradientControl;
   Animation<Color> colAnim1, colAnim2;
-  final Uri _emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'soham.rakhunde.com',
-      queryParameters: {'subject': 'Bug_Report'});
+  double logoAnim = 0;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    BackButtonInterceptor.add(myInterceptor);
     setState(() {
       xOffset = 250;
       yOffset = 140;
@@ -54,11 +53,52 @@ class _AboutPageState extends State<AboutPage>
     ).animate(playGradientControl);
   }
 
+  @override
+  void dispose() {
+    BackButtonInterceptor.remove(myInterceptor);
+    super.dispose();
+  }
+
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    if (isAboutOpen) {
+      setState(() {
+        xOffset = adjusted(250);
+        yOffset = adjusted(140);
+        scaleFactor = 0.7;
+        isDrawerOpen = true;
+        isAboutOpen = false;
+        SystemChrome.setSystemUIOverlayStyle(
+            SystemUiOverlayStyle(
+              statusBarColor: Colors.transparent,
+              statusBarIconBrightness: isAboutOpen
+                  ? Brightness.dark
+                  : Brightness.light,
+              systemNavigationBarColor: isAboutOpen
+                  ? backgroundColor
+                  : drawerColor,
+              systemNavigationBarIconBrightness: isAboutOpen
+                  ? Brightness.dark
+                  : Brightness.light,
+              systemNavigationBarDividerColor: isAboutOpen
+                  ? backgroundColor
+                  : drawerColor,
+            ));
+      });
+      return true;
+    }
+    else
+      return false;
+  }
+
+
   double adjusted(double val) => val * screenWidth * perPixel;
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;
+    screenWidth = MediaQuery
+        .of(context)
+        .size
+        .width;
     print('In the page');
     return ValueListenableBuilder(
       valueListenable: indexOfMenu,
@@ -115,14 +155,14 @@ class _AboutPageState extends State<AboutPage>
               });
             }
           }),
-          child: WillPopScope(
-            onWillPop: () async => false,
+          child: AbsorbPointer(
+            absorbing: !isAboutOpen,
             child: Container(
               height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
                 color: backgroundColor,
-                borderRadius: BorderRadius.circular(isStatsOpen ? 0 : 28),
+                borderRadius: BorderRadius.circular(isAboutOpen ? 0 : 28),
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -131,7 +171,6 @@ class _AboutPageState extends State<AboutPage>
                   Expanded(
                     flex: 13,
                     child: Container(
-                      padding: EdgeInsets.only(top: 50, bottom: 50),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -183,22 +222,40 @@ class _AboutPageState extends State<AboutPage>
                       ),
                     ),
                   ),
-                  Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(100),
-                      boxShadow: [
-                        BoxShadow(
-                            color: shadowColor,
-                            offset: Offset(8, 6),
-                            blurRadius: 12),
-                        BoxShadow(
-                            color: lightShadowColor,
-                            offset: Offset(-8, -6),
-                            blurRadius: 12),
-                      ],
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        logoAnim = 30;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      curve: Curves.elasticIn,
+                      onEnd: () {
+                        setState(() {
+                          logoAnim = 0;
+                        });
+                      },
+                      width: 250 + logoAnim,
+                      height: 250 + logoAnim,
+                      decoration: BoxDecoration(
+                        color: backgroundColor,
+                        borderRadius: BorderRadius.circular(150 + logoAnim / 2),
+                        boxShadow: [
+                          BoxShadow(
+                              color: shadowColor,
+                              offset: Offset(8, 6),
+                              blurRadius: 12),
+                          BoxShadow(
+                              color: lightShadowColor,
+                              offset: Offset(-8, -6),
+                              blurRadius: 12),
+                        ],
+                      ),
+                      duration: Duration(milliseconds: 600),
+                      child: ClipOval(
+                        child: Image.asset('assets/logoblender.png',
+                        ),
+                      ),
                     ),
                   ),
                   Padding(
@@ -304,10 +361,12 @@ class _AboutPageState extends State<AboutPage>
                         ),
                         GestureDetector(
                           onTap: (() async {
-                            if (await canLaunch(_emailLaunchUri.toString())) {
-                              await launch(_emailLaunchUri.toString());
+                            if (await canLaunch(
+                                'https://github.com/Soham-Rakhunde/workout_timer')) {
+                              await launch(
+                                  'https://github.com/Soham-Rakhunde/workout_timer');
                             } else {
-                              throw 'Could not launch $_emailLaunchUri.toString())';
+                              throw 'Could not launch https://github.com/Soham-Rakhunde/workout_timer}';
                             }
                           }),
                           child: Container(
@@ -334,8 +393,8 @@ class _AboutPageState extends State<AboutPage>
                             ),
                             child: Center(
                               child: FaIcon(
-                                FontAwesomeIcons.bug,
-                                size: 25,
+                                FontAwesomeIcons.github,
+                                size: 30,
                                 color: textColor,
                               ),
                             ),
@@ -350,7 +409,15 @@ class _AboutPageState extends State<AboutPage>
                   ),
                   Expanded(
                     flex: 6,
-                    child: Container(
+                    child: GestureDetector(
+                      onTap: (() {
+                        showLicensePage(
+                          context: context,
+                          applicationName: 'Workout Timer',
+                          applicationVersion: '1.0.0',
+                        );
+                      }),
+                      child: Container(
                         width:
                         MediaQuery
                             .of(context)
@@ -372,26 +439,18 @@ class _AboutPageState extends State<AboutPage>
                                 blurRadius: 12),
                           ],
                         ),
-                        child: GestureDetector(
-                          onTap: (() {
-                            showLicensePage(
-                              context: context,
-                              applicationName: 'Workout Timer',
-                              applicationVersion: '1.0.0',
-                            );
-                          }),
-                          child: Center(
-                            child: Text(
-                                'Open Licenses',
-                                style: TextStyle(
-                                  letterSpacing: 2,
-                                  fontFamily: 'MontserratBold',
-                                  fontSize: 20,
-                                  color: textColor,
-                                )
-                            ),
+                        child: Center(
+                          child: Text(
+                              'Open Licenses',
+                              style: TextStyle(
+                                letterSpacing: 2,
+                                fontFamily: 'MontserratBold',
+                                fontSize: 20,
+                                color: textColor,
+                              )
                           ),
-                        )
+                        ),
+                      ),
                     ),
                   ),
                   Expanded(

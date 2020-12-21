@@ -30,6 +30,7 @@ const kTextStyle =  TextStyle(
 const kInputDecor = InputDecoration(
   border: InputBorder.none,
 );
+
 Color backgroundColor = Color(0xFFF1F2F6);
 Color shadowColor = Color(0xFFDADFF9);
 Color lightShadowColor = Colors.white;

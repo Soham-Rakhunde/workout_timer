@@ -200,12 +200,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             }
           }),
           child:
-          Scaffold(
-            backgroundColor: backgroundColor,
-            body:
             AnimatedOpacity(
               duration: Duration(milliseconds: 200),
-              opacity: _opacity,
+            opacity: _opacity,
+            child: AbsorbPointer(
+              absorbing: !isHomeOpen,
               child: Column(
                 // mainAxisAlignment:MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -217,7 +216,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       children: [
                         Container(
                           padding: EdgeInsets.only(left: 27),
-
                           child: ValueListenableBuilder<String>(
                             valueListenable: _titleName,
                             builder: (context, value, child) {
@@ -234,7 +232,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           ),
                         ),
                         NeuButton(
-                          ico: Icon(Icons.menu, size: 30, color: textColor,),
+                          ico: Icon(
+                            Icons.menu,
+                            size: 30,
+                            color: textColor,
+                          ),
                           onPress: (() {
                             setState(() {
                               xOffset = adjusted(250);
@@ -245,23 +247,21 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               print('4opthome');
                               SystemChrome.setSystemUIOverlayStyle(
                                   SystemUiOverlayStyle(
-                                    statusBarColor: Colors.transparent,
-                                    // isHomeOpen
-                                    //     ? backgroundColor
-                                    //     : drawerColor,
-                                    statusBarIconBrightness: isHomeOpen
-                                        ? Brightness.dark
-                                        : Brightness.light,
-                                    systemNavigationBarColor: isHomeOpen
-                                        ? backgroundColor
-                                        : drawerColor,
-                                    systemNavigationBarIconBrightness: isHomeOpen
-                                        ? Brightness.dark
-                                        : Brightness.light,
-                                    systemNavigationBarDividerColor: isHomeOpen
-                                        ? backgroundColor
-                                        : drawerColor,
-                                  ));
+                                statusBarColor: Colors.transparent,
+                                // isHomeOpen
+                                //     ? backgroundColor
+                                //     : drawerColor,
+                                statusBarIconBrightness: isHomeOpen
+                                    ? Brightness.dark
+                                    : Brightness.light,
+                                systemNavigationBarColor:
+                                    isHomeOpen ? backgroundColor : drawerColor,
+                                systemNavigationBarIconBrightness: isHomeOpen
+                                    ? Brightness.dark
+                                    : Brightness.light,
+                                systemNavigationBarDividerColor:
+                                    isHomeOpen ? backgroundColor : drawerColor,
+                              ));
                             });
                           }),
                         ),
@@ -281,8 +281,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             child: Text(
                               'TIME / SET',
                               style: kTextStyle,
-                            )
-                        ),
+                            )),
                         Container(
                           margin: EdgeInsets.only(top: 10),
                           alignment: Alignment.center,
@@ -290,8 +289,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               NeuButton(
-                                ico: Icon(Icons.remove_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.remove_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(false, 'periodSec');
                                 }),
@@ -311,13 +313,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ),
                               Container(
                                   child: Text(
-                                    ':',
-                                    style: kTextStyle.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 25
-                                    ),
-                                  )
-                              ),
+                                ':',
+                                style: kTextStyle.copyWith(
+                                    fontWeight: FontWeight.bold, fontSize: 25),
+                              )),
                               Container(
                                 width: 40,
                                 alignment: Alignment.center,
@@ -332,8 +331,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
                               ),
                               NeuButton(
-                                ico: Icon(Icons.add_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.add_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(true, 'periodSec');
                                 }),
@@ -362,8 +364,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               NeuButton(
-                                ico: Icon(Icons.remove_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.remove_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(false, 'breakSec');
                                 }),
@@ -386,8 +391,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   ':',
                                   style: kTextStyle.copyWith(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 25
-                                  ),
+                                      fontSize: 25),
                                 ),
                               ),
                               Container(
@@ -401,11 +405,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         controller['breakSec'].text = val;
                                       });
                                     },
-                                  )
-                              ),
+                                  )),
                               NeuButton(
-                                ico: Icon(Icons.add_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.add_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(true, 'breakSec');
                                 }),
@@ -434,8 +440,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               NeuButton(
-                                ico: Icon(Icons.remove_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.remove_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(false, 'sets');
                                 }),
@@ -454,8 +463,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 ),
                               ),
                               NeuButton(
-                                ico: Icon(Icons.add_rounded, size: 30,
-                                  color: textColor,),
+                                ico: Icon(
+                                  Icons.add_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() {
                                   addRemove(true, 'sets');
                                 }),
@@ -484,9 +496,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   context,
                                   PageRouteBuilder(
                                       transitionDuration:
-                                      Duration(milliseconds: 700),
+                                          Duration(milliseconds: 700),
                                       reverseTransitionDuration:
-                                      Duration(milliseconds: 250),
+                                          Duration(milliseconds: 250),
                                       transitionsBuilder: (BuildContext context,
                                           Animation<double> animation,
                                           Animation<double> secAnimation,
@@ -511,13 +523,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               ico: GradientIcon(
                                 icon: Icons.play_arrow_rounded,
                                 size: 55,
-                                gradient: RadialGradient(
-                                    colors: <Color>[
-                                      colAnim1.value,
-                                      colAnim2.value,
-                                    ],
-                                    focal: Alignment.center
-                                ),
+                                gradient: RadialGradient(colors: <Color>[
+                                  colAnim1.value,
+                                  colAnim2.value,
+                                ], focal: Alignment.center),
                               ),
                               length: screenWidth / 4.6,
                               breadth: screenWidth / 4.6,
@@ -544,39 +553,44 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 final periodTime = TimeClass(
                                   name: 'Workout',
                                   sec: int.parse(controller['periodMin'].text) *
-                                      60 +
+                                          60 +
                                       int.parse(controller['periodSec'].text),
                                 );
                                 final breakTime = TimeClass(
                                   name: 'Break',
                                   sec: int.parse(controller['breakMin'].text) *
-                                      60 +
+                                          60 +
                                       int.parse(controller['breakSec'].text),
                                 );
-                                await Navigator.push(context, PageRouteBuilder(
-                                    transitionDuration: Duration(
-                                        milliseconds: 700),
-                                    reverseTransitionDuration: Duration(
-                                        milliseconds: 250),
-                                    transitionsBuilder: (BuildContext context,
-                                        Animation<double> animation,
-                                        Animation<double> secAnimation,
-                                        Widget child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    pageBuilder: (BuildContext context,
-                                        Animation<double> animation,
-                                        Animation<double> secAnimation) {
-                                      return TimerPage(args: [
-                                        periodTime,
-                                        breakTime,
-                                        int.parse(controller['sets'].text),
-                                      ],);
-                                    }
-                                ));
+                                await Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                        transitionDuration:
+                                            Duration(milliseconds: 700),
+                                        reverseTransitionDuration:
+                                            Duration(milliseconds: 250),
+                                        transitionsBuilder:
+                                            (BuildContext context,
+                                                Animation<double> animation,
+                                                Animation<double> secAnimation,
+                                                Widget child) {
+                                          return FadeTransition(
+                                            opacity: animation,
+                                            child: child,
+                                          );
+                                        },
+                                        pageBuilder: (BuildContext context,
+                                            Animation<double> animation,
+                                            Animation<double> secAnimation) {
+                                          return TimerPage(
+                                            args: [
+                                              periodTime,
+                                              breakTime,
+                                              int.parse(
+                                                  controller['sets'].text),
+                                            ],
+                                          );
+                                        }));
                               }),
                             );
                           },
@@ -585,7 +599,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           tag: 'rightButton',
                           child: NeuButton(
                             ico: Icon(
-                              Icons.save_outlined, size: 30, color: textColor,),
+                              Icons.save_outlined,
+                              size: 30,
+                              color: textColor,
+                            ),
                             onPress: (() async {
                               await createDialog(context);
                               if (controller['periodSec'] == '') {
@@ -629,7 +646,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 ],
               ),
             ),
-          ),
+            ),
         ),
       ),
     );
