@@ -1,8 +1,8 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
@@ -40,18 +40,20 @@ class _savedPageState extends State<savedPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            margin: EdgeInsets.fromLTRB(30, 80, 30, 5),
-            child: Text(
-              'Saved Workout',
-              style: kTextStyle.copyWith(
-                color: Color(0xFF707070),
-                letterSpacing: 2.0,
-                fontSize: 31,
-                fontWeight: FontWeight.bold,
+          Center(
+            child: Container(
+              margin: EdgeInsets.fromLTRB(0, 65, 0, 5),
+              child: Text(
+                'Saved Workout',
+                style: kTextStyle.copyWith(
+                  color: Color(0xFF707070),
+                  letterSpacing: 2.0,
+                  fontSize: 31,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
+              color: backgroundColor,
             ),
-            color: backgroundColor,
           ),
           Expanded(
             child: FutureBuilder(
@@ -60,29 +62,57 @@ class _savedPageState extends State<savedPage> {
                 if (snapshot.data == null) {
                   return Center(child: Text('Loading'));
                 } else {
-                  return ListView.builder(
-                    itemCount: snapshot.data.length,
-                    physics: BouncingScrollPhysics(),
-                    itemBuilder: (BuildContext context, int index) {
-                      return Dismissible(
-                        background: Container(
-                          padding: EdgeInsets.only(left: 30),
-                          alignment: Alignment.centerLeft,
-                          child: Wrap(direction: Axis.vertical, children: [
-                            RotatedBox(
-                                quarterTurns: 3,
-                                child: Center(
+                  return snapshot.data.length == 0
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Center(
+                                  child: FaIcon(
+                                FontAwesomeIcons.puzzlePiece,
+                                size: 100,
+                                color: Colors.teal,
+                              )),
+                              SizedBox(
+                                height: 40,
+                              ),
+                              Center(
                                   child: Text(
-                                    'Delete',
-                                    style: kTextStyle.copyWith(
-                                      color: textColor,
-                                      fontSize: 25,
-                                    ),
-                                  ),
-                                )),
-                          ]),
-                          // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
-                        ),
+                                'No Data Saved',
+                                style: TextStyle(fontSize: 25),
+                              )),
+                              Center(
+                                  child: Text(
+                                'Save data from homescreen',
+                                style: TextStyle(fontSize: 20),
+                              )),
+                            ],
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: snapshot.data.length,
+                          physics: BouncingScrollPhysics(),
+                          itemBuilder: (BuildContext context, int index) {
+                            return Dismissible(
+                              background: Container(
+                                padding: EdgeInsets.only(left: 30),
+                                alignment: Alignment.centerLeft,
+                                child:
+                                    Wrap(direction: Axis.vertical, children: [
+                                  RotatedBox(
+                                      quarterTurns: 3,
+                                      child: Center(
+                                        child: Text(
+                                          'Delete',
+                                          style: kTextStyle.copyWith(
+                                            color: textColor,
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      )),
+                                ]),
+                                // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
+                              ),
                         direction: DismissDirection.startToEnd,
                         key: UniqueKey(),
                         onDismissed: (direction) async {

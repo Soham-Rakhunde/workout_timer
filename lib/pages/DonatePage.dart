@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/services/colorEllipse.dart';
+// import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class DonatePage extends StatefulWidget {
   @override
@@ -26,15 +27,20 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   double positionOffset = 70;
   final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'soham.rakhunde.com',
+      path: 'soham.s.rakhunde.com',
       queryParameters: {'subject': 'Bug_Report'});
   AnimationController ycontroller;
   Animation<double> yanimation;
+
+  // static const String iapId = 'android.test.purchased';
+  // List<IAPItem> _items = [];
+  // FlutterInappPurchase InappPurchase;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    // initPlatformState(InappPurchase);
     BackButtonInterceptor.add(myInterceptor);
     xcontroller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -246,6 +252,15 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                           child: AspectRatio(
                             aspectRatio: 3 / 2,
                             child: GestureDetector(
+                              onTap: (() =>
+                                  Scaffold.of(context).showSnackBar(SnackBar(
+                                    duration: Duration(seconds: 1),
+                                    backgroundColor: Colors.transparent,
+                                    content: Text(
+                                      'In-App Purchases are disabled until next update',
+                                      style: kTextStyle,
+                                    ),
+                                  ))),
                               onPanStart: (details) {
                                 print('hori start');
                                 xcontroller.reset();
@@ -255,7 +270,6 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                   yCard = 0;
                                 });
                               },
-
                               onPanUpdate: (details) {
                                 print('hori  ${details.delta}');
                                 setState(() {
@@ -603,37 +617,65 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                 sigmaX: 12,
                                 sigmaY: 12,
                               ),
-                              child: Container(
-                                height: 70,
-                                width: screenWidth - 40,
-                                decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                        colors: [
-                                          Colors.white.withOpacity(0.4),
-                                          Colors.white.withOpacity(0.01),
-                                        ]
-                                    ),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(30)),
-                                    border: Border.all(
-                                      color: Colors.white.withOpacity(0.8),)
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'Support Us',
-                                    style: TextStyle(
-                                      color: backgroundColor,
-                                      shadows: <Shadow>[
-                                        Shadow(
-                                          offset: Offset(.0, .0),
-                                          blurRadius: 3.0,
-                                          color: textColor.withOpacity(0.5),
+                              child: GestureDetector(
+                                onTap: () =>
+                                    Scaffold.of(context).showSnackBar(
+                                        SnackBar(duration: Duration(seconds: 1),
+                                          backgroundColor: Colors.transparent,
+                                          content: Text(
+                                            'In-App Purchases are disabled until next update',
+                                            style: kTextStyle,
+                                          ),
+                                        )),
+                                child: Container(
+                                  height: 70,
+                                  width: screenWidth - 40,
+                                  decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                          begin: Alignment.topLeft,
+                                          end: Alignment.bottomRight,
+                                          colors: [
+                                            Colors.white.withOpacity(0.4),
+                                            Colors.white.withOpacity(0.01),
+                                          ]
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30)),
+                                      border: Border.all(
+                                        color: Colors.white.withOpacity(0.8),)
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Support',
+                                        style: TextStyle(
+                                          color: backgroundColor,
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                              offset: Offset(.0, .0),
+                                              blurRadius: 3.0,
+                                              color: textColor.withOpacity(0.5),
+                                            ),
+                                          ],
+                                          fontSize: 28,
                                         ),
-                                      ],
-                                      fontSize: 28,
-                                    ),
+                                      ),
+                                      Text(
+                                        ' Us',
+                                        style: TextStyle(
+                                          color: backgroundColor,
+                                          shadows: <Shadow>[
+                                            Shadow(
+                                              offset: Offset(.0, .0),
+                                              blurRadius: 3.0,
+                                              color: textColor.withOpacity(0.5),
+                                            ),
+                                          ],
+                                          fontSize: 28,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -652,4 +694,93 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
       ),
     );
   }
+
+// Future<void> initPlatformState(FlutterInappPurchase InappPurchase) async {
+//   // prepare
+//   var result = await InappPurchase.initConnection;
+//   print('result: $result');
+//
+//   // If the widget was removed from the tree while the asynchronous platform
+//   // message was in flight, we want to discard the reply rather than calling
+//   // setState to update our non-existent appearance.
+//   if (!mounted) return;
+//
+//   // refresh items for android
+//   String msg = await InappPurchase.consumeAllItems;
+//   print('consumeAllItems: $msg');
+//   await _getProduct(InappPurchase);
+// }
+//
+// Future<Null> _getProduct(FlutterInappPurchase InappPurchase) async {
+//   List<IAPItem> items = await InappPurchase.getProducts([iapId]);
+//   for (var item in items) {
+//     print('${item.toString()}');
+//     this._items.add(item);
+//   }
+//
+//   setState(() {
+//     this._items = items;
+//   });
+// }
+//
+// Future<Null> _buyProduct(IAPItem item,FlutterInappPurchase InappPurchase) async {
+//   try {
+//     PurchasedItem purchased = await InappPurchase.requestPurchase(item.productId);
+//     print(purchased);
+//     String msg = await InappPurchase.consumeAllItems;
+//     print('consumeAllItems: $msg');
+//   } catch (error) {
+//     print('$error');
+//   }
+// }
+//
+// List<Widget> _renderButton() {
+//   List<Widget> widgets = this._items.map((item) =>
+//       Container(
+//         height: 250.0,
+//         width: double.infinity,
+//         child: Card(
+//           child: Column(
+//             children: <Widget>[
+//               SizedBox(height: 28.0),
+//               Align(
+//                 alignment: Alignment.center,
+//                 child: Text('Banana', style: Theme
+//                     .of(context)
+//                     .textTheme
+//                     .display1,),
+//               ),
+//               SizedBox(height: 24.0),
+//               Align(
+//                 alignment: Alignment.center,
+//                 child: Text('This is a consumable item', style: TextStyle(fontSize: 16.0, color: Colors.grey[700]),),
+//               ),
+//               Align(
+//                 alignment: Alignment.center,
+//                 child: Text('Which you can buy multiple times', style: TextStyle(fontSize: 16.0, color: Colors.grey[700])),
+//               ),
+//               SizedBox(height: 24.0),
+//               SizedBox(
+//                 width: 340.0,
+//                 height: 50.0,
+//                 child: RaisedButton(
+//                   color: Colors.blue,
+//                   onPressed: () => _renderButton(),
+//                   shape: new RoundedRectangleBorder(
+//                       borderRadius: new BorderRadius.circular(30.0)),
+//                   child: Text('Buy ${item.price} ${item.currency}', style: Theme
+//                       .of(context)
+//                       .primaryTextTheme
+//                       .button,),
+//                 ),
+//               ),
+//             ],
+//           ),
+//         ),
+//       ),
+//
+//   ).toList();
+//   return widgets;
+// }
+
 }

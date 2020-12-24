@@ -16,14 +16,11 @@ class AboutPage extends StatefulWidget {
   _AboutPageState createState() => _AboutPageState();
 }
 
-class _AboutPageState extends State<AboutPage>
-    with SingleTickerProviderStateMixin {
+class _AboutPageState extends State<AboutPage> {
   double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
-  AnimationController playGradientControl;
-  Animation<Color> colAnim1, colAnim2;
   double logoAnim = 0;
 
   @override
@@ -38,19 +35,6 @@ class _AboutPageState extends State<AboutPage>
       isDrawerOpen = true;
       isAboutOpen = false;
     });
-    playGradientControl = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 1500),
-      reverseDuration: Duration(milliseconds: 1500),
-    );
-    colAnim1 = ColorTween(
-      begin: sunset[0],
-      end: sunset[1],
-    ).animate(playGradientControl);
-    colAnim2 = ColorTween(
-      begin: mango[0],
-      end: mango[1],
-    ).animate(playGradientControl);
   }
 
   @override
@@ -469,7 +453,7 @@ class _AboutPageState extends State<AboutPage>
   _onShare(BuildContext context) async {
     final RenderBox box = context.findRenderObject();
     await Share.share(
-        'Workout Timer : https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer',
+        'Hey wanna try out High Intensity Interval Training (HIIT) for the Workout. Checkout Workout Timer : https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer',
         sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
   }
 }

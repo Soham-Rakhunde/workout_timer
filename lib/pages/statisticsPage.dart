@@ -20,7 +20,6 @@ class _StatisticsPageState extends State<StatisticsPage>
   double scaleFactor = 1;
   AnimationController playGradientControl;
   Animation edges;
-  Animation<Color> colAnim1, colAnim2;
 
   @override
   void initState() {
@@ -42,14 +41,6 @@ class _StatisticsPageState extends State<StatisticsPage>
     edges = Tween<double>(
       begin: 28.0,
       end: 0.0,
-    ).animate(playGradientControl);
-    colAnim1 = ColorTween(
-      begin: darkGradient,
-      end: lightGradient,
-    ).animate(playGradientControl);
-    colAnim2 = ColorTween(
-      begin: lightGradient,
-      end: darkGradient,
     ).animate(playGradientControl);
   }
 

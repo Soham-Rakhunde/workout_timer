@@ -122,7 +122,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     String v = '$intValue';
     v = v.length == 1 ? '0$v' : v;
     setState(() {
-      print('$v');
       controller[_controllerName].text = v;
     });
   }
@@ -139,7 +138,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return ValueListenableBuilder(
       valueListenable: indexOfMenu,
       builder: (context, val, child) {
-        print('valchanged ${indexOfMenu.value}');
         return child;
       },
       child: AnimatedContainer(
@@ -155,7 +153,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         width: double.infinity,
         onEnd: (() {
           if (isHomeOpen && indexOfMenu.value == 0) {
-            print('3animhome');
             SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
               statusBarColor: Colors.transparent,
               // isHomeOpen
@@ -244,7 +241,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               scaleFactor = 0.7;
                               isDrawerOpen = true;
                               isHomeOpen = false;
-                              print('4opthome');
                               SystemChrome.setSystemUIOverlayStyle(
                                   SystemUiOverlayStyle(
                                 statusBarColor: Colors.transparent,
@@ -315,7 +311,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   child: Text(
                                 ':',
                                 style: kTextStyle.copyWith(
-                                    fontWeight: FontWeight.bold, fontSize: 25),
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 25,
+                                  color: textColor,
+                                ),
                               )),
                               Container(
                                 width: 40,
@@ -390,8 +389,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 child: Text(
                                   ':',
                                   style: kTextStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25),
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 25,
+                                    color: textColor,
+                                  ),
                                 ),
                               ),
                               Container(
@@ -454,7 +455,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 child: myTextField(
                                   controllerName: 'sets',
                                   func: (val) {
-                                    print('$val is val in callback');
                                     setState(() {
                                       retain['sets'] = val;
                                       controller['sets'].text = val;
@@ -624,7 +624,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 controller['sets'] = '3';
                               }
                               savedList = await savedData.read();
-                              print('old data $savedList');
                               SavedWorkout _data = SavedWorkout(
                                 name: stringFormatter(dialogController.text),
                                 pSec: int.parse(controller['periodSec'].text),
@@ -633,9 +632,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 bMin: int.parse(controller['breakMin'].text),
                                 setsCount: int.parse(controller['sets'].text),
                               );
-                              print('Encoded ${jsonEncode(_data.toMap())}');
+                              // print('Encoded ${jsonEncode(_data.toMap())}');
                               savedList.add(jsonEncode(_data.toMap()));
-                              print('new data $savedList');
+                              // print('new data $savedList');
                               await savedData.save(savedList);
                             }),
                           ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:store_redirect/store_redirect.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:workout_timer/main.dart';
 
 import '../constants.dart';
@@ -227,10 +227,14 @@ class _drawerPageState extends State<drawerPage> {
                           height: 40,
                         ),
                         GestureDetector(
-                          onTap: (() {
-                            setState(() {
-                              StoreRedirect.redirect();
-                            });
+                          onTap: (() async {
+                            if (await canLaunch(
+                                'https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer')) {
+                              await launch(
+                                  'https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer');
+                            } else {
+                              throw 'Could not launch https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer';
+                            }
                           }),
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.center,

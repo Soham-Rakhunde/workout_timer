@@ -5,6 +5,7 @@ import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/progressBuilder.dart';
@@ -49,6 +50,13 @@ class _TimerPageState extends State<TimerPage> {
     // TODO: implement initState
     super.initState();
     _getData();
+    Wakelock.enable();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    Wakelock.disable();
   }
 
   Future<bool> _getData() async {
@@ -81,7 +89,6 @@ class _TimerPageState extends State<TimerPage> {
       }
       tickTime.value = ((time - timeInSec.value) / time) * 100;
       progress.value += 100 / totalTime;
-      print(timeInSec.value);
       if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice) {
         audioPlayer.play('${timeInSec.value}-$voice.mp3');
       }
@@ -142,9 +149,8 @@ class _TimerPageState extends State<TimerPage> {
     breakT = widget.args[1];
     s = widget.args[2];
     totalTime = periodT.sec * s + breakT.sec * (s - 1);
-    // print('$totalTime');
     return WillPopScope(
-      onWillPop: () async => false,
+      onWillPop: () async => createAlertDialog(context),
       child: FutureBuilder(
           future: _getData(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -347,6 +353,53 @@ class _TimerPageState extends State<TimerPage> {
               );
             }
           }),
+    );
+  }
+
+  Future<bool> createAlertDialog(BuildContext context) {
+    return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+          ),
+          backgroundColor: backgroundColor,
+          titlePadding: EdgeInsets.fromLTRB(30, 30, 30, 10),
+          actionsPadding: EdgeInsets.only(top: 10, bottom: 15),
+          title: Center(
+            child: Text(
+              'Do you want to end the Workout',
+              style: TextStyle(
+                color: Color(0xFF707070),
+                fontSize: 22,
+              ),
+            ),
+          ),
+          actions: [
+            MaterialButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: Text(
+                'No',
+                style: kTextStyle.copyWith(
+                  fontSize: 25,
+                  fontFamily: 'MontserratBold',
+                ),
+              ),
+            ),
+            MaterialButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: Text(
+                'Yes',
+                style: kTextStyle.copyWith(
+                  fontSize: 25,
+                  fontFamily: 'MontserratBold',
+                ),
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 }
