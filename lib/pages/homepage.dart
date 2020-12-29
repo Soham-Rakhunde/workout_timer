@@ -87,15 +87,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     playGradientControl.dispose();
   }
 
-  Future<bool> _getData() async {
-    isDark.value = await savedData.readBool('isDark');
-    backgroundColor = backgroundC[isDark.value ? 1 : 0];
-    shadowColor = shadowC[isDark.value ? 1 : 0];
-    lightShadowColor = lightShadowC[isDark.value ? 1 : 0];
-    textColor = textC[isDark.value ? 1 : 0];
-    return isDark.value;
-  }
-
   void addRemove(bool flag, String _controllerName) {
     int intValue = int.parse(controller[_controllerName].text);
     intValue = intValue - (flag ? -1 : 1);
@@ -181,24 +172,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             color: backgroundColor,
             borderRadius: BorderRadius.circular(isHomeOpen ? 0 : 28),
           ),
-          child: FutureBuilder(
-              future: _getData(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.data == null) {
-                  return Center(child: Text('Loading'));
-                } else {
-                  return GestureDetector(
-                    onTap: (() {
-                      if (!isHomeOpen && indexOfMenu.value == 0) {
-                        setState(() {
-                          xOffset = 0;
-                          yOffset = 0;
-                          scaleFactor = 1;
-                          isDrawerOpen = false;
-                          isHomeOpen = true;
-                        });
-                      }
-                    }),
+          child: GestureDetector(
+            onTap: (() {
+              if (!isHomeOpen && indexOfMenu.value == 0) {
+                setState(() {
+                  xOffset = 0;
+                  yOffset = 0;
+                  scaleFactor = 1;
+                  isDrawerOpen = false;
+                  isHomeOpen = true;
+                });
+              }
+            }),
                     onHorizontalDragEnd: ((_) {
                       if (!isHomeOpen && indexOfMenu.value == 0) {
                         setState(() {
@@ -712,9 +697,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         ),
                       ),
                     ),
-                  );
-                }
-              }),
+          ),
         ),
       ),
     );

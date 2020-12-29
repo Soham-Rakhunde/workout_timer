@@ -69,7 +69,6 @@ class _mainPageState extends State<mainPage>
   void initState() {
     // TODO: implement initState
     super.initState();
-    _getData();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
@@ -100,7 +99,11 @@ class _mainPageState extends State<mainPage>
           future: _getData(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
             if (snapshot.data == null) {
-              return Center(child: Text('Loading'));
+              return Center(
+                  child: Image.asset(
+                'assets/icon.png',
+                width: screenWidth / 5,
+              ));
             } else {
               return Scaffold(
                 backgroundColor: drawerColor,
