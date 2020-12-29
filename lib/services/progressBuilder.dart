@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:sleek_circular_slider/sleek_circular_slider.dart';
 
 import '../constants.dart';
+import '../main.dart';
 import 'innerShadow.dart';
 
 class buildStack extends StatefulWidget {
@@ -216,9 +217,10 @@ class _buildStackState extends State<buildStack> {
                       return Text(
                         '${widget.timeInSec.value}',
                         style: kTextStyle.copyWith(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 50,
-                        ),
+                          color: isDark.value ? Colors.white : Colors.black,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 50,
+                          ),
                       );
                     },
                   ),

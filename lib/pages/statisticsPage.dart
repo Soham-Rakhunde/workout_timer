@@ -81,191 +81,204 @@ class _StatisticsPageState extends State<StatisticsPage>
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
-      valueListenable: indexOfMenu,
+      valueListenable: isDark,
       builder: (context, val, child) {
         return child;
       },
-      child: AnimatedContainer(
-        duration: Duration(milliseconds: 450),
-        curve: Curves.easeInOutQuart,
-        transform: Matrix4.translationValues(xOffset, yOffset, 100)
-          ..scale(scaleFactor),
-        height: MediaQuery.of(context).size.height,
-        width: MediaQuery.of(context).size.width,
-        onEnd: (() {
-          if (isStatsOpen && indexOfMenu.value == 1) {
-            SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness:
-                  isStatsOpen ? Brightness.dark : Brightness.light,
-              systemNavigationBarColor:
-                  isStatsOpen ? backgroundColor : drawerColor,
-              systemNavigationBarIconBrightness:
-                  isStatsOpen ? Brightness.dark : Brightness.light,
-              systemNavigationBarDividerColor:
-              isStatsOpen ? backgroundColor : drawerColor,
-            ));
-          }
-        }),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: BorderRadius.circular(edges.value),
-        ),
-        child: GestureDetector(
-          onTap: (() {
-            if (!isStatsOpen && indexOfMenu.value == 1) {
-              setState(() {
-                xOffset = 0;
-                playGradientControl.reverse();
-                yOffset = 0;
-                scaleFactor = 1;
-                isDrawerOpen = false;
-                isStatsOpen = true;
-              });
+      child: ValueListenableBuilder(
+        valueListenable: indexOfMenu,
+        builder: (context, val, child) {
+          return child;
+        },
+        child: AnimatedContainer(
+          duration: Duration(milliseconds: 450),
+          curve: Curves.easeInOutQuart,
+          transform: Matrix4.translationValues(xOffset, yOffset, 100)
+            ..scale(scaleFactor),
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          onEnd: (() {
+            if (isStatsOpen && indexOfMenu.value == 1) {
+              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness:
+                    isStatsOpen ? Brightness.dark : Brightness.light,
+                systemNavigationBarColor:
+                    isStatsOpen ? backgroundColor : drawerColor,
+                systemNavigationBarIconBrightness:
+                    isStatsOpen ? Brightness.dark : Brightness.light,
+                systemNavigationBarDividerColor:
+                    isStatsOpen ? backgroundColor : drawerColor,
+              ));
             }
           }),
-          onHorizontalDragEnd: ((_) {
-            if (!isStatsOpen && indexOfMenu.value == 1) {
-              setState(() {
-                xOffset = 0;
-                playGradientControl.reverse();
-                yOffset = 0;
-                scaleFactor = 1;
-                isDrawerOpen = false;
-                isStatsOpen = true;
-              });
-            }
-          }),
-          child: AbsorbPointer(
-            absorbing: !isStatsOpen,
-            child: Stack(
-              children: [
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(edges.value),
-                  child: AnimatedContainer(
-                    duration: Duration(milliseconds: 450),
-                    child: Container(
-                      child: Image.asset(
-                        'assets/images/img.jpeg',
-                        fit: BoxFit.fill,
-                      ),
-                      height: double.infinity,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(edges.value),
+          decoration: BoxDecoration(
+            color: backgroundColor,
+            borderRadius: BorderRadius.circular(edges.value),
+          ),
+          child: GestureDetector(
+            onTap: (() {
+              if (!isStatsOpen && indexOfMenu.value == 1) {
+                setState(() {
+                  xOffset = 0;
+                  playGradientControl.reverse();
+                  yOffset = 0;
+                  scaleFactor = 1;
+                  isDrawerOpen = false;
+                  isStatsOpen = true;
+                });
+              }
+            }),
+            onHorizontalDragEnd: ((_) {
+              if (!isStatsOpen && indexOfMenu.value == 1) {
+                setState(() {
+                  xOffset = 0;
+                  playGradientControl.reverse();
+                  yOffset = 0;
+                  scaleFactor = 1;
+                  isDrawerOpen = false;
+                  isStatsOpen = true;
+                });
+              }
+            }),
+            child: AbsorbPointer(
+              absorbing: !isStatsOpen,
+              child: Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(edges.value),
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 450),
+                      child: Container(
+                        child: Image.asset(
+                          'assets/images/img.jpeg',
+                          fit: BoxFit.fill,
+                        ),
+                        height: double.infinity,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(edges.value),
+                        ),
                       ),
                     ),
                   ),
-                ),
-                Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(edges.value),
-                  ),
-                  child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 50,),
-                        ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(
-                              sigmaX: 10,
-                              sigmaY: 10,
-                            ),
-                            child: Container(
-                              width: screenWidth * 0.9,
-                              decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Colors.grey.withOpacity(0.4),
-                                        Colors.grey.withOpacity(0.01),
-                                      ]
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(30)),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.5),)
+                  Container(
+                    height: double.infinity,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(edges.value),
+                    ),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            height: 50,
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: 10,
+                                sigmaY: 10,
                               ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.all(30),
-                                    child: Row(
-                                      mainAxisAlignment: MainAxisAlignment
-                                          .spaceBetween,
-                                      children: [
-                                        Container(
-                                          child: Text(
-                                            'Statistics',
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              letterSpacing: 2.0,
-                                              fontSize: 30,
-                                              fontWeight: FontWeight.bold,
+                              child: Container(
+                                width: screenWidth * 0.9,
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.grey.withOpacity(0.4),
+                                          Colors.grey.withOpacity(0.01),
+                                        ]),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.5),
+                                    )),
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(30),
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Container(
+                                            child: Text(
+                                              'Statistics',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                letterSpacing: 2.0,
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  SizedBox(height: 40,),
-                                  Padding(
-                                    padding: const EdgeInsets.only(bottom: 60),
-                                    child: Text(
-                                      'Coming Soon',
-                                      style: TextStyle(
-                                        color: backgroundColor,
-                                        letterSpacing: 3.5,
-                                        fontSize: 27,
-                                        fontWeight: FontWeight.bold,
+                                        ],
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      height: 40,
+                                    ),
+                                    Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 60),
+                                      child: Text(
+                                        'Coming Soon',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          letterSpacing: 3.5,
+                                          fontSize: 27,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 50,),
-                        ClipRRect(
-                          borderRadius: BorderRadius.all(Radius.circular(30)),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(
-                              sigmaX: 10,
-                              sigmaY: 10,
-                            ),
-                            child: Container(
-                              width: screenWidth * 0.9,
-                              decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Colors.grey.withOpacity(0.4),
-                                        Colors.grey.withOpacity(0.01),
-                                      ]
-                                  ),
-                                  borderRadius: BorderRadius.all(
-                                      Radius.circular(30)),
-                                  border: Border.all(
-                                    color: Colors.white.withOpacity(0.6),)
+                          SizedBox(
+                            height: 50,
+                          ),
+                          ClipRRect(
+                            borderRadius: BorderRadius.all(Radius.circular(30)),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(
+                                sigmaX: 10,
+                                sigmaY: 10,
                               ),
-                              child: BarChartSample1(),
+                              child: Container(
+                                width: screenWidth * 0.9,
+                                decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Colors.grey.withOpacity(0.4),
+                                          Colors.grey.withOpacity(0.01),
+                                        ]),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(30)),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.6),
+                                    )),
+                                child: BarChartSample1(),
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 50,),
-                      ]),
-                ),
-              ],
+                          SizedBox(
+                            height: 50,
+                          ),
+                        ]),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

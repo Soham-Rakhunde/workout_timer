@@ -8,8 +8,10 @@ import 'package:workout_timer/pages/homepage.dart';
 import 'package:workout_timer/pages/settingsPage.dart';
 import 'package:workout_timer/pages/statisticsPage.dart';
 import 'package:workout_timer/pages/timerpage.dart';
+import 'package:workout_timer/services/scaleFactor.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
+ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
 bool isDrawerOpen = false;
 bool isHomeOpen = true;
 bool isAboutOpen = false;
@@ -39,7 +41,6 @@ void main() {
         ]
       )
   );
-
   runApp(MaterialApp(
     debugShowMaterialGrid: false,
     debugShowCheckedModeBanner: false,
@@ -62,17 +63,27 @@ class mainPage extends StatefulWidget {
 class _mainPageState extends State<mainPage>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
-
+  SharedPref savedData = SharedPref();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _getData();
     _animationController = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 500),
       reverseDuration: Duration(milliseconds: 500),
     );
+  }
+
+  Future<bool> _getData() async {
+    isDark.value = await savedData.readBool('isDark');
+    backgroundColor = backgroundC[isDark.value ? 1 : 0];
+    shadowColor = shadowC[isDark.value ? 1 : 0];
+    lightShadowColor = lightShadowC[isDark.value ? 1 : 0];
+    textColor = textC[isDark.value ? 1 : 0];
+    return isDark.value;
   }
 
   double screenWidth;
@@ -81,123 +92,123 @@ class _mainPageState extends State<mainPage>
 
   @override
   Widget build(BuildContext context) {
-    print('1main');
+    SizeConfig().init(context);
     screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
       onWillPop: () async => true,
-      child: Scaffold(
-        backgroundColor: drawerColor,
-        body: Stack(
-          children: [
-            drawerPage(),
-            Positioned(
-              left: 200,
-              top: 180,
-              child: GestureDetector(
-                onTap: () async {
-                  final periodTime = TimeClass(
-                    name: 'Workout',
-                    sec: int.parse(controller['periodMin'].text) * 60 +
-                        int.parse(controller['periodSec'].text),
-                  );
-                  final breakTime = TimeClass(
-                    name: 'Break',
-                    sec: int.parse(controller['breakMin'].text) * 60 +
-                        int.parse(controller['breakSec'].text),
-                  );
-                  await Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 700),
-                          reverseTransitionDuration:
-                              Duration(milliseconds: 250),
-                          transitionsBuilder: (BuildContext context,
-                              Animation<double> animation,
-                              Animation<double> secAnimation,
-                              Widget child) {
-                            return FadeTransition(
-                              opacity: animation,
-                              child: child,
-                            );
+      child: FutureBuilder(
+          future: _getData(),
+          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+            if (snapshot.data == null) {
+              return Center(child: Text('Loading'));
+            } else {
+              return Scaffold(
+                backgroundColor: drawerColor,
+                body: Stack(
+                  children: [
+                    drawerPage(),
+                    Positioned(
+                      left: 200,
+                      top: 140 + SizeConfig.screenHeight * 0.05,
+                      child: GestureDetector(
+                        onTap: () async {
+                          final periodTime = TimeClass(
+                            name: 'Workout',
+                            sec: int.parse(controller['periodMin'].text) * 60 +
+                                int.parse(controller['periodSec'].text),
+                          );
+                          final breakTime = TimeClass(
+                            name: 'Break',
+                            sec: int.parse(controller['breakMin'].text) * 60 +
+                                int.parse(controller['breakSec'].text),
+                          );
+                          await Navigator.push(
+                              context,
+                              PageRouteBuilder(
+                                  transitionDuration:
+                                      Duration(milliseconds: 700),
+                                  reverseTransitionDuration:
+                                      Duration(milliseconds: 250),
+                                  transitionsBuilder: (BuildContext context,
+                                      Animation<double> animation,
+                                      Animation<double> secAnimation,
+                                      Widget child) {
+                                    return FadeTransition(
+                                      opacity: animation,
+                                      child: child,
+                                    );
+                                  },
+                                  pageBuilder: (BuildContext context,
+                                      Animation<double> animation,
+                                      Animation<double> secAnimation) {
+                                    return TimerPage(
+                                      args: [
+                                        periodTime,
+                                        breakTime,
+                                        int.parse(controller['sets'].text),
+                                      ],
+                                    );
+                                  }));
+                        },
+                        child: ValueListenableBuilder(
+                          valueListenable: isDark,
+                          builder: (context, val, child) {
+                            return Container(
+                                height: MediaQuery.of(context).size.height * .6,
+                                width: MediaQuery.of(context).size.width * .6,
+                                decoration: BoxDecoration(
+                                  color: backgroundColor,
+                                  borderRadius: BorderRadius.circular(17),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(17),
+                                  child: Image.asset(
+                                    'assets/progressImg${isDark.value ? 1 : 0}.${isDark.value ? 'jpg' : 'png'}',
+                                    alignment: Alignment.centerLeft,
+                                  ),
+                                ));
                           },
-                          pageBuilder: (BuildContext context,
-                              Animation<double> animation,
-                              Animation<double> secAnimation) {
-                            return TimerPage(
-                              args: [
-                                periodTime,
-                                breakTime,
-                                int.parse(controller['sets'].text),
-                              ],
-                            );
-                          }));
-                },
-                child: Container(
-                    height: MediaQuery.of(context).size.height * .6,
-                    width: MediaQuery.of(context).size.width * .6,
-                    padding: EdgeInsets.symmetric(vertical: 2),
-                    decoration: BoxDecoration(
-                      color: backgroundColor,
-                      borderRadius: BorderRadius.circular(17),
+                        ),
+                      ),
                     ),
-                    child: Image.asset('assets/progressImg.png')),
-              ),
-            ),
-            Positioned(
-              left: 240,
-              top: 180,
-              child: Container(
-                height: MediaQuery.of(context).size.height * .6,
-                width: 20,
-                decoration: BoxDecoration(
-                  boxShadow: [
-                    BoxShadow(color: Colors.black12, blurRadius: 12),
+                    Positioned(
+                      left: 240,
+                      top: 140 + SizeConfig.screenHeight * 0.05,
+                      child: ValueListenableBuilder(
+                        valueListenable: isDark,
+                        builder: (context, val, child) {
+                          return Container(
+                            height: MediaQuery.of(context).size.height * .6,
+                            width: SizeConfig.sw * 20,
+                            decoration: BoxDecoration(
+                              boxShadow: [
+                                BoxShadow(color: shadowColor, blurRadius: 12),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    ValueListenableBuilder<int>(
+                      valueListenable: indexOfMenu,
+                      builder: (context, value, _) {
+                        return IndexedStack(
+                          index: indexOfMenu.value,
+                          children: [
+                            HomePage(),
+                            StatisticsPage(),
+                            DonatePage(),
+                            AboutPage(),
+                            SettingsPage(),
+                          ],
+                        );
+                      },
+                    ),
                   ],
                 ),
-              ),
-            ),
-            ValueListenableBuilder<int>(
-              valueListenable: indexOfMenu,
-              builder: (context, value, _) {
-                return IndexedStack(
-                  index: indexOfMenu.value,
-                  children: [
-                    HomePage(),
-                    StatisticsPage(),
-                    DonatePage(),
-                    AboutPage(),
-                    SettingsPage(),
-                  ],
-                );
-              },
-            ),
-            // AnimatedBuilder(
-            //   animation: _animationController,
-            //   builder: (BuildContext context, Widget child) {
-            //     print('builder');
-            //     if(indexOfMenu.value == 0){
-            //       print('');
-            //     }else if(indexOfMenu.value == 3){
-            //       Navigator.push(context, PageRouteBuilder(
-            //         transitionDuration: Duration(milliseconds:700),
-            //         reverseTransitionDuration: Duration(milliseconds:250),
-            //         transitionsBuilder:(BuildContext context,Animation<double> animation,Animation<double> secAnimation, Widget child){
-            //           return FadeTransition(
-            //             opacity: animation,
-            //             child: child,
-            //           );
-            //         },
-            //         pageBuilder: (BuildContext context,Animation<double> animation,Animation<double> secAnimation){
-            //           return AboutPage();
-            //         }
-            //     ));
-            //   }
-            //
-            // },
-            // ),
-          ],
-        ),
-      ),
+              );
+            }
+          }),
     );
   }
 }

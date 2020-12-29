@@ -46,7 +46,7 @@ class _savedPageState extends State<savedPage> {
               child: Text(
                 'Saved Workout',
                 style: kTextStyle.copyWith(
-                  color: Color(0xFF707070),
+                  color: textColor,
                   letterSpacing: 2.0,
                   fontSize: 31,
                   fontWeight: FontWeight.bold,

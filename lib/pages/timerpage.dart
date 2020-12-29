@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
+import 'package:workout_timer/main.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
@@ -135,8 +136,6 @@ class _TimerPageState extends State<TimerPage> {
         }
         i.value++;
       } while (i.value <= s);
-      AudioCache finishPlayer = AudioCache(prefix: 'assets/audio/$voice/');
-      finishPlayer.play('finish-$voice.mp3');
       i.value--;
     }
     if (isVoice) audioPlayer.clearCache();
@@ -176,7 +175,7 @@ class _TimerPageState extends State<TimerPage> {
                               return Text(
                                 _titleName.value,
                                 style: TextStyle(
-                                  color: Color(0xFF707070),
+                                  color: textColor,
                                   letterSpacing: 2.0,
                                   fontSize: 40,
                                   fontWeight: FontWeight.bold,
@@ -227,6 +226,9 @@ class _TimerPageState extends State<TimerPage> {
                                       'Set',
                                       style: kTextStyle.copyWith(
                                         letterSpacing: 0.5,
+                                        color: isDark.value
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                     SizedBox(
@@ -240,6 +242,9 @@ class _TimerPageState extends State<TimerPage> {
                                           style: kTextStyle.copyWith(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 40,
+                                            color: isDark.value
+                                                ? Colors.white
+                                                : Colors.black,
                                           ),
                                         );
                                       },
@@ -275,6 +280,9 @@ class _TimerPageState extends State<TimerPage> {
                                       'Progress',
                                       style: kTextStyle.copyWith(
                                         letterSpacing: 0.5,
+                                        color: isDark.value
+                                            ? Colors.white
+                                            : Colors.black,
                                       ),
                                     ),
                                     SizedBox(
@@ -290,6 +298,9 @@ class _TimerPageState extends State<TimerPage> {
                                           style: kTextStyle.copyWith(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 40,
+                                            color: isDark.value
+                                                ? Colors.white
+                                                : Colors.black,
                                           ),
                                         );
                                       },
@@ -309,9 +320,15 @@ class _TimerPageState extends State<TimerPage> {
                                 tag: 'leftButton',
                                 child: NeuButton(
                                   onPress: (() {
+                                    if (isVoice) {
+                                      AudioCache finishPlayer = AudioCache(
+                                          prefix: 'assets/audio/$voice/');
+                                      finishPlayer.play('finish-$voice.mp3');
+                                      audioPlayer.clearCache();
+                                      isVoice = false;
+                                    }
                                     i.value = s + 1;
                                     timeInSec.value = 0;
-                                    if (isVoice) audioPlayer.clearCache();
                                     Navigator.pop(context);
                                   }),
                                   ico: Icon(
@@ -371,7 +388,7 @@ class _TimerPageState extends State<TimerPage> {
             child: Text(
               'Do you want to end the Workout',
               style: TextStyle(
-                color: Color(0xFF707070),
+                color: textColor,
                 fontSize: 22,
               ),
             ),
@@ -383,6 +400,7 @@ class _TimerPageState extends State<TimerPage> {
                 'No',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
+                  color: isDark.value ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),
@@ -393,6 +411,7 @@ class _TimerPageState extends State<TimerPage> {
                 'Yes',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
+                  color: isDark.value ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),
