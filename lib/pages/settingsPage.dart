@@ -44,6 +44,9 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
+    isVoice.dispose();
+    Voice.dispose();
+    selection.dispose();
     super.dispose();
   }
 

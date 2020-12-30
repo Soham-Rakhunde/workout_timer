@@ -25,15 +25,24 @@ class _buildStackState extends State<buildStack> {
   }
 
   @override
+  void dispose() {
+    widget.i.dispose();
+    widget.tickTime.dispose();
+    widget.timeInSec.dispose();
+    // TODO: implement dispose
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double pieWidth = 60;
-    Widget customWidgetReturn (double val)=> Text('');
+    Widget customWidgetReturn(double val) => Text('');
     return ValueListenableBuilder(
-      valueListenable: widget.tickTime,
-      builder: (context, value, child) {
-        return TweenAnimationBuilder(
-            tween: Tween<double>(begin: 1,end: 0),
-            duration: Duration(seconds: 5),
+        valueListenable: widget.tickTime,
+        builder: (context, value, child) {
+          return TweenAnimationBuilder(
+              tween: Tween<double>(begin: 1, end: 0),
+              duration: Duration(seconds: 5),
             builder: (BuildContext context, double value, Widget _) {
               return Stack(
                 alignment: AlignmentDirectional.center,

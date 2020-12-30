@@ -84,6 +84,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       controller[controllerName].dispose();
     }
     dialogController.dispose();
+    _titleName.dispose();
     playGradientControl.dispose();
   }
 

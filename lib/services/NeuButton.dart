@@ -23,7 +23,6 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     if(widget.animated)
     {
@@ -36,7 +35,6 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
   }
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     if(widget.animated)
     {

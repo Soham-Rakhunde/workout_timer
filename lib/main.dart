@@ -67,7 +67,6 @@ class _mainPageState extends State<mainPage>
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _animationController = AnimationController(
       vsync: this,

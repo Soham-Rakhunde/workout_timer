@@ -57,6 +57,9 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void dispose() {
     super.dispose();
+    tickTime.dispose();
+    progress.dispose();
+    resumeFlag.dispose();
     Wakelock.disable();
   }
 
@@ -327,8 +330,8 @@ class _TimerPageState extends State<TimerPage> {
                                       audioPlayer.clearCache();
                                       isVoice = false;
                                     }
-                                    i.value = s + 1;
-                                    timeInSec.value = 0;
+                                    // i.value = s + 1;
+                                    // timeInSec.value = 0;
                                     Navigator.pop(context);
                                   }),
                                   ico: Icon(
