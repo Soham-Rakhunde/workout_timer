@@ -196,7 +196,7 @@ class _AboutPageState extends State<AboutPage> {
                             ),
                             NeuButton(
                               ico: Icon(
-                                Icons.menu,
+                                Icons.menu_rounded,
                                 size: 30,
                                 color: textColor,
                               ),
@@ -291,7 +291,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 1.1.2',
+                        'Version 1.2.0',
                         style: kTextStyle.copyWith(
                           color: isDark.value ? Colors.white : Colors.black,
                         ),
@@ -420,7 +420,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '1.1.2',
+                            applicationVersion: '1.2.0',
                           );
                         }),
                         child: Container(

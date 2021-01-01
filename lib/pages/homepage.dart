@@ -247,10 +247,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   ),
                                   NeuButton(
                                     ico: Icon(
-                                      Icons.menu,
-                                      size: 30,
-                                      color: textColor,
-                                    ),
+                                      Icons.menu_rounded,
+                              size: 30,
+                              color: textColor,
+                            ),
                                     onPress: (() {
                                       setState(() {
                                         isBackPressed = true;

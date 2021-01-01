@@ -152,7 +152,7 @@ class _SettingsPageState extends State<SettingsPage> {
             }
           }),
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: isDark.value ? Colors.black : backgroundColor,
             borderRadius: BorderRadius.circular(isDrawerOpen ? 28 : 0),
           ),
           child: GestureDetector(
@@ -258,23 +258,68 @@ class _SettingsPageState extends State<SettingsPage> {
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Expanded(
-                              flex: 8,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    'Settings',
-                                    style: TextStyle(
-                                      color: textColor.withAlpha(1000),
-                                      letterSpacing: 2.0,
-                                      fontFamily: 'MontserratBold',
-                                      fontSize: 40,
+                              flex: 6,
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 40, top: 50),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Settings',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        letterSpacing: 2.0,
+                                        fontSize: 35,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                    IconButton(
+                                      color: Colors.transparent,
+                                      onPressed: (() {
+                                        setState(() {
+                                          isBackPressed = true;
+                                          xOffset = adjusted(250);
+                                          yOffset = adjusted(140);
+                                          scaleFactor = 0.7;
+                                          isDrawerOpen = true;
+                                          isSettingsOpen = false;
+                                          SystemChrome.setSystemUIOverlayStyle(
+                                              SystemUiOverlayStyle(
+                                            statusBarColor: Colors.transparent,
+                                            statusBarIconBrightness:
+                                                isSettingsOpen
+                                                    ? Brightness.dark
+                                                    : Brightness.light,
+                                            systemNavigationBarColor:
+                                                isSettingsOpen
+                                                    ? backgroundColor
+                                                    : drawerColor,
+                                            systemNavigationBarIconBrightness:
+                                                isSettingsOpen
+                                                    ? Brightness.dark
+                                                    : Brightness.light,
+                                            systemNavigationBarDividerColor:
+                                                isSettingsOpen
+                                                    ? backgroundColor
+                                                    : drawerColor,
+                                          ));
+                                        });
+                                      }),
+                                      padding: EdgeInsets.only(right: 35),
+                                      iconSize: 40,
+                                      icon: Icon(
+                                        Icons.menu_rounded,
+                                        size: 40,
+                                        color: textColor,
+                                      ),
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                            Expanded(flex: 0, child: SizedBox()),
+                            Expanded(flex: 2, child: SizedBox()),
                             Expanded(
                               flex: 8,
                               child: ClipRRect(
@@ -670,7 +715,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                             ),
-                            Expanded(flex: 2, child: SizedBox()),
+                            Expanded(flex: 1, child: SizedBox()),
                             Expanded(
                               flex: 8,
                               child: ClipRRect(
@@ -749,8 +794,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                                               isDark.value
                                                                   ? 1
                                                                   : 0];
-                                                      textColor = textC[
-                                                          isDark.value ? 1 : 0];
+                                                      textColor = isContrast
+                                                          ? Colors.black
+                                                          : textC[isDark.value
+                                                              ? 1
+                                                              : 0];
                                                     });
                                                   }),
                                                   child: AnimatedContainer(
@@ -787,7 +835,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                               ? backgroundColor
                                                               : textColor,
                                                           letterSpacing: 2.0,
-                                                          fontSize: 18,
+                                                          fontSize: 20,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                         ),
@@ -858,7 +906,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                               ? backgroundColor
                                                               : textColor,
                                                           letterSpacing: 2.0,
-                                                          fontSize: 17,
+                                                          fontSize: 20,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                         ),
@@ -880,7 +928,245 @@ class _SettingsPageState extends State<SettingsPage> {
                                 ),
                               ),
                             ),
-                            Expanded(flex: 10, child: SizedBox()),
+                            Expanded(flex: 1, child: SizedBox()),
+                            Expanded(
+                              flex: 8,
+                              child: AnimatedSwitcher(
+                                duration: Duration(milliseconds: 350),
+                                reverseDuration: Duration(milliseconds: 350),
+                                switchInCurve: Curves.easeOutBack,
+                                switchOutCurve: Curves.easeOutBack,
+                                transitionBuilder:
+                                    (Widget child, Animation<double> anim) =>
+                                        ScaleTransition(
+                                  scale: anim,
+                                  child: child,
+                                ),
+                                child: isDark.value
+                                    ? Container()
+                                    : ClipRRect(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        child: BackdropFilter(
+                                          filter: ImageFilter.blur(
+                                            sigmaX: 10,
+                                            sigmaY: 10,
+                                          ),
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width -
+                                                60,
+                                            decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    begin: Alignment.topLeft,
+                                                    end: Alignment.bottomRight,
+                                                    colors: [
+                                                      Colors.white
+                                                          .withOpacity(0.4),
+                                                      Colors.white
+                                                          .withOpacity(0.01),
+                                                    ]),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30)),
+                                                border: Border.all(
+                                                  color: Colors.white
+                                                      .withOpacity(0.8),
+                                                )),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          left: 30, top: 30),
+                                                  child: Text(
+                                                    'High-Contrast Text',
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: TextStyle(
+                                                      color: textColor,
+                                                      letterSpacing: 1.0,
+                                                      fontSize: 26,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.only(
+                                                          bottom: 15),
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: SizedBox(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 10,
+                                                        child: GestureDetector(
+                                                          onTap: (() async {
+                                                            await savedData
+                                                                .saveBool(
+                                                                    'isContrast',
+                                                                    false);
+                                                            setState(() {
+                                                              isContrast =
+                                                                  false;
+                                                              textColor =
+                                                                  textC[0];
+                                                            });
+                                                          }),
+                                                          child:
+                                                              AnimatedContainer(
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                            curve: Curves
+                                                                .easeOutQuint,
+                                                            width: (MediaQuery.of(context)
+                                                                            .size
+                                                                            .width -
+                                                                        60) /
+                                                                    3 -
+                                                                15,
+                                                            height: 70,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: !isContrast
+                                                                  ? textColor
+                                                                      .withOpacity(
+                                                                          0.5)
+                                                                  : Colors
+                                                                      .transparent,
+                                                              border: Border.all(
+                                                                  width: 1,
+                                                                  color: Colors
+                                                                      .white
+                                                                      .withOpacity(
+                                                                          0.8)),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'Off',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: !isContrast
+                                                                      ? backgroundColor
+                                                                      : textColor,
+                                                                  letterSpacing:
+                                                                      2.0,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: SizedBox(),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 10,
+                                                        child: GestureDetector(
+                                                          onTap: (() async {
+                                                            await savedData
+                                                                .saveBool(
+                                                                    'isContrast',
+                                                                    true);
+                                                            setState(() {
+                                                              isContrast = true;
+                                                              textColor =
+                                                                  Colors.black;
+                                                            });
+                                                          }),
+                                                          child:
+                                                              AnimatedContainer(
+                                                            duration: Duration(
+                                                                milliseconds:
+                                                                    200),
+                                                            curve: Curves
+                                                                .easeOutQuint,
+                                                            width: (MediaQuery.of(context)
+                                                                            .size
+                                                                            .width -
+                                                                        60) /
+                                                                    3 -
+                                                                15,
+                                                            height: 70,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: isContrast
+                                                                  ? textColor
+                                                                      .withOpacity(
+                                                                          0.5)
+                                                                  : Colors
+                                                                      .transparent,
+                                                              border: Border.all(
+                                                                  width: 1,
+                                                                  color: Colors
+                                                                      .white
+                                                                      .withOpacity(
+                                                                          0.8)),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                            child: Center(
+                                                              child: Text(
+                                                                'On',
+                                                                style:
+                                                                    TextStyle(
+                                                                  color: isContrast
+                                                                      ? backgroundColor
+                                                                      : textColor,
+                                                                  letterSpacing:
+                                                                      2.0,
+                                                                  fontSize: 20,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      Expanded(
+                                                        flex: 1,
+                                                        child: SizedBox(),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                )
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            Expanded(flex: 3, child: SizedBox()),
                           ]),
                     ],
                   ),

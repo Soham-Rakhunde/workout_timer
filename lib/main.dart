@@ -12,6 +12,7 @@ import 'package:workout_timer/services/scaleFactor.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
+bool isContrast = false;
 bool isDrawerOpen = false;
 bool isHomeOpen = true;
 bool isAboutOpen = false;
@@ -77,10 +78,11 @@ class _mainPageState extends State<mainPage>
 
   Future<bool> _getData() async {
     isDark.value = await savedData.readBool('isDark');
+    isContrast = await savedData.readBool('isContrast');
     backgroundColor = backgroundC[isDark.value ? 1 : 0];
     shadowColor = shadowC[isDark.value ? 1 : 0];
     lightShadowColor = lightShadowC[isDark.value ? 1 : 0];
-    textColor = textC[isDark.value ? 1 : 0];
+    textColor = isContrast ? Colors.black : textC[isDark.value ? 1 : 0];
     return isDark.value;
   }
 

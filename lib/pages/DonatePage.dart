@@ -152,7 +152,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
             }
           }),
           decoration: BoxDecoration(
-            color: backgroundColor,
+            color: isDark.value ? Colors.black : backgroundColor,
             borderRadius: BorderRadius.circular(isDrawerOpen ? 28 : 0),
           ),
           child: GestureDetector(
@@ -186,7 +186,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                 height: double.infinity,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: backgroundColor,
+                  color: isDark.value ? Colors.black : backgroundColor,
                   borderRadius: BorderRadius.circular(isDonateOpen ? 0 : 28),
                 ),
                 child: ClipRRect(
@@ -260,14 +260,60 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                         children: [
                           Padding(
                             padding: EdgeInsets.only(top: 70),
-                            child: Text(
-                              'Support',
-                              style: TextStyle(
-                                color: textColor,
-                                letterSpacing: 2.0,
-                                fontSize: 35,
-                                fontWeight: FontWeight.bold,
-                              ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(left: 30),
+                                  child: Text(
+                                    'Support',
+                                    style: TextStyle(
+                                      color: textColor,
+                                      letterSpacing: 2.0,
+                                      fontSize: 35,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                                IconButton(
+                                  color: Colors.transparent,
+                                  onPressed: (() {
+                                    setState(() {
+                                      isBackPressed = true;
+                                      xOffset = adjusted(250);
+                                      yOffset = adjusted(140);
+                                      scaleFactor = 0.7;
+                                      isDrawerOpen = true;
+                                      isDonateOpen = false;
+                                      SystemChrome.setSystemUIOverlayStyle(
+                                          SystemUiOverlayStyle(
+                                        statusBarColor: Colors.transparent,
+                                        statusBarIconBrightness: isDonateOpen
+                                            ? Brightness.dark
+                                            : Brightness.light,
+                                        systemNavigationBarColor: isDonateOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                        systemNavigationBarIconBrightness:
+                                            isDonateOpen
+                                                ? Brightness.dark
+                                                : Brightness.light,
+                                        systemNavigationBarDividerColor:
+                                            isDonateOpen
+                                                ? backgroundColor
+                                                : drawerColor,
+                                      ));
+                                    });
+                                  }),
+                                  padding: EdgeInsets.only(right: 30),
+                                  iconSize: 40,
+                                  icon: Icon(
+                                    Icons.menu_rounded,
+                                    size: 40,
+                                    color: textColor,
+                                  ),
+                                )
+                              ],
                             ),
                           ),
                           Padding(

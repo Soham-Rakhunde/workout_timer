@@ -60,7 +60,7 @@ class SharedPref {
     //isVoice
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(str) == null) {
-      if (str == 'isDark')
+      if (str == 'isDark' || str == 'isContrast')
         return false;
       else
         return true;

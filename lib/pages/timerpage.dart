@@ -281,6 +281,7 @@ class _TimerPageState extends State<TimerPage> {
                                   children: [
                                     Text(
                                       'Progress',
+                                      overflow: TextOverflow.ellipsis,
                                       style: kTextStyle.copyWith(
                                         letterSpacing: 0.5,
                                         color: isDark.value
@@ -349,13 +350,15 @@ class _TimerPageState extends State<TimerPage> {
                                 builder: (context, value, child) {
                                   return Hero(
                                     tag: 'rightButton',
-                                    child: NeuButton(
-                                      flag: resumeFlag.value,
-                                      animated: true,
-                                      ico: AnimatedIcons.pause_play,
-                                      onPress: (() {
-                                        resumeFlag.value = !resumeFlag.value;
-                                      }),
+                                    child: Center(
+                                      child: NeuButton(
+                                        flag: resumeFlag.value,
+                                        animated: true,
+                                        ico: AnimatedIcons.pause_play,
+                                        onPress: (() {
+                                          resumeFlag.value = !resumeFlag.value;
+                                        }),
+                                      ),
                                     ),
                                   );
                                 },

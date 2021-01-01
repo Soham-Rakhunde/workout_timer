@@ -243,6 +243,48 @@ class _StatisticsPageState extends State<StatisticsPage>
                                               ),
                                             ),
                                           ),
+                                          IconButton(
+                                            color: Colors.transparent,
+                                            onPressed: (() {
+                                              setState(() {
+                                                isBackPressed = true;
+                                                xOffset = adjusted(250);
+                                                yOffset = adjusted(140);
+                                                scaleFactor = 0.7;
+                                                isDrawerOpen = true;
+                                                isStatsOpen = false;
+                                                SystemChrome
+                                                    .setSystemUIOverlayStyle(
+                                                        SystemUiOverlayStyle(
+                                                  statusBarColor:
+                                                      Colors.transparent,
+                                                  statusBarIconBrightness:
+                                                      isStatsOpen
+                                                          ? Brightness.dark
+                                                          : Brightness.light,
+                                                  systemNavigationBarColor:
+                                                      isStatsOpen
+                                                          ? backgroundColor
+                                                          : drawerColor,
+                                                  systemNavigationBarIconBrightness:
+                                                      isStatsOpen
+                                                          ? Brightness.dark
+                                                          : Brightness.light,
+                                                  systemNavigationBarDividerColor:
+                                                      isStatsOpen
+                                                          ? backgroundColor
+                                                          : drawerColor,
+                                                ));
+                                              });
+                                            }),
+                                            iconSize: 35,
+                                            icon: Icon(
+                                              Icons.menu_rounded,
+                                              size: 35,
+                                              color:
+                                                  Colors.white.withOpacity(0.7),
+                                            ),
+                                          )
                                         ],
                                       ),
                                     ),
