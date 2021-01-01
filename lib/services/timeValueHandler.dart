@@ -60,7 +60,10 @@ class SharedPref {
     //isVoice
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(str) == null) {
-      return true;
+      if (str == 'isDark')
+        return false;
+      else
+        return true;
     } else {
       print('$str   ${prefs.getBool(str)}');
       return prefs.getBool(str);

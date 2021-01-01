@@ -21,6 +21,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
+  bool isBackPressed = false;
   double xCard = 0, yCard = 0, zCard = 0;
   AnimationController xcontroller;
   Animation<double> xanimation;
@@ -52,6 +53,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
     );
     setState(() {
       xOffset = 250;
+      isBackPressed = false;
       yOffset = 140;
       scaleFactor = 0.7;
       isDrawerOpen = true;
@@ -68,6 +70,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (isDonateOpen) {
       setState(() {
+        isBackPressed = true;
         xOffset = adjusted(250);
         positionOffset = 70;
         yOffset = adjusted(140);
@@ -77,13 +80,13 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
         SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness:
-              isDonateOpen ? Brightness.dark : Brightness.light,
+          isDonateOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarColor:
-              isDonateOpen ? backgroundColor : drawerColor,
+          isDonateOpen ? backgroundColor : drawerColor,
           systemNavigationBarIconBrightness:
-              isDonateOpen ? Brightness.dark : Brightness.light,
+          isDonateOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarDividerColor:
-              isDonateOpen ? backgroundColor : drawerColor,
+          isDonateOpen ? backgroundColor : drawerColor,
         ));
       });
       return true;
@@ -104,15 +107,34 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
+          if (!isDonateOpen && indexOfMenu.value == 2 && !isBackPressed) {
+            Future.delayed(Duration(microseconds: 1)).then((value) {
+              setState(() {
+                xOffset = 0;
+                yOffset = 0;
+                positionOffset = 0;
+                scaleFactor = 1;
+                isDrawerOpen = false;
+                isDonateOpen = true;
+              });
+            });
+          } else if (indexOfMenu.value != 2)
+            isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 450),
+          duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           onEnd: (() {
             if (isDonateOpen && indexOfMenu.value == 2) {
               print('5animabout');

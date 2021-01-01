@@ -29,12 +29,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
+  bool isBackPressed = false;
   List<String> savedList = List<String>();
   SharedPref savedData = SharedPref();
 
   @override
   void initState() {
     super.initState();
+    isBackPressed = false;
     for (String controllerName in controller.keys) {
       initListenerMaker(controllerName);
     }
@@ -43,7 +45,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       duration: Duration(milliseconds: 1000),
       reverseDuration: Duration(milliseconds: 1000),
     );
-    colAnim1= ColorTween(
+    colAnim1 = ColorTween(
       begin: darkGradient,
       end: lightGradient,
     ).animate(playGradientControl);
@@ -141,15 +143,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
+          if (!isHomeOpen && indexOfMenu.value == 0 && !isBackPressed) {
+            Future.delayed(Duration(microseconds: 1)).then((value) {
+              setState(() {
+                xOffset = 0;
+                playGradientControl.reverse();
+                yOffset = 0;
+                scaleFactor = 1;
+                isDrawerOpen = false;
+                isHomeOpen = true;
+              });
+            });
+          } else if (indexOfMenu.value != 0) isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
           padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-          duration: Duration(milliseconds: 450),
+          duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
-          height: MediaQuery.of(context).size.height,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
           width: double.infinity,
           onEnd: (() {
             if (isHomeOpen && indexOfMenu.value == 0) {
@@ -236,6 +253,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     ),
                                     onPress: (() {
                                       setState(() {
+                                        isBackPressed = true;
                                         xOffset = 250;
                                         yOffset = 140;
                                         scaleFactor = 0.7;
@@ -243,25 +261,26 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         isHomeOpen = false;
                                         SystemChrome.setSystemUIOverlayStyle(
                                             SystemUiOverlayStyle(
-                                          statusBarColor: Colors.transparent,
-                                          // isHomeOpen
-                                          //     ? backgroundColor
-                                          //     : drawerColor,
-                                          statusBarIconBrightness: isHomeOpen
-                                              ? Brightness.dark
-                                              : Brightness.light,
-                                          systemNavigationBarColor: isHomeOpen
-                                              ? backgroundColor
-                                              : drawerColor,
-                                          systemNavigationBarIconBrightness:
+                                              statusBarColor: Colors
+                                                  .transparent,
+                                              // isHomeOpen
+                                              //     ? backgroundColor
+                                              //     : drawerColor,
+                                              statusBarIconBrightness: isHomeOpen
+                                                  ? Brightness.dark
+                                                  : Brightness.light,
+                                              systemNavigationBarColor: isHomeOpen
+                                                  ? backgroundColor
+                                                  : drawerColor,
+                                              systemNavigationBarIconBrightness:
                                               isHomeOpen
                                                   ? Brightness.dark
                                                   : Brightness.light,
-                                          systemNavigationBarDividerColor:
+                                              systemNavigationBarDividerColor:
                                               isHomeOpen
                                                   ? backgroundColor
                                                   : drawerColor,
-                                        ));
+                                            ));
                                       });
                                     }),
                                   ),
@@ -304,7 +323,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           }),
                                         ),
                                         Container(
-                                          width: 40,
+                                          padding: EdgeInsets.only(left: 5),
+                                          width: 60,
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'periodMin',
@@ -327,7 +347,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           ),
                                         )),
                                         Container(
-                                          width: 40,
+                                          padding: EdgeInsets.only(right: 5),
+                                          width: 60,
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'periodSec',
@@ -389,7 +410,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           }),
                                         ),
                                         Container(
-                                          width: 40,
+                                          width: 60,
+                                          padding: EdgeInsets.only(left: 5),
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'breakMin',
@@ -413,7 +435,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           ),
                                         ),
                                         Container(
-                                            width: 40,
+                                            width: 60,
+                                            padding: EdgeInsets.only(right: 5),
                                             alignment: Alignment.center,
                                             child: myTextField(
                                               controllerName: 'breakSec',
@@ -474,7 +497,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           }),
                                         ),
                                         Container(
-                                          width: 90,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          width: 130,
                                           child: myTextField(
                                             controllerName: 'sets',
                                             func: (val) {
@@ -520,16 +545,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             context,
                                             PageRouteBuilder(
                                                 transitionDuration:
-                                                    Duration(milliseconds: 700),
+                                                Duration(milliseconds: 250),
                                                 reverseTransitionDuration:
-                                                    Duration(milliseconds: 250),
+                                                Duration(milliseconds: 150),
                                                 transitionsBuilder:
                                                     (BuildContext context,
-                                                        Animation<double>
-                                                            animation,
-                                                        Animation<double>
-                                                            secAnimation,
-                                                        Widget child) {
+                                                    Animation<double>
+                                                    animation,
+                                                    Animation<double>
+                                                    secAnimation,
+                                                    Widget child) {
                                                   return FadeTransition(
                                                     opacity: animation,
                                                     child: child,
@@ -604,17 +629,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                               context,
                                               PageRouteBuilder(
                                                   transitionDuration: Duration(
-                                                      milliseconds: 700),
+                                                      milliseconds: 250),
                                                   reverseTransitionDuration:
-                                                      Duration(
-                                                          milliseconds: 250),
+                                                  Duration(
+                                                      milliseconds: 150),
                                                   transitionsBuilder:
                                                       (BuildContext context,
-                                                          Animation<double>
-                                                              animation,
-                                                          Animation<double>
-                                                              secAnimation,
-                                                          Widget child) {
+                                                      Animation<double>
+                                                      animation,
+                                                      Animation<double>
+                                                      secAnimation,
+                                                      Widget child) {
                                                     return FadeTransition(
                                                       opacity: animation,
                                                       child: child,

@@ -160,20 +160,21 @@ class _savedPageState extends State<savedPage> {
                                 context,
                                 PageRouteBuilder(
                                     transitionDuration:
-                                        Duration(milliseconds: 700),
-                                    reverseTransitionDuration:
-                                        Duration(milliseconds: 250),
-                                    transitionsBuilder: (BuildContext context,
-                                        Animation<double> animation,
-                                        Animation<double> secAnimation,
-                                        Widget child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                    pageBuilder: (BuildContext context,
-                                        Animation<double> animation,
+                                              Duration(milliseconds: 250),
+                                          reverseTransitionDuration:
+                                              Duration(milliseconds: 150),
+                                          transitionsBuilder: (BuildContext
+                                                  context,
+                                              Animation<double> animation,
+                                              Animation<double> secAnimation,
+                                              Widget child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                          pageBuilder: (BuildContext context,
+                                              Animation<double> animation,
                                         Animation<double> secAnimation) {
                                       return TimerPage(
                                         args: [

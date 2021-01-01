@@ -1,12 +1,6 @@
 import 'package:flutter/material.dart';
 
-//particles: 10,
-//   foregroundColor: Color(0xff59ab5b),
-//   backgroundColor: Color(0xff0a5a55),
-//   size: 0.62,
-//   speed: 7.69,
-//   offset: 0.37,
-//   blendMode: BlendMode.plus,
+final drawerAnimDur = 350;
 ValueNotifier<int> indexOfMenu =
     ValueNotifier<int>(0); //Timer,Stats,Donate,About,Rate
 Map retain = {

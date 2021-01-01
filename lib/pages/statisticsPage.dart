@@ -18,6 +18,7 @@ class _StatisticsPageState extends State<StatisticsPage>
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
+  bool isBackPressed = false;
   AnimationController playGradientControl;
   Animation edges;
 
@@ -29,6 +30,7 @@ class _StatisticsPageState extends State<StatisticsPage>
     setState(() {
       xOffset = 250;
       yOffset = 140;
+      isBackPressed = false;
       scaleFactor = 0.7;
       isDrawerOpen = true;
       isStatsOpen = false;
@@ -53,6 +55,7 @@ class _StatisticsPageState extends State<StatisticsPage>
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (isStatsOpen) {
       setState(() {
+        isBackPressed = true;
         xOffset = adjusted(250);
         yOffset = adjusted(140);
         playGradientControl.forward();
@@ -65,9 +68,9 @@ class _StatisticsPageState extends State<StatisticsPage>
               isStatsOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarColor: isStatsOpen ? backgroundColor : drawerColor,
           systemNavigationBarIconBrightness:
-              isStatsOpen ? Brightness.dark : Brightness.light,
+          isStatsOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarDividerColor:
-              isStatsOpen ? backgroundColor : drawerColor,
+          isStatsOpen ? backgroundColor : drawerColor,
         ));
       });
       return true;
@@ -88,15 +91,34 @@ class _StatisticsPageState extends State<StatisticsPage>
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
+          if (!isStatsOpen && indexOfMenu.value == 1 && !isBackPressed) {
+            Future.delayed(Duration(microseconds: 1)).then((value) {
+              setState(() {
+                xOffset = 0;
+                playGradientControl.reverse();
+                yOffset = 0;
+                scaleFactor = 1;
+                isDrawerOpen = false;
+                isStatsOpen = true;
+              });
+            });
+          } else if (indexOfMenu.value != 1)
+            isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 450),
+          duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           onEnd: (() {
             if (isStatsOpen && indexOfMenu.value == 1) {
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -120,6 +142,7 @@ class _StatisticsPageState extends State<StatisticsPage>
             onTap: (() {
               if (!isStatsOpen && indexOfMenu.value == 1) {
                 setState(() {
+                  isBackPressed = false;
                   xOffset = 0;
                   playGradientControl.reverse();
                   yOffset = 0;
@@ -132,6 +155,7 @@ class _StatisticsPageState extends State<StatisticsPage>
             onHorizontalDragEnd: ((_) {
               if (!isStatsOpen && indexOfMenu.value == 1) {
                 setState(() {
+                  isBackPressed = false;
                   xOffset = 0;
                   playGradientControl.reverse();
                   yOffset = 0;

@@ -25,6 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   ValueNotifier<String> Voice = ValueNotifier<String>('');
   AudioCache audioPlayer;
   double positionOffset = 70;
+  bool isBackPressed = false;
 
   @override
   void initState() {
@@ -34,6 +35,7 @@ class _SettingsPageState extends State<SettingsPage> {
     BackButtonInterceptor.add(myInterceptor);
     setState(() {
       xOffset = 250;
+      isBackPressed = false;
       yOffset = 140;
       scaleFactor = 0.7;
       isDrawerOpen = true;
@@ -53,6 +55,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (isSettingsOpen) {
       setState(() {
+        isBackPressed = true;
         xOffset = adjusted(250);
         yOffset = adjusted(140);
         positionOffset = 70;
@@ -64,11 +67,11 @@ class _SettingsPageState extends State<SettingsPage> {
           statusBarIconBrightness:
               isSettingsOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarColor:
-              isSettingsOpen ? backgroundColor : drawerColor,
+          isSettingsOpen ? backgroundColor : drawerColor,
           systemNavigationBarIconBrightness:
-              isSettingsOpen ? Brightness.dark : Brightness.light,
+          isSettingsOpen ? Brightness.dark : Brightness.light,
           systemNavigationBarDividerColor:
-              isSettingsOpen ? backgroundColor : drawerColor,
+          isSettingsOpen ? backgroundColor : drawerColor,
         ));
       });
       return true;
@@ -104,15 +107,34 @@ class _SettingsPageState extends State<SettingsPage> {
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
+          if (!isSettingsOpen && indexOfMenu.value == 4 && !isBackPressed) {
+            Future.delayed(Duration(microseconds: 1)).then((value) {
+              setState(() {
+                xOffset = 0;
+                yOffset = 0;
+                positionOffset = 0;
+                scaleFactor = 1;
+                isDrawerOpen = false;
+                isSettingsOpen = true;
+              });
+            });
+          } else if (indexOfMenu.value != 4)
+            isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 450),
+          duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           onEnd: (() {
             if (isSettingsOpen && indexOfMenu.value == 4) {
               print('5animabout');

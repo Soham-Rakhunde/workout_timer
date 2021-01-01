@@ -128,9 +128,9 @@ class _mainPageState extends State<mainPage>
                               context,
                               PageRouteBuilder(
                                   transitionDuration:
-                                      Duration(milliseconds: 700),
-                                  reverseTransitionDuration:
                                       Duration(milliseconds: 250),
+                                  reverseTransitionDuration:
+                                      Duration(milliseconds: 150),
                                   transitionsBuilder: (BuildContext context,
                                       Animation<double> animation,
                                       Animation<double> secAnimation,

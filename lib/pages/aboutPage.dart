@@ -22,6 +22,7 @@ class _AboutPageState extends State<AboutPage> {
   double yOffset = 0;
   double scaleFactor = 1;
   double logoAnim = 0;
+  bool isBackPressed = false;
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _AboutPageState extends State<AboutPage> {
     setState(() {
       xOffset = 250;
       yOffset = 140;
+      isBackPressed = false;
       scaleFactor = 0.7;
       isDrawerOpen = true;
       isAboutOpen = false;
@@ -46,17 +48,16 @@ class _AboutPageState extends State<AboutPage> {
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     if (isAboutOpen) {
       setState(() {
+        isBackPressed = true;
         xOffset = adjusted(250);
         yOffset = adjusted(140);
         scaleFactor = 0.7;
         isDrawerOpen = true;
         isAboutOpen = false;
-        SystemChrome.setSystemUIOverlayStyle(
-            SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: isAboutOpen
-                  ? Brightness.dark
-                  : Brightness.light,
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              isAboutOpen ? Brightness.dark : Brightness.light,
               systemNavigationBarColor: isAboutOpen
                   ? backgroundColor
                   : drawerColor,
@@ -92,15 +93,33 @@ class _AboutPageState extends State<AboutPage> {
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
+          if (!isAboutOpen && indexOfMenu.value == 3 && !isBackPressed) {
+            Future.delayed(Duration(microseconds: 1)).then((value) {
+              setState(() {
+                xOffset = 0;
+                yOffset = 0;
+                scaleFactor = 1;
+                isDrawerOpen = false;
+                isAboutOpen = true;
+              });
+            });
+          } else if (indexOfMenu.value != 3)
+            isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
-          duration: Duration(milliseconds: 450),
+          duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          height: MediaQuery
+              .of(context)
+              .size
+              .height,
+          width: MediaQuery
+              .of(context)
+              .size
+              .width,
           onEnd: (() {
             if (isAboutOpen && indexOfMenu.value == 3) {
               print('5animabout');
@@ -183,6 +202,7 @@ class _AboutPageState extends State<AboutPage> {
                               ),
                               onPress: (() {
                                 setState(() {
+                                  isBackPressed = true;
                                   xOffset = adjusted(250);
                                   yOffset = adjusted(140);
                                   scaleFactor = 0.7;
@@ -190,21 +210,21 @@ class _AboutPageState extends State<AboutPage> {
                                   isAboutOpen = false;
                                   SystemChrome.setSystemUIOverlayStyle(
                                       SystemUiOverlayStyle(
-                                    statusBarColor: Colors.transparent,
-                                    statusBarIconBrightness: isAboutOpen
-                                        ? Brightness.dark
-                                        : Brightness.light,
-                                    systemNavigationBarColor: isAboutOpen
-                                        ? backgroundColor
-                                        : drawerColor,
-                                    systemNavigationBarIconBrightness:
+                                        statusBarColor: Colors.transparent,
+                                        statusBarIconBrightness: isAboutOpen
+                                            ? Brightness.dark
+                                            : Brightness.light,
+                                        systemNavigationBarColor: isAboutOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                        systemNavigationBarIconBrightness:
                                         isAboutOpen
                                             ? Brightness.dark
                                             : Brightness.light,
-                                    systemNavigationBarDividerColor: isAboutOpen
-                                        ? backgroundColor
-                                        : drawerColor,
-                                  ));
+                                        systemNavigationBarDividerColor: isAboutOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                      ));
                                 });
                               }),
                             ),
@@ -271,7 +291,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 1.1.0',
+                        'Version 1.1.2',
                         style: kTextStyle.copyWith(
                           color: isDark.value ? Colors.white : Colors.black,
                         ),
@@ -400,7 +420,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '1.1.0',
+                            applicationVersion: '1.1.2',
                           );
                         }),
                         child: Container(
