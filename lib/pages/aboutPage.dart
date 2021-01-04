@@ -266,6 +266,10 @@ class _AboutPageState extends State<AboutPage> {
                         child: ClipOval(
                           child: Image.asset(
                             'assets/logoblender.png',
+                            color: isDark.value
+                                ? backgroundC[0].withAlpha(243)
+                                : Colors.transparent,
+                            colorBlendMode: BlendMode.difference,
                           ),
                         ),
                       ),
@@ -291,7 +295,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 1.2.0',
+                        'Version 1.2.2',
                         style: kTextStyle.copyWith(
                           color: isDark.value ? Colors.white : Colors.black,
                         ),
@@ -420,7 +424,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '1.2.0',
+                            applicationVersion: '1.2.2',
                           );
                         }),
                         child: Container(

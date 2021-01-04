@@ -87,17 +87,16 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
                 ),
               ),
               Positioned.fill(
-                child:widget.animated
-                      ?Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: AnimatedIcon(
-                          icon: widget.ico,
-                          size: 30,
-                          color: textColor,
-                          progress: playPauseController,
-                        ),
-                      )
-                      :widget.ico),
+                child: widget.animated
+                      ? Center(
+                          child: AnimatedIcon(
+                            icon: widget.ico,
+                            size: 30,
+                            color: textColor,
+                            progress: playPauseController,
+                          ),
+                        )
+                      : widget.ico),
             ],
           );
         },

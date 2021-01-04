@@ -46,6 +46,8 @@ class _TimerPageState extends State<TimerPage> {
 
   SharedPref savedData = SharedPref();
 
+  int flexFactor;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -86,7 +88,7 @@ class _TimerPageState extends State<TimerPage> {
   void startTimer(int time) async {
     while (timeInSec.value >= 0) {
       while (!resumeFlag.value) {
-        await Future.delayed(Duration(milliseconds: 100));
+        await Future.delayed(Duration(milliseconds: 400));
       }
       if (i.value > s) {
         break;
@@ -147,6 +149,7 @@ class _TimerPageState extends State<TimerPage> {
 
   @override
   build(BuildContext context) {
+    flexFactor = ((MediaQuery.of(context).size.width - 50) / 10).toInt();
     periodT = widget.args[0];
     breakT = widget.args[1];
     s = widget.args[2];
@@ -170,8 +173,11 @@ class _TimerPageState extends State<TimerPage> {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 60),
+                        Spacer(
+                          flex: 3 * flexFactor,
+                        ),
+                        Expanded(
+                          flex: 3 * flexFactor,
                           child: ValueListenableBuilder<String>(
                             valueListenable: _titleName,
                             builder: (context, value, child) {
@@ -187,134 +193,144 @@ class _TimerPageState extends State<TimerPage> {
                             },
                           ),
                         ),
-                        Container(
-                          width: MediaQuery.of(context).size.width - 50,
-                          height: MediaQuery.of(context).size.width - 50,
-                          child: buildStack(
-                            tickTime: tickTime,
-                            timeInSec: timeInSec,
-                            i: i,
+                        Spacer(
+                          flex: 2 * flexFactor,
+                        ),
+                        Expanded(
+                          flex: 20 * flexFactor,
+                          child: Container(
+                            // width: MediaQuery.of(context).size.width - 50,
+                            height: MediaQuery.of(context).size.width - 50,
+                            child: buildStack(
+                              tickTime: tickTime,
+                              timeInSec: timeInSec,
+                              i: i,
+                            ),
                           ),
                         ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Container(
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 40,
-                                padding: EdgeInsets.only(
-                                    top: 20, left: 25, right: 25, bottom: 20),
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.circular(32),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: shadowColor,
-                                        offset: Offset(
-                                            8 - value * 8, 6 - value * 6),
-                                        blurRadius: 12),
-                                    BoxShadow(
-                                        color: lightShadowColor,
-                                        offset: Offset(
-                                            -8 + value * 8, -6 + value * 6),
-                                        blurRadius: 12),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: [
-                                    Text(
-                                      'Set',
-                                      style: kTextStyle.copyWith(
-                                        letterSpacing: 0.5,
-                                        color: isDark.value
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    ValueListenableBuilder(
-                                      valueListenable: i,
-                                      builder: (context, value, child) {
-                                        return Text(
-                                          '${i.value}/$s',
-                                          style: kTextStyle.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 40,
-                                            color: isDark.value
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                )),
-                            Container(
-                                width:
-                                    MediaQuery.of(context).size.width / 2 - 40,
-                                padding: EdgeInsets.only(
-                                    top: 20, left: 25, right: 25, bottom: 20),
-                                decoration: BoxDecoration(
-                                  color: backgroundColor,
-                                  borderRadius: BorderRadius.circular(32),
-                                  boxShadow: [
-                                    BoxShadow(
-                                        color: shadowColor,
-                                        offset: Offset(8, 6),
-                                        blurRadius: 12),
-                                    BoxShadow(
-                                        color: lightShadowColor,
-                                        offset: Offset(-8, -6),
-                                        blurRadius: 12),
-                                  ],
-                                ),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      'Progress',
-                                      overflow: TextOverflow.ellipsis,
-                                      style: kTextStyle.copyWith(
-                                        letterSpacing: 0.5,
-                                        color: isDark.value
-                                            ? Colors.white
-                                            : Colors.black,
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      height: 20,
-                                    ),
-                                    ValueListenableBuilder(
-                                      valueListenable: progress,
-                                      builder: (context, value, child) {
-                                        return Text(
-                                          progress.value >= 99.5
-                                              ? '100'
-                                              : '${progress.value.toStringAsFixed(0)}%',
-                                          style: kTextStyle.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 40,
-                                            color: isDark.value
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                )),
-                          ],
+                        Spacer(
+                          flex: 3 * flexFactor,
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(bottom: 30),
+                        Expanded(
+                          flex: 7 * flexFactor,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Container(
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      40,
+                                  padding: EdgeInsets.only(
+                                      top: 20, left: 25, right: 25, bottom: 20),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    borderRadius: BorderRadius.circular(32),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: shadowColor,
+                                          offset: Offset(
+                                              8 - value * 8, 6 - value * 6),
+                                          blurRadius: 12),
+                                      BoxShadow(
+                                          color: lightShadowColor,
+                                          offset: Offset(
+                                              -8 + value * 8, -6 + value * 6),
+                                          blurRadius: 12),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      Text(
+                                        'Set',
+                                        style: kTextStyle.copyWith(
+                                          letterSpacing: 0.5,
+                                          color: isDark.value
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      ValueListenableBuilder(
+                                        valueListenable: i,
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            '${i.value}/$s',
+                                            style: kTextStyle.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 40,
+                                              color: isDark.value
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                              Container(
+                                  width: MediaQuery.of(context).size.width / 2 -
+                                      40,
+                                  padding: EdgeInsets.only(
+                                      top: 20, left: 25, right: 25, bottom: 20),
+                                  decoration: BoxDecoration(
+                                    color: backgroundColor,
+                                    borderRadius: BorderRadius.circular(32),
+                                    boxShadow: [
+                                      BoxShadow(
+                                          color: shadowColor,
+                                          offset: Offset(8, 6),
+                                          blurRadius: 12),
+                                      BoxShadow(
+                                          color: lightShadowColor,
+                                          offset: Offset(-8, -6),
+                                          blurRadius: 12),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    mainAxisSize: MainAxisSize.max,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        'Progress',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: kTextStyle.copyWith(
+                                          letterSpacing: 0.5,
+                                          color: isDark.value
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                      ValueListenableBuilder(
+                                        valueListenable: progress,
+                                        builder: (context, value, child) {
+                                          return Text(
+                                            progress.value >= 99.5
+                                                ? '100'
+                                                : '${progress.value.toStringAsFixed(0)}%',
+                                            style: kTextStyle.copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 40,
+                                              color: isDark.value
+                                                  ? Colors.white
+                                                  : Colors.black,
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  )),
+                            ],
+                          ),
+                        ),
+                        Spacer(
+                          flex: 3 * flexFactor,
+                        ),
+                        Expanded(
+                          flex: 4 * flexFactor,
                           child: Row(
                             children: [
                               Spacer(
@@ -368,6 +384,9 @@ class _TimerPageState extends State<TimerPage> {
                               ),
                             ],
                           ),
+                        ),
+                        Spacer(
+                          flex: 1 * flexFactor,
                         ),
                       ],
                     );
