@@ -137,7 +137,6 @@ class _SettingsPageState extends State<SettingsPage> {
               .width,
           onEnd: (() {
             if (isSettingsOpen && indexOfMenu.value == 4) {
-              print('5animabout');
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness:

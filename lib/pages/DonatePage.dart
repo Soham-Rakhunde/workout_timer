@@ -1,15 +1,18 @@
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/services/colorEllipse.dart';
-// import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class DonatePage extends StatefulWidget {
   @override
@@ -17,6 +20,7 @@ class DonatePage extends StatefulWidget {
 }
 
 class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
+  static const _productIds = {'80_spoon'};
   double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
@@ -26,12 +30,17 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   AnimationController xcontroller;
   Animation<double> xanimation;
   double positionOffset = 70;
+
   final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'soham.s.rakhunde.com',
       queryParameters: {'subject': 'Bug_Report'});
   AnimationController ycontroller;
   Animation<double> yanimation;
+
+  InAppPurchaseConnection _connection = InAppPurchaseConnection.instance;
+  StreamSubscription<List<PurchaseDetails>> _subscription;
+  List<ProductDetails> _products = [];
 
   // static const String iapId = 'android.test.purchased';
   // List<IAPItem> _items = [];
@@ -41,6 +50,18 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
+
+    Stream purchaseUpdated =
+        InAppPurchaseConnection.instance.purchaseUpdatedStream;
+    _subscription = purchaseUpdated.listen((purchaseDetailsList) {
+      _listenToPurchaseUpdated(purchaseDetailsList);
+    }, onDone: () {
+      _subscription.cancel();
+    }, onError: (error) {
+      // handle error here.
+    });
+    initStoreInfo();
+
     // initPlatformState(InappPurchase);
     BackButtonInterceptor.add(myInterceptor);
     xcontroller = AnimationController(
@@ -65,6 +86,36 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
     super.dispose();
+  }
+
+  initStoreInfo() async {
+    ProductDetailsResponse productDetailResponse =
+        await _connection.queryProductDetails(_productIds);
+    if (productDetailResponse.error == null) {
+      setState(() {
+        _products = productDetailResponse.productDetails;
+      });
+    }
+  }
+
+  _listenToPurchaseUpdated(List<PurchaseDetails> purchaseDetailsList) {
+    purchaseDetailsList.forEach((PurchaseDetails purchaseDetails) async {
+      if (purchaseDetails.status == PurchaseStatus.pending) {
+        // show progress bar or something
+      } else {
+        if (purchaseDetails.status == PurchaseStatus.error) {
+          // show error message or failure icon
+        } else if (purchaseDetails.status == PurchaseStatus.purchased) {
+          // show success message and deliver the product.
+        }
+      }
+    });
+  }
+
+  _buyProduct(int num) {
+    final PurchaseParam purchaseParam =
+        PurchaseParam(productDetails: _products[0]);
+    _connection.buyConsumable(purchaseParam: purchaseParam);
   }
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
@@ -137,17 +188,16 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
               .width,
           onEnd: (() {
             if (isDonateOpen && indexOfMenu.value == 2) {
-              print('5animabout');
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness:
-                    isDonateOpen ? Brightness.dark : Brightness.light,
+                isDonateOpen ? Brightness.dark : Brightness.light,
                 systemNavigationBarColor:
-                    isDonateOpen ? backgroundColor : drawerColor,
+                isDonateOpen ? backgroundColor : drawerColor,
                 systemNavigationBarIconBrightness:
-                    isDonateOpen ? Brightness.dark : Brightness.light,
+                isDonateOpen ? Brightness.dark : Brightness.light,
                 systemNavigationBarDividerColor:
-                    isDonateOpen ? backgroundColor : drawerColor,
+                isDonateOpen ? backgroundColor : drawerColor,
               ));
             }
           }),
@@ -191,7 +241,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                 ),
                 child: ClipRRect(
                   borderRadius:
-                      BorderRadius.all(Radius.circular(isDonateOpen ? 0 : 28)),
+                  BorderRadius.all(Radius.circular(isDonateOpen ? 0 : 28)),
                   child: Stack(
                     children: [
                       AnimatedPositioned(
@@ -287,22 +337,22 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                       isDonateOpen = false;
                                       SystemChrome.setSystemUIOverlayStyle(
                                           SystemUiOverlayStyle(
-                                        statusBarColor: Colors.transparent,
-                                        statusBarIconBrightness: isDonateOpen
-                                            ? Brightness.dark
-                                            : Brightness.light,
-                                        systemNavigationBarColor: isDonateOpen
-                                            ? backgroundColor
-                                            : drawerColor,
-                                        systemNavigationBarIconBrightness:
+                                            statusBarColor: Colors.transparent,
+                                            statusBarIconBrightness: isDonateOpen
+                                                ? Brightness.dark
+                                                : Brightness.light,
+                                            systemNavigationBarColor: isDonateOpen
+                                                ? backgroundColor
+                                                : drawerColor,
+                                            systemNavigationBarIconBrightness:
                                             isDonateOpen
                                                 ? Brightness.dark
                                                 : Brightness.light,
-                                        systemNavigationBarDividerColor:
+                                            systemNavigationBarDividerColor:
                                             isDonateOpen
                                                 ? backgroundColor
                                                 : drawerColor,
-                                      ));
+                                          ));
                                     });
                                   }),
                                   padding: EdgeInsets.only(right: 30),
@@ -321,21 +371,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                             child: AspectRatio(
                               aspectRatio: 3 / 2,
                               child: GestureDetector(
-                                onTap: (() =>
-                                    Scaffold.of(context).showSnackBar(SnackBar(
-                                      duration: Duration(seconds: 1),
-                                      backgroundColor: Colors.transparent,
-                                      content: Text(
-                                        'In-App Purchases are disabled until next update',
-                                        style: kTextStyle.copyWith(
-                                          color: isDark.value
-                                              ? Colors.white
-                                              : Colors.black,
-                                        ),
-                                      ),
-                                    ))),
                                 onPanStart: (details) {
-                                  print('hori start');
                                   xcontroller.reset();
                                   ycontroller.reset();
                                   setState(() {
@@ -344,7 +380,6 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                   });
                                 },
                                 onPanUpdate: (details) {
-                                  print('hori  ${details.delta}');
                                   setState(() {
                                     xCard += details.delta.dx;
                                     xCard %= 360;
@@ -354,26 +389,26 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                 },
                                 onPanEnd: (details) {
                                   final double xend =
-                                      360 - xCard >= 180 ? 0 : 360;
+                                  360 - xCard >= 180 ? 0 : 360;
                                   xanimation =
-                                      Tween<double>(begin: xCard, end: xend)
-                                          .animate(xcontroller)
-                                            ..addListener(() {
-                                              setState(() {
-                                                xCard = xanimation.value;
-                                              });
-                                            });
+                                  Tween<double>(begin: xCard, end: xend)
+                                      .animate(xcontroller)
+                                    ..addListener(() {
+                                      setState(() {
+                                        xCard = xanimation.value;
+                                      });
+                                    });
                                   xcontroller.forward();
                                   final double yend =
-                                      360 - yCard >= 180 ? 0 : 360;
+                                  360 - yCard >= 180 ? 0 : 360;
                                   yanimation =
-                                      Tween<double>(begin: yCard, end: yend)
-                                          .animate(ycontroller)
-                                            ..addListener(() {
-                                              setState(() {
-                                                yCard = yanimation.value;
-                                              });
-                                            });
+                                  Tween<double>(begin: yCard, end: yend)
+                                      .animate(ycontroller)
+                                    ..addListener(() {
+                                      setState(() {
+                                        yCard = yanimation.value;
+                                      });
+                                    });
                                   ycontroller.forward();
                                 },
                                 child: Transform(
@@ -382,119 +417,231 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                     ..rotateX(yCard / 180 * pi)
                                     ..rotateY(-xCard / 180 * pi),
                                   alignment: Alignment.center,
-                                  child: ClipRRect(
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
-                                    child: BackdropFilter(
-                                      filter: ImageFilter.blur(
-                                        sigmaX: 12,
-                                        sigmaY: 12,
+                                  child: FocusedMenuHolder(
+                                    menuBoxDecoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                            colors: [
+                                              Colors.white.withOpacity(0.4),
+                                              Colors.white.withOpacity(0.01),
+                                            ]),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(30)),
+                                        border: Border.all(
+                                          color: Colors.white.withOpacity(0.8),
+                                        )),
+                                    menuWidth:
+                                        MediaQuery.of(context).size.width -
+                                            20 * 2,
+                                    menuItemExtent: 55,
+                                    menuItems: [
+                                      FocusedMenuItem(
+                                        title: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Buy me some Water',
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontFamily: 'MontserratBold',
+                                            ),
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        trailingIcon: Icon(
+                                            Icons.local_bar_rounded,
+                                            color: textColor),
+                                        onPressed: () => print('fuck'),
                                       ),
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                                colors: [
-                                                  Colors.white.withOpacity(0.4),
-                                                  Colors.white
-                                                      .withOpacity(0.01),
-                                                ]),
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(30)),
-                                            border: Border.all(
-                                              color:
-                                                  Colors.white.withOpacity(0.8),
-                                            )),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    flex: 6,
-                                                    child: Image.asset(
-                                                      'assets/logo/cc-visa.png',
-                                                      color: textColor,
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 3,
-                                                    child: SizedBox(),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 3,
-                                                    child: Text(
-                                                      '4856 1289 6547 2323',
-                                                      style: TextStyle(
+                                      FocusedMenuItem(
+                                        title: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Buy me a Spoon',
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontFamily: 'MontserratBold',
+                                            ),
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        trailingIcon: Icon(
+                                            Icons.restaurant_rounded,
+                                            color: textColor),
+                                        onPressed: () async =>
+                                            await _buyProduct(0),
+                                      ),
+                                      FocusedMenuItem(
+                                        title: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Buy me a Coffee',
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontFamily: 'MontserratBold',
+                                            ),
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        trailingIcon: Icon(
+                                            Icons.local_cafe_rounded,
+                                            color: textColor),
+                                        onPressed: () => null,
+                                      ),
+                                      FocusedMenuItem(
+                                        title: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Buy me a Treat',
+                                            style: TextStyle(
+                                              color: textColor,
+                                              fontFamily: 'MontserratBold',
+                                            ),
+                                          ),
+                                        ),
+                                        backgroundColor: Colors.transparent,
+                                        trailingIcon: Icon(
+                                            Icons.fastfood_rounded,
+                                            color: textColor),
+                                        onPressed: () => null,
+                                      ),
+                                      FocusedMenuItem(
+                                        title: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            'Gimme all of it',
+                                            style: TextStyle(
+                                                color: textColor,
+                                                fontFamily: 'MontserratBold'),
+                                          ),
+                                        ),
+                                        trailingIcon: Icon(
+                                            Icons.all_inclusive_rounded,
+                                            color: textColor),
+                                        backgroundColor: Colors.transparent,
+                                        onPressed: () => null,
+                                      ),
+                                    ],
+                                    blurBackgroundColor: backgroundColor,
+                                    menuOffset: 20,
+                                    openWithTap: true,
+                                    onPressed: () {},
+                                    child: ClipRRect(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(30)),
+                                      child: BackdropFilter(
+                                        filter: ImageFilter.blur(
+                                          sigmaX: 12,
+                                          sigmaY: 12,
+                                        ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              gradient: LinearGradient(
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                  colors: [
+                                                    Colors.white
+                                                        .withOpacity(0.4),
+                                                    Colors.white
+                                                        .withOpacity(0.01),
+                                                  ]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(30)),
+                                              border: Border.all(
+                                                color: Colors.white
+                                                    .withOpacity(0.8),
+                                              )),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 6,
+                                                      child: Image.asset(
+                                                        'assets/logo/cc-visa.png',
                                                         color: textColor,
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        letterSpacing: 1.8,
                                                       ),
                                                     ),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 2,
-                                                    child: SizedBox(),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 3,
-                                                    child: Text(
-                                                      'Rakhunde Soham',
-                                                      style: TextStyle(
-                                                        color: textColor,
-                                                        fontFamily: 'Cursive',
-                                                        fontSize: 22,
-                                                        letterSpacing: 1.5,
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: SizedBox(),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Text(
+                                                        '4856 1289 6547 2323',
+                                                        style: TextStyle(
+                                                          color: textColor,
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 1.8,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                              Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.end,
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
-                                                children: [
-                                                  Expanded(
-                                                    flex: 4,
-                                                    child: Image.asset(
-                                                      'assets/logo/cc-chip.png',
-                                                      color: textColor,
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: SizedBox(),
                                                     ),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 8,
-                                                    child: SizedBox(),
-                                                  ),
-                                                  Expanded(
-                                                    flex: 2,
-                                                    child: Text(
-                                                      '07/24',
-                                                      style: TextStyle(
-                                                        color: textColor,
-                                                        fontSize: 20,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        letterSpacing: 1.8,
+                                                    Expanded(
+                                                      flex: 3,
+                                                      child: Text(
+                                                        'Rakhunde Soham',
+                                                        style: TextStyle(
+                                                          color: textColor,
+                                                          fontFamily: 'Cursive',
+                                                          fontSize: 22,
+                                                          letterSpacing: 1.5,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ],
+                                                  ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      flex: 4,
+                                                      child: Image.asset(
+                                                        'assets/logo/cc-chip.png',
+                                                        color: textColor,
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 8,
+                                                      child: SizedBox(),
+                                                    ),
+                                                    Expanded(
+                                                      flex: 2,
+                                                      child: Text(
+                                                        '07/24',
+                                                        style: TextStyle(
+                                                          color: textColor,
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          letterSpacing: 1.8,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ),
                                       ),
@@ -522,7 +669,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                           Colors.white.withOpacity(0.01),
                                         ]),
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(30)),
+                                    BorderRadius.all(Radius.circular(30)),
                                     border: Border.all(
                                       color: Colors.white.withOpacity(0.8),
                                     )),
@@ -530,9 +677,9 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                   padding: const EdgeInsets.all(20),
                                   child: Column(
                                     mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
+                                    MainAxisAlignment.spaceBetween,
                                     crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    CrossAxisAlignment.center,
                                     children: [
                                       SizedBox(
                                         height: 10,
@@ -549,9 +696,9 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                       ),
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
+                                        MainAxisAlignment.spaceEvenly,
                                         crossAxisAlignment:
-                                            CrossAxisAlignment.center,
+                                        CrossAxisAlignment.center,
                                         children: [
                                           Expanded(
                                             flex: 5,
@@ -571,7 +718,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                   gradient: LinearGradient(
                                                       begin: Alignment.topLeft,
                                                       end:
-                                                          Alignment.bottomRight,
+                                                      Alignment.bottomRight,
                                                       colors: [
                                                         Colors.white
                                                             .withOpacity(0.4),
@@ -579,8 +726,8 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                             .withOpacity(0.0),
                                                       ]),
                                                   borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(25)),
+                                                  BorderRadius.all(
+                                                      Radius.circular(25)),
                                                 ),
                                                 padding: EdgeInsets.all(15),
                                                 margin: EdgeInsets.all(5),
@@ -611,7 +758,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                   gradient: LinearGradient(
                                                       begin: Alignment.topLeft,
                                                       end:
-                                                          Alignment.bottomRight,
+                                                      Alignment.bottomRight,
                                                       colors: [
                                                         Colors.white
                                                             .withOpacity(0.4),
@@ -619,8 +766,8 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                             .withOpacity(0.01),
                                                       ]),
                                                   borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(25)),
+                                                  BorderRadius.all(
+                                                      Radius.circular(25)),
                                                 ),
                                                 padding: EdgeInsets.all(15),
                                                 margin: EdgeInsets.all(5),
@@ -652,7 +799,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                   gradient: LinearGradient(
                                                       begin: Alignment.topLeft,
                                                       end:
-                                                          Alignment.bottomRight,
+                                                      Alignment.bottomRight,
                                                       colors: [
                                                         Colors.white
                                                             .withOpacity(0.4),
@@ -660,8 +807,8 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                                             .withOpacity(0.01),
                                                       ]),
                                                   borderRadius:
-                                                      BorderRadius.all(
-                                                          Radius.circular(25)),
+                                                  BorderRadius.all(
+                                                      Radius.circular(25)),
                                                 ),
                                                 padding: EdgeInsets.all(15),
                                                 margin: EdgeInsets.all(5),
@@ -685,28 +832,117 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                           ),
                           Padding(
                             padding: const EdgeInsets.fromLTRB(20, 0, 20, 30),
-                            child: ClipRRect(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30)),
-                              child: BackdropFilter(
-                                filter: ImageFilter.blur(
-                                  sigmaX: 12,
-                                  sigmaY: 12,
-                                ),
-                                child: GestureDetector(
-                                  onTap: () => Scaffold.of(context)
-                                      .showSnackBar(SnackBar(
-                                    duration: Duration(seconds: 1),
-                                    backgroundColor: Colors.transparent,
-                                    content: Text(
-                                      'In-App Purchases are disabled until next update',
-                                      style: kTextStyle.copyWith(
-                                        color: isDark.value
-                                            ? Colors.white
-                                            : Colors.black,
+                            child: FocusedMenuHolder(
+                              menuBoxDecoration: BoxDecoration(
+                                  gradient: LinearGradient(
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                      colors: [
+                                        Colors.white.withOpacity(0.4),
+                                        Colors.white.withOpacity(0.01),
+                                      ]),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30)),
+                                  border: Border.all(
+                                    color: Colors.white.withOpacity(0.8),
+                                  )),
+                              menuWidth:
+                                  MediaQuery.of(context).size.width - 20 * 2,
+                              menuItemExtent: 55,
+                              menuItems: [
+                                FocusedMenuItem(
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Buy me some Water',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontFamily: 'MontserratBold',
                                       ),
                                     ),
-                                  )),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  trailingIcon: Icon(Icons.local_bar_rounded,
+                                      color: textColor),
+                                  onPressed: () => null,
+                                ),
+                                FocusedMenuItem(
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Buy me a Spoon',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontFamily: 'MontserratBold',
+                                      ),
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  trailingIcon: Icon(Icons.restaurant_rounded,
+                                      color: textColor),
+                                  onPressed: () => null,
+                                ),
+                                FocusedMenuItem(
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Buy me a Coffee',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontFamily: 'MontserratBold',
+                                      ),
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  trailingIcon: Icon(Icons.local_cafe_rounded,
+                                      color: textColor),
+                                  onPressed: () => null,
+                                ),
+                                FocusedMenuItem(
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Buy me a Treat',
+                                      style: TextStyle(
+                                        color: textColor,
+                                        fontFamily: 'MontserratBold',
+                                      ),
+                                    ),
+                                  ),
+                                  backgroundColor: Colors.transparent,
+                                  trailingIcon: Icon(Icons.fastfood_rounded,
+                                      color: textColor),
+                                  onPressed: () => null,
+                                ),
+                                FocusedMenuItem(
+                                  title: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'Gimme all of it',
+                                      style: TextStyle(
+                                          color: textColor,
+                                          fontFamily: 'MontserratBold'),
+                                    ),
+                                  ),
+                                  trailingIcon: Icon(
+                                      Icons.all_inclusive_rounded,
+                                      color: textColor),
+                                  backgroundColor: Colors.transparent,
+                                  onPressed: () => null,
+                                ),
+                              ],
+                              blurBackgroundColor: backgroundColor,
+                              menuOffset: 20,
+                              openWithTap: true,
+                              onPressed: () {},
+                              child: ClipRRect(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30)),
+                                child: BackdropFilter(
+                                  filter: ImageFilter.blur(
+                                    sigmaX: 12,
+                                    sigmaY: 12,
+                                  ),
                                   child: Container(
                                     height: 70,
                                     width: screenWidth - 40,
@@ -725,35 +961,21 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                         )),
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.center,
+                                      MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           'Support',
                                           style: TextStyle(
-                                            color: backgroundColor,
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                offset: Offset(.0, .0),
-                                                blurRadius: 3.0,
-                                                color:
-                                                    textColor.withOpacity(0.5),
-                                              ),
-                                            ],
+                                            color: textColor,
+                                            fontFamily: 'MontserratBold',
                                             fontSize: 28,
                                           ),
                                         ),
                                         Text(
                                           ' Us',
                                           style: TextStyle(
-                                            color: backgroundColor,
-                                            shadows: <Shadow>[
-                                              Shadow(
-                                                offset: Offset(.0, .0),
-                                                blurRadius: 3.0,
-                                                color:
-                                                    textColor.withOpacity(0.5),
-                                              ),
-                                            ],
+                                            color: textColor,
+                                            fontFamily: 'MontserratBold',
                                             fontSize: 28,
                                           ),
                                         ),

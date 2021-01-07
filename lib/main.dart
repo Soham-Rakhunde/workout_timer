@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/DonatePage.dart';
 import 'package:workout_timer/pages/aboutPage.dart';
@@ -32,16 +33,13 @@ void main() {
             systemNavigationBarColor: Color(0xFFF1F2F6),
             systemNavigationBarIconBrightness: Brightness.dark,
             systemNavigationBarDividerColor: Color(0xFFF1F2F6),
-          ))
-  );
-  Future.delayed(Duration(milliseconds: 1)).then(
-    (value) => SystemChrome.setPreferredOrientations(
-      [
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-        ]
-      )
-  );
+          )));
+  Future.delayed(Duration(milliseconds: 1))
+      .then((value) => SystemChrome.setPreferredOrientations([
+            DeviceOrientation.portraitUp,
+            DeviceOrientation.portraitDown,
+          ]));
+  InAppPurchaseConnection.enablePendingPurchases();
   runApp(MaterialApp(
     debugShowMaterialGrid: false,
     debugShowCheckedModeBanner: false,
@@ -61,19 +59,12 @@ class mainPage extends StatefulWidget {
   _mainPageState createState() => _mainPageState();
 }
 
-class _mainPageState extends State<mainPage>
-    with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
+class _mainPageState extends State<mainPage> {
   SharedPref savedData = SharedPref();
 
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 500),
-      reverseDuration: Duration(milliseconds: 500),
-    );
   }
 
   Future<bool> _getData() async {
@@ -118,13 +109,17 @@ class _mainPageState extends State<mainPage>
                         onTap: () async {
                           final periodTime = TimeClass(
                             name: 'Workout',
-                            sec: int.parse(controller['periodMin'].text) * 60 +
-                                int.parse(controller['periodSec'].text),
+                            sec: Duration(
+                              minutes: int.parse(controller['periodMin'].text),
+                              seconds: int.parse(controller['periodSec'].text),
+                            ).inSeconds,
                           );
                           final breakTime = TimeClass(
                             name: 'Break',
-                            sec: int.parse(controller['breakMin'].text) * 60 +
-                                int.parse(controller['breakSec'].text),
+                            sec: Duration(
+                              minutes: int.parse(controller['breakMin'].text),
+                              seconds: int.parse(controller['breakSec'].text),
+                            ).inSeconds,
                           );
                           await Navigator.push(
                               context,
@@ -147,6 +142,7 @@ class _mainPageState extends State<mainPage>
                                       Animation<double> secAnimation) {
                                     return TimerPage(
                                       args: [
+                                        2,
                                         periodTime,
                                         breakTime,
                                         int.parse(controller['sets'].text),

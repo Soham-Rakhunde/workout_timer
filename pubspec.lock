@@ -78,13 +78,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.16.2"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.0.0"
   equatable:
     dependency: transitive
     description:
@@ -125,6 +118,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_displaymode:
+    dependency: "direct main"
+    description:
+      name: flutter_displaymode
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.1.1"
   flutter_test:
     dependency: "direct dev"
     description: flutter
@@ -135,6 +135,13 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  focused_menu:
+    dependency: "direct main"
+    description:
+      name: focused_menu
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "1.0.2"
   font_awesome_flutter:
     dependency: "direct main"
     description:
@@ -156,6 +163,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.2"
+  in_app_purchase:
+    dependency: "direct main"
+    description:
+      name: in_app_purchase
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.3.4+16"
   intl:
     dependency: transitive
     description:
@@ -170,6 +184,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.6.3-nullsafety.3"
+  json_annotation:
+    dependency: transitive
+    description:
+      name: json_annotation
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.1.1"
   matcher:
     dependency: transitive
     description:
@@ -247,13 +268,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.4+3"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.9.2"
   platform:
     dependency: transitive
     description:
@@ -275,13 +289,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "3.0.13"
-  sa_v1_migration:
-    dependency: transitive
-    description:
-      name: sa_v1_migration
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.2"
   share:
     dependency: "direct main"
     description:
@@ -331,13 +338,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.0.1+3"
-  simple_animations:
-    dependency: "direct main"
-    description:
-      name: simple_animations
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.4.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -378,20 +378,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.0-nullsafety.3"
-  supercharged:
-    dependency: transitive
-    description:
-      name: supercharged
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.12.0"
-  supercharged_dart:
-    dependency: transitive
-    description:
-      name: supercharged_dart
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.4.0"
   term_glyph:
     dependency: transitive
     description:

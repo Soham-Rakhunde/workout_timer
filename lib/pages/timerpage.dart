@@ -38,7 +38,7 @@ class _TimerPageState extends State<TimerPage> {
 
   ValueNotifier<bool> resumeFlag = ValueNotifier<bool>(true);
 
-  TimeClass periodT, breakT;
+  List<TimeClass> _timeT = [];
 
   String voice;
 
@@ -47,6 +47,8 @@ class _TimerPageState extends State<TimerPage> {
   SharedPref savedData = SharedPref();
 
   int flexFactor;
+
+  int count;
 
   @override
   void initState() {
@@ -127,19 +129,21 @@ class _TimerPageState extends State<TimerPage> {
     await Future.delayed(Duration(seconds: 1));
     if(timeInSec.value>0) {
       do {
-        if (isVoice) audioPlayer.play('start-$voice.mp3');
-        _titleName.value = periodT.name;
-        timeInSec.value = periodT.sec;
-        await startTimer(periodT.sec);
-        if (i.value != s) {
-          _titleName.value = breakT.name;
-          timeInSec.value = breakT.sec;
-          if (i.value != s + 1 && isVoice) {
-            audioPlayer.play('rest-$voice.mp3');
+        for (int n = 0; n < count - 1; n++) {
+          if (isVoice) audioPlayer.play('start-$voice.mp3');
+          _titleName.value = _timeT[n].name;
+          timeInSec.value = _timeT[n].sec;
+          await startTimer(_timeT[n].sec);
+          if (i.value != s) {
+            _titleName.value = _timeT[count - 1].name;
+            timeInSec.value = _timeT[count - 1].sec;
+            if (i.value != s + 1 && isVoice) {
+              audioPlayer.play('rest-$voice.mp3');
+            }
+            await startTimer(_timeT[count - 1].sec);
           }
-          await startTimer(breakT.sec);
+          i.value++;
         }
-        i.value++;
       } while (i.value <= s);
       i.value--;
     }
@@ -149,11 +153,11 @@ class _TimerPageState extends State<TimerPage> {
 
   @override
   build(BuildContext context) {
-    flexFactor = ((MediaQuery.of(context).size.width - 50) / 10).toInt();
-    periodT = widget.args[0];
-    breakT = widget.args[1];
-    s = widget.args[2];
-    totalTime = periodT.sec * s + breakT.sec * (s - 1);
+    flexFactor = (MediaQuery.of(context).size.width - 50) ~/ 10;
+    count = widget.args[0];
+    for (int n = 1; n <= count; n++) _timeT.add(widget.args[n]);
+    s = widget.args[3];
+    totalTime = _timeT[0].sec * s + _timeT[1].sec * (s - 1);
     return WillPopScope(
       onWillPop: () async => createAlertDialog(context),
       child: FutureBuilder(
@@ -242,29 +246,35 @@ class _TimerPageState extends State<TimerPage> {
                                         MainAxisAlignment.spaceBetween,
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      Text(
-                                        'Set',
-                                        style: kTextStyle.copyWith(
-                                          letterSpacing: 0.5,
-                                          color: isDark.value
-                                              ? Colors.white
-                                              : Colors.black,
+                                      FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          'Set',
+                                          style: kTextStyle.copyWith(
+                                            letterSpacing: 0.5,
+                                            color: isDark.value
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
-                                      ValueListenableBuilder(
-                                        valueListenable: i,
-                                        builder: (context, value, child) {
-                                          return Text(
-                                            '${i.value}/$s',
-                                            style: kTextStyle.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 40,
-                                              color: isDark.value
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                            ),
-                                          );
-                                        },
+                                      FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: ValueListenableBuilder(
+                                          valueListenable: i,
+                                          builder: (context, value, child) {
+                                            return Text(
+                                              '${i.value}/$s',
+                                              style: kTextStyle.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 40,
+                                                color: isDark.value
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ],
                                   )),
@@ -294,32 +304,37 @@ class _TimerPageState extends State<TimerPage> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        'Progress',
-                                        overflow: TextOverflow.ellipsis,
-                                        style: kTextStyle.copyWith(
-                                          letterSpacing: 0.5,
-                                          color: isDark.value
-                                              ? Colors.white
-                                              : Colors.black,
+                                      FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: Text(
+                                          'Progress',
+                                          style: kTextStyle.copyWith(
+                                            letterSpacing: 0.5,
+                                            color: isDark.value
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
-                                      ValueListenableBuilder(
-                                        valueListenable: progress,
-                                        builder: (context, value, child) {
-                                          return Text(
-                                            progress.value >= 99.5
-                                                ? '100'
-                                                : '${progress.value.toStringAsFixed(0)}%',
-                                            style: kTextStyle.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 40,
-                                              color: isDark.value
-                                                  ? Colors.white
-                                                  : Colors.black,
-                                            ),
-                                          );
-                                        },
+                                      FittedBox(
+                                        fit: BoxFit.fitWidth,
+                                        child: ValueListenableBuilder(
+                                          valueListenable: progress,
+                                          builder: (context, value, child) {
+                                            return Text(
+                                              progress.value >= 99.5
+                                                  ? '100'
+                                                  : '${progress.value.toStringAsFixed(0)}%',
+                                              style: kTextStyle.copyWith(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 40,
+                                                color: isDark.value
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            );
+                                          },
+                                        ),
                                       ),
                                     ],
                                   )),

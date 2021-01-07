@@ -33,6 +33,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   List<String> savedList = List<String>();
   SharedPref savedData = SharedPref();
 
+  // RateMyApp rateMyApp = RateMyApp(
+  //   preferencesPrefix: 'rateMyApp_',
+  //   minDays: 0,
+  //   minLaunches: 0,
+  //   remindDays: 0,
+  //   remindLaunches: 0,
+  //   // googlePlayIdentifier: 'com.rakhunde.workout_timer',
+  // );
+
   @override
   void initState() {
     super.initState();
@@ -253,17 +262,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                             ),
                                     onPress: (() {
                                       setState(() {
-                                        isBackPressed = true;
-                                        xOffset = 250;
-                                        yOffset = 140;
-                                        scaleFactor = 0.7;
-                                        isDrawerOpen = true;
-                                        isHomeOpen = false;
-                                        SystemChrome.setSystemUIOverlayStyle(
-                                            SystemUiOverlayStyle(
-                                              statusBarColor: Colors
-                                                  .transparent,
-                                              // isHomeOpen
+                                        FocusScope.of(context).unfocus();
+                                isBackPressed = true;
+                                xOffset = 250;
+                                yOffset = 140;
+                                scaleFactor = 0.7;
+                                isDrawerOpen = true;
+                                isHomeOpen = false;
+                                SystemChrome.setSystemUIOverlayStyle(
+                                    SystemUiOverlayStyle(
+                                  statusBarColor: Colors.transparent,
+                                  // isHomeOpen
                                               //     ? backgroundColor
                                               //     : drawerColor,
                                               statusBarIconBrightness: isHomeOpen
@@ -572,9 +581,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   ),
                                   AnimatedBuilder(
                                     animation: playGradientControl,
-                                    builder:
-                                        (BuildContext context, Widget child) {
-                                      return NeuButton(
+                            builder: (BuildContext context, Widget child) {
+                              return AnimatedSwitcher(
+                                duration: Duration(milliseconds: 1300),
+                                reverseDuration: Duration(milliseconds: 350),
+                                switchInCurve: Curves.easeOutBack,
+                                switchOutCurve: Curves.easeOutBack,
+                                transitionBuilder:
+                                    (Widget child, Animation<double> anim) =>
+                                        ScaleTransition(
+                                  scale: anim,
+                                  child: child,
+                                ),
+                                child: WidgetsBinding
+                                            .instance.window.viewInsets.bottom >
+                                        0.0
+                                    ? Container()
+                                    : NeuButton(
                                         ico: GradientIcon(
                                           icon: Icons.play_arrow_rounded,
                                           size: 55,
@@ -608,38 +631,47 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           }
                                           final periodTime = TimeClass(
                                             name: 'Workout',
-                                            sec: int.parse(
-                                                        controller['periodMin']
-                                                            .text) *
-                                                    60 +
-                                                int.parse(
-                                                    controller['periodSec']
-                                                        .text),
+                                            sec: Duration(
+                                              minutes: int.parse(
+                                                  controller['periodMin'].text),
+                                              seconds: int.parse(
+                                                  controller['periodSec'].text),
+                                            ).inSeconds,
                                           );
                                           final breakTime = TimeClass(
                                             name: 'Break',
-                                            sec: int.parse(
-                                                        controller['breakMin']
-                                                            .text) *
-                                                    60 +
-                                                int.parse(controller['breakSec']
-                                                    .text),
+                                            sec: Duration(
+                                              minutes: int.parse(
+                                                  controller['breakMin'].text),
+                                              seconds: int.parse(
+                                                  controller['breakSec'].text),
+                                            ).inSeconds,
                                           );
+                                          final page = TimerPage(
+                                            args: [
+                                              2,
+                                              periodTime,
+                                              breakTime,
+                                              int.parse(
+                                                  controller['sets'].text),
+                                            ],
+                                          );
+                                          // await Future.delayed(Duration(microseconds: 1));
                                           await Navigator.push(
                                               context,
                                               PageRouteBuilder(
                                                   transitionDuration: Duration(
                                                       milliseconds: 250),
                                                   reverseTransitionDuration:
-                                                  Duration(
-                                                      milliseconds: 150),
+                                                      Duration(
+                                                          milliseconds: 150),
                                                   transitionsBuilder:
                                                       (BuildContext context,
-                                                      Animation<double>
-                                                      animation,
-                                                      Animation<double>
-                                                      secAnimation,
-                                                      Widget child) {
+                                                          Animation<double>
+                                                              animation,
+                                                          Animation<double>
+                                                              secAnimation,
+                                                          Widget child) {
                                                     return FadeTransition(
                                                       opacity: animation,
                                                       child: child,
@@ -651,20 +683,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                               animation,
                                                           Animation<double>
                                                               secAnimation) {
-                                                    return TimerPage(
-                                                      args: [
-                                                        periodTime,
-                                                        breakTime,
-                                                        int.parse(
-                                                            controller['sets']
-                                                                .text),
-                                                      ],
-                                                    );
+                                                    return page;
                                                   }));
                                         }),
-                                      );
-                                    },
-                                  ),
+                                      ),
+                              );
+                            },
+                          ),
                                   Hero(
                                     tag: 'rightButton',
                                     child: NeuButton(
@@ -711,7 +736,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         // print('Encoded ${jsonEncode(_data.toMap())}');
                                         savedList
                                             .add(jsonEncode(_data.toMap()));
-                                        // print('new data $savedList');
                                         await savedData.save(savedList);
                                       }),
                                     ),

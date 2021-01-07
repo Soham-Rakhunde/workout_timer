@@ -1,7 +1,7 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TimeClass {
-  int sec, x;
+  int sec;
   String name;
 
   TimeClass({this.name, this.sec});
@@ -65,7 +65,6 @@ class SharedPref {
       else
         return true;
     } else {
-      print('$str   ${prefs.getBool(str)}');
       return prefs.getBool(str);
     }
   }
@@ -85,7 +84,6 @@ class SharedPref {
   saveString(String prefName, String val) async {
     final prefs = await SharedPreferences.getInstance();
     prefs.setString(prefName, val);
-    print('$prefName   $val');
   }
 
   saveBool(String prefName, bool val) async {

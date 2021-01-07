@@ -84,7 +84,6 @@ class _AboutPageState extends State<AboutPage> {
         .of(context)
         .size
         .width;
-    print('In the page');
     return ValueListenableBuilder(
       valueListenable: isDark,
       builder: (context, val, child) {
@@ -122,7 +121,6 @@ class _AboutPageState extends State<AboutPage> {
               .width,
           onEnd: (() {
             if (isAboutOpen && indexOfMenu.value == 3) {
-              print('5animabout');
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness:
@@ -295,7 +293,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 1.2.2',
+                        'Version 1.3.0',
                         style: kTextStyle.copyWith(
                           color: isDark.value ? Colors.white : Colors.black,
                         ),
@@ -424,7 +422,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '1.2.2',
+                            applicationVersion: '1.3.0',
                           );
                         }),
                         child: Container(
@@ -445,14 +443,18 @@ class _AboutPageState extends State<AboutPage> {
                                   blurRadius: 12),
                             ],
                           ),
-                          child: Center(
-                            child: Text('Open Licenses',
-                                style: TextStyle(
-                                  letterSpacing: 2,
-                                  fontFamily: 'MontserratBold',
-                                  fontSize: 20,
-                                  color: textColor,
-                                )),
+                          child: FittedBox(
+                            fit: BoxFit.fitHeight,
+                            child: Padding(
+                              padding: const EdgeInsets.all(5.0),
+                              child: Text('Open Licenses',
+                                  style: TextStyle(
+                                    letterSpacing: 2,
+                                    fontFamily: 'MontserratBold',
+                                    fontSize: 20,
+                                    color: textColor,
+                                  )),
+                            ),
                           ),
                         ),
                       ),

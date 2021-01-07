@@ -25,7 +25,6 @@ class myTextField extends StatelessWidget {
       textAlign: TextAlign.center,
       cursorColor: Colors.grey,
       onChanged: ((val) {
-        print('$val i s val');
         temp = int.parse(val);//check value bounds
         if(controllerName != 'sets' && (temp<0 || temp>60)){
           val = retain[controllerName];

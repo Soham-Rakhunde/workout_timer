@@ -82,7 +82,6 @@ class _drawerPageState extends State<drawerPage> {
                             onTap: (() {
                               setState(() {
                                 indexOfMenu.value = 0;
-                                print('${indexOfMenu.value}');
                               });
                             }),
                             child: Row(
@@ -116,7 +115,6 @@ class _drawerPageState extends State<drawerPage> {
                             onTap: (() {
                               setState(() {
                                 indexOfMenu.value = 1;
-                                print('${indexOfMenu.value}');
                               });
                             }),
                             child: Row(
@@ -150,7 +148,6 @@ class _drawerPageState extends State<drawerPage> {
                             onTap: (() {
                               setState(() {
                                 indexOfMenu.value = 2;
-                                print('${indexOfMenu.value}');
                               });
                             }),
                             child: Row(
@@ -186,7 +183,6 @@ class _drawerPageState extends State<drawerPage> {
                               setState(() {
                                 indexOfMenu.value = 3;
                               });
-                              print('${indexOfMenu.value}');
                               // Navigator.push(context,
                               //     PageRouteBuilder(
                               //     transitionDuration: Duration(milliseconds:150),
@@ -274,7 +270,6 @@ class _drawerPageState extends State<drawerPage> {
                         setState(() {
                           indexOfMenu.value = 4;
                         });
-                        print('${indexOfMenu.value}');
                       }),
                       child: Container(
                         margin: EdgeInsets.only(bottom: 20),
