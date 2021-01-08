@@ -46,6 +46,16 @@ class SharedPref {
     }
   }
 
+  Future<int> readInt(String str) async {
+    //refresh rate
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (prefs.getInt(str) == null) {
+      return 1;
+    } else {
+      return prefs.getInt(str);
+    }
+  }
+
   Future<String> readString(String str) async {
     //Voice
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -79,6 +89,11 @@ class SharedPref {
     final prefs = await SharedPreferences.getInstance();
     prefs.setStringList("List", value);
     // prefs.setString(key, json.encode(value));
+  }
+
+  saveInt(String prefName, int val) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt(prefName, val);
   }
 
   saveString(String prefName, String val) async {

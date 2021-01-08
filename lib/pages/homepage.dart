@@ -582,111 +582,93 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   AnimatedBuilder(
                                     animation: playGradientControl,
                             builder: (BuildContext context, Widget child) {
-                              return AnimatedSwitcher(
-                                duration: Duration(milliseconds: 1300),
-                                reverseDuration: Duration(milliseconds: 350),
-                                switchInCurve: Curves.easeOutBack,
-                                switchOutCurve: Curves.easeOutBack,
-                                transitionBuilder:
-                                    (Widget child, Animation<double> anim) =>
-                                        ScaleTransition(
-                                  scale: anim,
-                                  child: child,
+                              return NeuButton(
+                                ico: GradientIcon(
+                                  icon: Icons.play_arrow_rounded,
+                                  size: 55,
+                                  gradient: RadialGradient(colors: <Color>[
+                                    colAnim1.value,
+                                    colAnim2.value,
+                                  ], focal: Alignment.center),
                                 ),
-                                child: WidgetsBinding
-                                            .instance.window.viewInsets.bottom >
-                                        0.0
-                                    ? Container()
-                                    : NeuButton(
-                                        ico: GradientIcon(
-                                          icon: Icons.play_arrow_rounded,
-                                          size: 55,
-                                          gradient:
-                                              RadialGradient(colors: <Color>[
-                                            colAnim1.value,
-                                            colAnim2.value,
-                                          ], focal: Alignment.center),
-                                        ),
-                                        length: screenWidth / 4.6,
-                                        breadth: screenWidth / 4.6,
-                                        radii: 50,
-                                        onPress: (() async {
-                                          if (controller['periodSec'] == '') {
-                                            controller['periodSec'] = '30';
-                                          }
-                                          if (controller['periodMin'] == '') {
-                                            controller['periodMin'] = '0';
-                                          }
-                                          if (controller['periodSec'] == '') {
-                                            controller['periodSec'] = '30';
-                                          }
-                                          if (controller['breakMin'] == '') {
-                                            controller['breakMin'] = '0';
-                                          }
-                                          if (controller['breakSec'] == '') {
-                                            controller['breakSec'] = '30';
-                                          }
-                                          if (controller['sets'] == '') {
-                                            controller['sets'] = '3';
-                                          }
-                                          final periodTime = TimeClass(
-                                            name: 'Workout',
-                                            sec: Duration(
-                                              minutes: int.parse(
-                                                  controller['periodMin'].text),
-                                              seconds: int.parse(
-                                                  controller['periodSec'].text),
-                                            ).inSeconds,
-                                          );
-                                          final breakTime = TimeClass(
-                                            name: 'Break',
-                                            sec: Duration(
-                                              minutes: int.parse(
-                                                  controller['breakMin'].text),
-                                              seconds: int.parse(
-                                                  controller['breakSec'].text),
-                                            ).inSeconds,
-                                          );
-                                          final page = TimerPage(
-                                            args: [
-                                              2,
-                                              periodTime,
-                                              breakTime,
-                                              int.parse(
-                                                  controller['sets'].text),
-                                            ],
-                                          );
-                                          // await Future.delayed(Duration(microseconds: 1));
-                                          await Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                  transitionDuration: Duration(
-                                                      milliseconds: 250),
-                                                  reverseTransitionDuration:
-                                                      Duration(
-                                                          milliseconds: 150),
-                                                  transitionsBuilder:
-                                                      (BuildContext context,
-                                                          Animation<double>
-                                                              animation,
-                                                          Animation<double>
-                                                              secAnimation,
-                                                          Widget child) {
-                                                    return FadeTransition(
-                                                      opacity: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                  pageBuilder:
-                                                      (BuildContext context,
-                                                          Animation<double>
-                                                              animation,
-                                                          Animation<double>
-                                                              secAnimation) {
-                                                    return page;
-                                                  }));
-                                        }),
-                                      ),
+                                length: screenWidth / 4.6,
+                                breadth: screenWidth / 4.6,
+                                radii: 50,
+                                onPress: (() async {
+                                  FocusScopeNode currentFocus =
+                                      FocusScope.of(context);
+                                  print('here');
+                                  if (!currentFocus.hasPrimaryFocus) {
+                                    currentFocus.unfocus();
+                                  }
+                                  if (controller['periodSec'] == '') {
+                                    controller['periodSec'] = '30';
+                                  }
+                                  if (controller['periodMin'] == '') {
+                                    controller['periodMin'] = '0';
+                                  }
+                                  if (controller['periodSec'] == '') {
+                                    controller['periodSec'] = '30';
+                                  }
+                                  if (controller['breakMin'] == '') {
+                                    controller['breakMin'] = '0';
+                                  }
+                                  if (controller['breakSec'] == '') {
+                                    controller['breakSec'] = '30';
+                                  }
+                                  if (controller['sets'] == '') {
+                                    controller['sets'] = '3';
+                                  }
+                                  final periodTime = TimeClass(
+                                    name: 'Workout',
+                                    sec: Duration(
+                                      minutes: int.parse(
+                                          controller['periodMin'].text),
+                                      seconds: int.parse(
+                                          controller['periodSec'].text),
+                                    ).inSeconds,
+                                  );
+                                  final breakTime = TimeClass(
+                                    name: 'Break',
+                                    sec: Duration(
+                                      minutes: int.parse(
+                                          controller['breakMin'].text),
+                                      seconds: int.parse(
+                                          controller['breakSec'].text),
+                                    ).inSeconds,
+                                  );
+                                  final page = TimerPage(
+                                    args: [
+                                      2,
+                                      periodTime,
+                                      breakTime,
+                                      int.parse(controller['sets'].text),
+                                    ],
+                                  );
+                                  // await Future.delayed(Duration(microseconds: 1));
+                                  await Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                          transitionDuration:
+                                              Duration(milliseconds: 250),
+                                          reverseTransitionDuration:
+                                              Duration(milliseconds: 150),
+                                          transitionsBuilder: (BuildContext
+                                                  context,
+                                              Animation<double> animation,
+                                              Animation<double> secAnimation,
+                                              Widget child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                          pageBuilder: (BuildContext context,
+                                              Animation<double> animation,
+                                              Animation<double> secAnimation) {
+                                            return page;
+                                          }));
+                                }),
                               );
                             },
                           ),

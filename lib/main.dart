@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/DonatePage.dart';
@@ -21,6 +22,7 @@ bool isStatsOpen = false;
 bool isDonateOpen = false;
 bool isSettingsOpen = false;
 const perPixel = 0.0025641025641026;
+DisplayMode selected;
 
 void main() {
   Future.delayed(Duration(milliseconds: 1)).then(
@@ -62,6 +64,38 @@ class mainPage extends StatefulWidget {
 class _mainPageState extends State<mainPage> {
   SharedPref savedData = SharedPref();
 
+  DisplayMode selected;
+
+  List<DisplayMode> modesList = <DisplayMode>[];
+
+  int refreshId = 1;
+
+  Future<bool> fetchModes() async {
+    try {
+      modesList = await FlutterDisplayMode.supported;
+
+      /// On OnePlus 7 Pro:
+      /// #1 1080x2340 @ 60Hz
+      /// #2 1080x2340 @ 90Hz
+      /// #3 1440x3120 @ 90Hz
+      /// #4 1440x3120 @ 60Hz
+      /// On OnePlus 8 Pro:
+      /// #1 1080x2376 @ 60Hz
+      /// #2 1440x3168 @ 120Hz
+      /// #3 1440x3168 @ 60Hz
+      /// #4 1080x2376 @ 120Hz
+    } on PlatformException catch (e) {
+      print(e);
+
+      /// e.code =>
+      /// noAPI - No API support. Only Marshmallow and above.
+      /// noActivity - Activity is not available. Probably app is in background
+    }
+    selected =
+        modesList.firstWhere((DisplayMode m) => m.selected, orElse: () => null);
+    return true;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -74,6 +108,18 @@ class _mainPageState extends State<mainPage> {
     shadowColor = shadowC[isDark.value ? 1 : 0];
     lightShadowColor = lightShadowC[isDark.value ? 1 : 0];
     textColor = isContrast ? Colors.black : textC[isDark.value ? 1 : 0];
+    await fetchModes();
+    if (modesList.length > 1) {
+      refreshId = await savedData.readInt('deviceModeId');
+      modesList.forEach((element) async {
+        if (element.id == refreshId) {
+          await FlutterDisplayMode.setMode(element);
+          if (mounted) {
+            setState(() {});
+          }
+        }
+      });
+    }
     return isDark.value;
   }
 
@@ -86,7 +132,13 @@ class _mainPageState extends State<mainPage> {
     SizeConfig().init(context);
     screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
-      onWillPop: () async => true,
+      onWillPop: () async {
+        // final DisplayMode mode = await getCurrentMode();
+        // fetchModes();
+        // print(mode);
+        // print(mode.toString());
+        return true;
+      },
       child: FutureBuilder(
           future: _getData(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {

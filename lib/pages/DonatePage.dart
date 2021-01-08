@@ -332,27 +332,28 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                       isBackPressed = true;
                                       xOffset = adjusted(250);
                                       yOffset = adjusted(140);
+                                      positionOffset = 70;
                                       scaleFactor = 0.7;
                                       isDrawerOpen = true;
                                       isDonateOpen = false;
                                       SystemChrome.setSystemUIOverlayStyle(
                                           SystemUiOverlayStyle(
-                                            statusBarColor: Colors.transparent,
-                                            statusBarIconBrightness: isDonateOpen
-                                                ? Brightness.dark
-                                                : Brightness.light,
-                                            systemNavigationBarColor: isDonateOpen
-                                                ? backgroundColor
-                                                : drawerColor,
-                                            systemNavigationBarIconBrightness:
+                                        statusBarColor: Colors.transparent,
+                                        statusBarIconBrightness: isDonateOpen
+                                            ? Brightness.dark
+                                            : Brightness.light,
+                                        systemNavigationBarColor: isDonateOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                        systemNavigationBarIconBrightness:
                                             isDonateOpen
                                                 ? Brightness.dark
                                                 : Brightness.light,
-                                            systemNavigationBarDividerColor:
+                                        systemNavigationBarDividerColor:
                                             isDonateOpen
                                                 ? backgroundColor
                                                 : drawerColor,
-                                          ));
+                                      ));
                                     });
                                   }),
                                   padding: EdgeInsets.only(right: 30),

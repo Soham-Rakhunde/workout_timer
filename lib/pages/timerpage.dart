@@ -50,10 +50,13 @@ class _TimerPageState extends State<TimerPage> {
 
   int count;
 
+  bool firstInstance = true;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    firstInstance = true;
     _getData();
     Wakelock.enable();
   }
@@ -147,17 +150,27 @@ class _TimerPageState extends State<TimerPage> {
       } while (i.value <= s);
       i.value--;
     }
-    if (isVoice) audioPlayer.clearCache();
     timeInSec.value = 0;
+    if (isVoice) {
+      AudioCache finishPlayer = AudioCache(prefix: 'assets/audio/$voice/');
+      finishPlayer.play('finish-$voice.mp3');
+      audioPlayer.clearCache();
+      isVoice = false;
+    }
+    // i.value = s + 1;
+    // timeInSec.value = 0;
+    Navigator.pop(context);
   }
 
   @override
   build(BuildContext context) {
     flexFactor = (MediaQuery.of(context).size.width - 50) ~/ 10;
-    count = widget.args[0];
-    for (int n = 1; n <= count; n++) _timeT.add(widget.args[n]);
-    s = widget.args[3];
-    totalTime = _timeT[0].sec * s + _timeT[1].sec * (s - 1);
+    if (firstInstance) {
+      count = widget.args[0];
+      for (int n = 1; n <= count; n++) _timeT.add(widget.args[n]);
+      s = widget.args[3];
+      totalTime = _timeT[0].sec * s + _timeT[1].sec * (s - 1);
+    }
     return WillPopScope(
       onWillPop: () async => createAlertDialog(context),
       child: FutureBuilder(
@@ -166,7 +179,10 @@ class _TimerPageState extends State<TimerPage> {
             if (snapshot.data == null) {
               return Center(child: Text('Loading'));
             } else {
-              timerFunc();
+              if (firstInstance) {
+                timerFunc();
+                firstInstance = false;
+              }
               return Scaffold(
                 resizeToAvoidBottomInset: false,
                 backgroundColor: backgroundColor,
