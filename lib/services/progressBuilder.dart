@@ -93,8 +93,8 @@ class _buildStackState extends State<buildStack> {
                         size: lerpDouble(0, diameter, 0.865),
                               angleRange: 90,
                               startAngle: 0,
-                              animationEnabled: false,
-                              animDurationMultiplier: 0.1,
+                              animationEnabled: true,
+                              animDurationMultiplier: 0.9,
                               customWidths: CustomSliderWidths(
                                 trackWidth: pieWidth,
                                 progressBarWidth: pieWidth,
@@ -102,10 +102,10 @@ class _buildStackState extends State<buildStack> {
                               ),
                               customColors: CustomSliderColors(
                                 trackColor: Colors.transparent,
-                          hideShadow: true,
-                          progressBarColors: turqoiseGradient,
-                          dotColor: Colors.transparent,
-                          gradientStartAngle: 0,
+                                hideShadow: true,
+                                progressBarColors: turqoiseGradient,
+                                dotColor: Colors.transparent,
+                                gradientStartAngle: 0,
                           gradientEndAngle: 90,
                         ),
                       ),
@@ -113,12 +113,15 @@ class _buildStackState extends State<buildStack> {
                     widget.tickTime.value <=25 ? Container() :
                     SleekCircularSlider(
                       innerWidget: (customWidgetReturn),
-                      min: 25,
-                      max: 50,
-                      initialValue: widget.tickTime.value<25 ?
-                      25 : (widget.tickTime.value>47 ? 50 : widget.tickTime.value),
-                      appearance: CircularSliderAppearance(
-                        size: lerpDouble(0, diameter, 0.865),
+                            min: 26,
+                            max: 50,
+                            initialValue: widget.tickTime.value < 26
+                                ? 26
+                                : (widget.tickTime.value > 47
+                                    ? 50
+                                    : widget.tickTime.value),
+                            appearance: CircularSliderAppearance(
+                              size: lerpDouble(0, diameter, 0.865),
                               angleRange: 90,
                               startAngle: 90,
                               customWidths: CustomSliderWidths(
@@ -130,26 +133,29 @@ class _buildStackState extends State<buildStack> {
                                 hideShadow: true,
                                 trackColor: Colors.transparent,
                                 trackGradientStartAngle: 90,
-                          trackGradientEndAngle: 270,
-                          progressBarColors: greenGradient,
-                          dotColor: Colors.transparent,
-                          gradientStartAngle: 90,
-                          gradientEndAngle: 180,
-                        ),
-                        animationEnabled: false,
-                        animDurationMultiplier: 0.1,
-                      ),
+                                trackGradientEndAngle: 270,
+                                progressBarColors: greenGradient,
+                                dotColor: Colors.transparent,
+                                gradientStartAngle: 90,
+                                gradientEndAngle: 180,
+                              ),
+                              animationEnabled: true,
+                              animDurationMultiplier: 0.9,
+                            ),
                     ),
                     widget.tickTime.value <=50 ? Container() :
                     SleekCircularSlider(
                       innerWidget: (customWidgetReturn),
-                      min: 50,
-                      max: 75,
-                      initialValue: widget.tickTime.value<50 ?
-                      50 : (widget.tickTime.value>72 ? 75 : widget.tickTime.value),
-                      appearance: CircularSliderAppearance(
-                        animationEnabled: false,
-                              animDurationMultiplier: 0.1,
+                            min: 51,
+                            max: 75,
+                            initialValue: widget.tickTime.value < 51
+                                ? 51
+                                : (widget.tickTime.value > 72
+                                    ? 75
+                                    : widget.tickTime.value),
+                            appearance: CircularSliderAppearance(
+                              animationEnabled: true,
+                              animDurationMultiplier: 0.9,
                               size: lerpDouble(0, diameter, 0.865),
                               angleRange: 90,
                               startAngle: 180,
@@ -171,13 +177,16 @@ class _buildStackState extends State<buildStack> {
                     widget.tickTime.value <=75 ? Container() :
                     SleekCircularSlider(
                       innerWidget: (customWidgetReturn),
-                      min: 75,
-                      max: 100,
-                      initialValue:widget.tickTime.value<75 ?
-                      75 : (widget.tickTime.value>97 ? 100 : widget.tickTime.value),
-                      appearance: CircularSliderAppearance(
-                        animationEnabled: false,
-                              animDurationMultiplier: 0.1,
+                            min: 76,
+                            max: 100,
+                            initialValue: widget.tickTime.value < 76
+                                ? 76
+                                : (widget.tickTime.value > 97
+                                    ? 100
+                                    : widget.tickTime.value),
+                            appearance: CircularSliderAppearance(
+                              animationEnabled: true,
+                              animDurationMultiplier: 0.9,
                               size: lerpDouble(0, diameter, 0.865),
                               angleRange: 90,
                               startAngle: 270,

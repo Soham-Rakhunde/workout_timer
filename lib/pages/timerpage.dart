@@ -119,7 +119,6 @@ class _TimerPageState extends State<TimerPage> {
     }
     print('f');
     tickTime.value = ((time - timeInSec.value) / time) * 100;
-
     print('ds');
   }
 
@@ -148,18 +147,21 @@ class _TimerPageState extends State<TimerPage> {
     if (timeInSec.value > 0) {
       print('2');
       do {
+        //overall sets
         print('3');
-        setList.forEach((setClass) {
+        for (int index = 0; index < setList.length; index++) {
           print('4');
-          for (int setNum = 1; setNum <= setClass.sets; setNum++) {
+          for (int setNum = 1; setNum <= setList[index].sets; setNum++) {
             print('5');
-            setClass.timeList.forEach((timeClass) async {
+            for (int j = 0; j < setList[index].timeList.length; j++) {
               print('6');
               if (isVoice) audioPlayer.play('start-$voice.mp3');
-              print('${timeClass.name} aasas ${timeClass.sec}');
-              _titleName.value = timeClass.name;
-              timeInSec.value = timeClass.sec;
-              await startTimer(timeClass.sec);
+              print(
+                  '${setList[index].timeList[j].name} aasas ${setList[index].timeList[j].sec}');
+              _titleName.value = setList[index].timeList[j].name;
+              timeInSec.value = setList[index].timeList[j].sec;
+              if (timeInSec.value > 0)
+                await startTimer(setList[index].timeList[j].sec);
               print(isRest);
               if (i.value != s && isRest) {
                 print('7');
@@ -168,12 +170,12 @@ class _TimerPageState extends State<TimerPage> {
                 if (i.value != s + 1 && isVoice) {
                   audioPlayer.play('rest-$voice.mp3');
                 }
-                await startTimer(breakT.sec);
+                if (timeInSec.value > 0) await startTimer(breakT.sec);
               }
-            });
+            }
           }
           print('8');
-        });
+        }
         i.value++;
         print('9');
       } while (i.value <= s);
