@@ -37,43 +37,34 @@ class _drawerPageState extends State<drawerPage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Icon(
-                          //   Icons.watch_later_outlined,
-                          //   size: 50,
-                          //   color: Colors.teal[200],
-                          // ),
-                          // SizedBox(width:10),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Workout Timer',
-                                style: TextStyle(
-                                  color: Colors.teal[200],
-                                  letterSpacing: 2.0,
-                                  fontSize: 30,
-                                  fontFamily: 'MontserratBold',
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                'High-intensity interval training',
-                                style: TextStyle(
-                                  color: Colors.teal,
-                                  letterSpacing: 1.5,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Workout Timer',
+                          style: TextStyle(
+                            color: Colors.teal[200],
+                            letterSpacing: 2.0,
+                            fontSize: 30,
+                            fontFamily: 'MontserratBold',
+                            fontWeight: FontWeight.bold,
                           ),
-                        ]),
+                        ),
+                        Text(
+                          'High-intensity interval training',
+                          style: TextStyle(
+                            color: Colors.teal,
+                            letterSpacing: 1.5,
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
                     AnimatedContainer(
+                      width: 170,
+                      height: MediaQuery.of(context).size.height * 9 / 20,
                       duration: Duration(milliseconds: 250),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,32 +75,72 @@ class _drawerPageState extends State<drawerPage> {
                                 indexOfMenu.value = 0;
                               });
                             }),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.timer,
-                                  size: 25,
-                                  color: Colors
-                                      .teal[indexOfMenu.value == 0 ? 200 : 500],
-                                ),
-                                SizedBox(width: 15),
-                                Text(
-                                  'Timer',
-                                  style: TextStyle(
-                                    fontFamily: 'MontserratBold',
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.timer,
+                                    size: 25,
                                     color: Colors.teal[
                                         indexOfMenu.value == 0 ? 200 : 500],
-                                    letterSpacing: 1.5,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenWidth / 20),
+                                  Text(
+                                    'Timer',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[
+                                          indexOfMenu.value == 0 ? 200 : 500],
+                                      letterSpacing: 1.5,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
-                            height: 40,
+                            height: MediaQuery.of(context).size.height * 4 / 85,
+                          ),
+                          GestureDetector(
+                            //advanced
+                            onTap: (() {
+                              setState(() {
+                                indexOfMenu.value = 5;
+                              });
+                            }),
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  FaIcon(
+                                    FontAwesomeIcons.dumbbell,
+                                    size: 20,
+                                    color: Colors.teal[
+                                        indexOfMenu.value == 5 ? 200 : 500],
+                                  ),
+                                  SizedBox(width: screenWidth / 20),
+                                  Text(
+                                    'Advanced',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[
+                                          indexOfMenu.value == 5 ? 200 : 500],
+                                      letterSpacing: 0.4,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height * 4 / 85,
                           ),
                           GestureDetector(
                             onTap: (() {
@@ -117,32 +148,35 @@ class _drawerPageState extends State<drawerPage> {
                                 indexOfMenu.value = 1;
                               });
                             }),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.stacked_line_chart_rounded,
-                                  size: 25,
-                                  color: Colors
-                                      .teal[indexOfMenu.value == 1 ? 200 : 500],
-                                ),
-                                SizedBox(width: 15),
-                                Text(
-                                  'Stats',
-                                  style: TextStyle(
-                                    fontFamily: 'MontserratBold',
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.stacked_line_chart_rounded,
+                                    size: 25,
                                     color: Colors.teal[
                                         indexOfMenu.value == 1 ? 200 : 500],
-                                    letterSpacing: 1.5,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenWidth / 20),
+                                  Text(
+                                    'Stats',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[
+                                          indexOfMenu.value == 1 ? 200 : 500],
+                                      letterSpacing: 1.5,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
-                            height: 40,
+                            height: MediaQuery.of(context).size.height * 4 / 85,
                           ),
                           GestureDetector(
                             onTap: (() {
@@ -150,33 +184,36 @@ class _drawerPageState extends State<drawerPage> {
                                 indexOfMenu.value = 2;
                               });
                             }),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                SizedBox(width: 5),
-                                FaIcon(
-                                  FontAwesomeIcons.dollarSign,
-                                  size: 22,
-                                  color: Colors
-                                      .teal[indexOfMenu.value == 2 ? 200 : 500],
-                                ),
-                                SizedBox(width: 20),
-                                Text(
-                                  'Support',
-                                  style: TextStyle(
-                                    fontFamily: 'MontserratBold',
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  SizedBox(width: 5),
+                                  FaIcon(
+                                    FontAwesomeIcons.dollarSign,
+                                    size: 22,
                                     color: Colors.teal[
                                         indexOfMenu.value == 2 ? 200 : 500],
-                                    letterSpacing: 1.5,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenWidth / 15),
+                                  Text(
+                                    'Support',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[
+                                          indexOfMenu.value == 2 ? 200 : 500],
+                                      letterSpacing: 1.5,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
-                            height: 40,
+                            height: MediaQuery.of(context).size.height * 4 / 85,
                           ),
                           GestureDetector(
                             onTap: (() {
@@ -200,32 +237,35 @@ class _drawerPageState extends State<drawerPage> {
                               // ));
                             }),
                             // onTap: ()=>createDialog(context),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.info_outline_rounded,
-                                  size: 25,
-                                  color: Colors
-                                      .teal[indexOfMenu.value == 3 ? 200 : 500],
-                                ),
-                                SizedBox(width: 15),
-                                Text(
-                                  'About',
-                                  style: TextStyle(
-                                    fontFamily: 'MontserratBold',
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 25,
                                     color: Colors.teal[
                                         indexOfMenu.value == 3 ? 200 : 500],
-                                    letterSpacing: 1.5,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenWidth / 20),
+                                  Text(
+                                    'About',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[
+                                          indexOfMenu.value == 3 ? 200 : 500],
+                                      letterSpacing: 1.5,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           SizedBox(
-                            height: 40,
+                            height: MediaQuery.of(context).size.height * 4 / 85,
                           ),
                           GestureDetector(
                             onTap: (() async {
@@ -237,30 +277,30 @@ class _drawerPageState extends State<drawerPage> {
                                 throw 'Could not launch https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer';
                               }
                             }),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.star_border_rounded,
-                                  size: 25,
-                                  color: Colors.teal[500],
-                                ),
-                                SizedBox(width: 15),
-                                Text(
-                                  'Rate',
-                                  style: TextStyle(
-                                    fontFamily: 'MontserratBold',
+                            child: FittedBox(
+                              fit: BoxFit.fitHeight,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.star_border_rounded,
+                                    size: 25,
                                     color: Colors.teal[500],
-                                    letterSpacing: 1.5,
-                                    fontSize: 22,
-                                    fontWeight: FontWeight.w900,
                                   ),
-                                ),
-                              ],
+                                  SizedBox(width: screenWidth / 20),
+                                  Text(
+                                    'Rate',
+                                    style: TextStyle(
+                                      fontFamily: 'MontserratBold',
+                                      color: Colors.teal[500],
+                                      letterSpacing: 1.5,
+                                      fontSize: 22,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          SizedBox(
-                            height: 30,
                           ),
                         ],
                       ),
@@ -284,7 +324,7 @@ class _drawerPageState extends State<drawerPage> {
                                     .teal[indexOfMenu.value == 4 ? 200 : 500],
                               ),
                               SizedBox(
-                                width: 10,
+                                width: screenWidth / 40,
                               ),
                               Text(
                                 'Settings',
@@ -298,7 +338,7 @@ class _drawerPageState extends State<drawerPage> {
                                 ),
                               ),
                               SizedBox(
-                                width: 15,
+                                width: screenWidth / 20,
                               ),
                               Container(
                                 height: 20,
@@ -306,7 +346,7 @@ class _drawerPageState extends State<drawerPage> {
                                 color: Colors.teal,
                               ),
                               SizedBox(
-                                width: 15,
+                                width: screenWidth / 20,
                               ),
                               GestureDetector(
                                 onTap: (() {

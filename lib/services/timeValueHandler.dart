@@ -1,10 +1,19 @@
+import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class TimeClass {
-  int sec;
-  String name;
+class SetClass {
+  List<TimeClass> timeList;
+  int sets;
 
-  TimeClass({this.name, this.sec});
+  SetClass({@required this.timeList, @required this.sets});
+}
+
+class TimeClass {
+  int sec = 30;
+  String type = 'start';
+  String name = 'Workout';
+
+  TimeClass({this.type, this.sec, this.name});
 }
 
 class SavedWorkout {
@@ -15,17 +24,16 @@ class SavedWorkout {
   int bSec;
   int setsCount;
 
-  SavedWorkout(
-      {this.name, this.bMin, this.bSec, this.pMin, this.pSec, this.setsCount});
+  SavedWorkout({this.name, this.bMin, this.bSec, this.pMin, this.pSec, this.setsCount});
 
   Map toMap() => {
-        'name': name,
-        'pMin': pMin,
-        'pSec': pSec,
-        'bMin': bMin,
-        'bSec': bSec,
-        'setsCount': setsCount,
-      };
+    'name': name,
+    'pMin': pMin,
+    'pSec': pSec,
+    'bMin': bMin,
+    'bSec': bSec,
+    'setsCount': setsCount,
+  };
 
   SavedWorkout.fromMap(Map map)
       : name = map['name'],

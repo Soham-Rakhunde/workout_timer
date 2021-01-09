@@ -21,6 +21,7 @@ bool isAboutOpen = false;
 bool isStatsOpen = false;
 bool isDonateOpen = false;
 bool isSettingsOpen = false;
+bool isAdvancedOpen = false;
 const perPixel = 0.0025641025641026;
 DisplayMode selected;
 
@@ -160,14 +161,14 @@ class _mainPageState extends State<mainPage> {
                       child: GestureDetector(
                         onTap: () async {
                           final periodTime = TimeClass(
-                            name: 'Workout',
+                            type: 'Workout',
                             sec: Duration(
                               minutes: int.parse(controller['periodMin'].text),
                               seconds: int.parse(controller['periodSec'].text),
                             ).inSeconds,
                           );
                           final breakTime = TimeClass(
-                            name: 'Break',
+                            type: 'Break',
                             sec: Duration(
                               minutes: int.parse(controller['breakMin'].text),
                               seconds: int.parse(controller['breakSec'].text),
@@ -193,12 +194,14 @@ class _mainPageState extends State<mainPage> {
                                       Animation<double> animation,
                                       Animation<double> secAnimation) {
                                     return TimerPage(
+                                      isRest: true,
                                       args: [
-                                        2,
-                                        periodTime,
-                                        breakTime,
-                                        int.parse(controller['sets'].text),
+                                        SetClass(timeList: [
+                                          periodTime,
+                                          breakTime,
+                                        ], sets: 1)
                                       ],
+                                      sets: int.parse(controller['sets'].text),
                                     );
                                   }));
                         },

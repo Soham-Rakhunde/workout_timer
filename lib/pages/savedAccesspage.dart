@@ -146,7 +146,7 @@ class _savedPageState extends State<savedPage> {
                                     controller['sets'] = '3';
                                   }
                                   final periodTime = TimeClass(
-                                    name: snapshot.data[index].name,
+                                    type: snapshot.data[index].type,
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['periodMin'].text),
@@ -155,7 +155,7 @@ class _savedPageState extends State<savedPage> {
                                     ).inSeconds,
                                   );
                                   final breakTime = TimeClass(
-                                    name: 'Break',
+                                    type: 'Break',
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['breakMin'].text),
@@ -184,13 +184,15 @@ class _savedPageState extends State<savedPage> {
                                               Animation<double> animation,
                                               Animation<double> secAnimation) {
                                             return TimerPage(
+                                              isRest: true,
                                               args: [
-                                                2,
-                                                periodTime,
-                                                breakTime,
-                                                int.parse(
-                                                    controller['sets'].text),
+                                                SetClass(timeList: [
+                                                  periodTime,
+                                                  breakTime,
+                                                ], sets: 1)
                                               ],
+                                              sets: int.parse(
+                                                  controller['sets'].text),
                                             );
                                           }));
                                 }),
@@ -211,9 +213,9 @@ class _savedPageState extends State<savedPage> {
                                         child: FittedBox(
                                           fit: BoxFit.fitWidth,
                                           child: Text(
-                                            snapshot.data[index].name == ''
+                                            snapshot.data[index].type == ''
                                                 ? 'Name'
-                                                : '${snapshot.data[index].name}',
+                                                : '${snapshot.data[index].type}',
                                             style: kTextStyle.copyWith(
                                               color: backgroundColor,
                                               fontWeight: FontWeight.bold,

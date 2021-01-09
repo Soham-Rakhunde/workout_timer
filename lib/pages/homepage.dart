@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/pages/savedAccesspage.dart';
@@ -76,9 +75,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      // isHomeOpen
-      //     ? backgroundColor
-      //     : drawerColor,
       statusBarIconBrightness: isHomeOpen ? Brightness.dark : Brightness.light,
       systemNavigationBarColor: isHomeOpen ? backgroundColor : drawerColor,
       systemNavigationBarIconBrightness:
@@ -621,6 +617,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   }
                                   final periodTime = TimeClass(
                                     name: 'Workout',
+                                    type: 'start',
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['periodMin'].text),
@@ -630,6 +627,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   );
                                   final breakTime = TimeClass(
                                     name: 'Break',
+                                    type: 'rest',
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['breakMin'].text),
@@ -637,13 +635,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           controller['breakSec'].text),
                                     ).inSeconds,
                                   );
-                                  final page = TimerPage(
-                                    args: [
-                                      2,
+                                  final set1 = SetClass(
+                                    timeList: [
                                       periodTime,
-                                      breakTime,
-                                      int.parse(controller['sets'].text),
                                     ],
+                                    sets: 1,
+                                  );
+                                  final page = TimerPage(
+                                    isRest: true,
+                                    args: [set1],
+                                    sets: int.parse(controller['sets'].text),
+                                    breakTime: breakTime,
                                   );
                                   // await Future.delayed(Duration(microseconds: 1));
                                   await Navigator.push(

@@ -13,9 +13,12 @@ import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 class TimerPage extends StatefulWidget {
-  TimerPage({this.args});
+  TimerPage({this.args, this.sets, this.isRest, this.breakTime});
 
-  List args = [];
+  List<SetClass> args = [];
+  int sets;
+  bool isRest;
+  TimeClass breakTime;
 
   @override
   _TimerPageState createState() => _TimerPageState();
@@ -38,8 +41,6 @@ class _TimerPageState extends State<TimerPage> {
 
   ValueNotifier<bool> resumeFlag = ValueNotifier<bool>(true);
 
-  List<TimeClass> _timeT = [];
-
   String voice;
 
   bool isVoice;
@@ -48,7 +49,9 @@ class _TimerPageState extends State<TimerPage> {
 
   int flexFactor;
 
-  int count;
+  List<SetClass> setList = [];
+  bool isRest;
+  TimeClass breakT;
 
   bool firstInstance = true;
 
@@ -64,6 +67,7 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void dispose() {
     super.dispose();
+    print('dispose');
     tickTime.dispose();
     progress.dispose();
     resumeFlag.dispose();
@@ -91,22 +95,32 @@ class _TimerPageState extends State<TimerPage> {
   }
 
   void startTimer(int time) async {
+    print('as $time');
     while (timeInSec.value >= 0) {
+      print('a');
       while (!resumeFlag.value) {
+        print('b');
         await Future.delayed(Duration(milliseconds: 400));
       }
       if (i.value > s) {
+        print('broke');
         break;
       }
+      print('c');
       tickTime.value = ((time - timeInSec.value) / time) * 100;
       progress.value += 100 / totalTime;
       if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice) {
+        print('d');
         audioPlayer.play('${timeInSec.value}-$voice.mp3');
       }
       await Future.delayed(Duration(seconds: 1));
+      print('e');
       timeInSec.value--;
     }
-    tickTime.value = ((time - timeInSec.value)/time)*100;
+    print('f');
+    tickTime.value = ((time - timeInSec.value) / time) * 100;
+
+    print('ds');
   }
 
   void timerFunc() async{
@@ -130,23 +144,38 @@ class _TimerPageState extends State<TimerPage> {
     timeInSec.value = 1;
     if (isVoice) audioPlayer.play('1-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
-    if(timeInSec.value>0) {
+    print('1');
+    if (timeInSec.value > 0) {
+      print('2');
       do {
-        for (int n = 0; n < count - 1; n++) {
-          if (isVoice) audioPlayer.play('start-$voice.mp3');
-          _titleName.value = _timeT[n].name;
-          timeInSec.value = _timeT[n].sec;
-          await startTimer(_timeT[n].sec);
-          if (i.value != s) {
-            _titleName.value = _timeT[count - 1].name;
-            timeInSec.value = _timeT[count - 1].sec;
-            if (i.value != s + 1 && isVoice) {
-              audioPlayer.play('rest-$voice.mp3');
-            }
-            await startTimer(_timeT[count - 1].sec);
+        print('3');
+        setList.forEach((setClass) {
+          print('4');
+          for (int setNum = 1; setNum <= setClass.sets; setNum++) {
+            print('5');
+            setClass.timeList.forEach((timeClass) async {
+              print('6');
+              if (isVoice) audioPlayer.play('start-$voice.mp3');
+              print('${timeClass.name} aasas ${timeClass.sec}');
+              _titleName.value = timeClass.name;
+              timeInSec.value = timeClass.sec;
+              await startTimer(timeClass.sec);
+              print(isRest);
+              if (i.value != s && isRest) {
+                print('7');
+                _titleName.value = breakT.name;
+                timeInSec.value = breakT.sec;
+                if (i.value != s + 1 && isVoice) {
+                  audioPlayer.play('rest-$voice.mp3');
+                }
+                await startTimer(breakT.sec);
+              }
+            });
           }
-          i.value++;
-        }
+          print('8');
+        });
+        i.value++;
+        print('9');
       } while (i.value <= s);
       i.value--;
     }
@@ -166,10 +195,12 @@ class _TimerPageState extends State<TimerPage> {
   build(BuildContext context) {
     flexFactor = (MediaQuery.of(context).size.width - 50) ~/ 10;
     if (firstInstance) {
-      count = widget.args[0];
-      for (int n = 1; n <= count; n++) _timeT.add(widget.args[n]);
-      s = widget.args[3];
-      totalTime = _timeT[0].sec * s + _timeT[1].sec * (s - 1);
+      s = widget.sets;
+      setList = widget.args;
+      isRest = widget.isRest;
+      breakT = widget.breakTime;
+      totalTime = 150;
+      // _timeT[0].sec * s + _timeT[1].sec * (s - 1);
     }
     return WillPopScope(
       onWillPop: () async => createAlertDialog(context),
