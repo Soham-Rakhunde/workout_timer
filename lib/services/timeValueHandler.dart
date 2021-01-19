@@ -4,16 +4,139 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SetClass {
   List<TimeClass> timeList;
   int sets;
+  double height = 300;
+  String grpName = 'Group';
+  TextEditingController nameController = TextEditingController(text: 'Group');
+  TextEditingController textController = TextEditingController(text: '01');
+  String retain = '-1';
 
-  SetClass({@required this.timeList, @required this.sets});
+  Map<String, dynamic> toJson() {
+    List<Map> timeList = this.timeList != null
+        ? this.timeList.map((i) => i.toJson()).toList()
+        : null;
+    return {
+      "grpName": this.grpName,
+      "sets": this.sets,
+      "timeList": timeList,
+    };
+  }
+
+  void addRemove(bool flag) {
+    int intValue = int.parse(textController.text);
+    intValue = intValue - (flag ? -1 : 1);
+    if (intValue <= 0) {
+      intValue = 1;
+    } else if (intValue >= 100) {
+      intValue = 99;
+    }
+    String v = '$intValue';
+    sets = intValue;
+    v = v.length == 1 ? '0$v' : v;
+    textController.text = v;
+  }
+
+  void listenerMaker() {
+    if (retain == '-1') {
+      retain = '01';
+      textController.text = '01';
+      sets = 1;
+    } else {
+      textController.text = retain;
+      sets = int.parse(retain);
+    }
+
+    if (grpName == 'Group') {
+      grpName = 'Group';
+      nameController.text = 'Group';
+    } else {
+      nameController.text = grpName;
+    }
+
+    textController.addListener(() {
+      textController.selection = TextSelection(
+        baseOffset: textController.text.length,
+        extentOffset: textController.text.length,
+      );
+    });
+    nameController.addListener(() {
+      nameController.selection = TextSelection(
+        baseOffset: nameController.text.length,
+        extentOffset: nameController.text.length,
+      );
+    });
+  }
+
+  SetClass({@required this.timeList, @required this.sets, this.grpName});
 }
 
 class TimeClass {
   int sec = 30;
-  String type = 'start';
-  String name = 'Workout';
+  bool isWork = true;
+  String name = 'Work';
+  Map controllers = {
+    'name': TextEditingController(text: 'Work'),
+    'min': TextEditingController(text: '00'),
+    'sec': TextEditingController(text: '30'),
+  };
 
-  TimeClass({this.type, this.sec, this.name});
+  Map retained = {
+    'name': '-1',
+    'min': '-1',
+    'sec': '-1',
+  };
+
+  TimeClass({@required this.isWork, @required this.sec, this.name});
+
+  void initListenerMaker() {
+    retained.forEach((key, value) {
+      if (retained[key] == '-1') {
+        if (key == 'sec') {
+          retained[key] = '30';
+          controllers[key].text = '30';
+        } else if (key == 'name') {
+          retained[key] = name;
+          controllers[key].text = name;
+        } else {
+          retained[key] = '00';
+          controllers[key].text = '00';
+        }
+      } else {
+        controllers[key].text = retained[key];
+      }
+      controllers[key].addListener(() {
+        controllers[key].selection = TextSelection(
+          baseOffset: controllers[key].text.length,
+          extentOffset: controllers[key].text.length,
+        );
+      });
+    });
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": this.name,
+      "sec": this.sec,
+      "isWork": this.isWork,
+    };
+  }
+}
+
+class SavedAdvanced {
+  String name;
+  List<SetClass> groups;
+
+  SavedAdvanced({this.name, this.groups});
+
+  Map toMap() {
+    List<Map> groups = this.groups != null
+        ? this.groups.map((i) => i.toJson()).toList()
+        : null;
+    return {'name': name, 'groups': groups};
+  }
+
+  SavedAdvanced.fromMap(Map map)
+      : name = map['name'],
+        groups = map['groups'];
 }
 
 class SavedWorkout {
@@ -24,7 +147,8 @@ class SavedWorkout {
   int bSec;
   int setsCount;
 
-  SavedWorkout({this.name, this.bMin, this.bSec, this.pMin, this.pSec, this.setsCount});
+  SavedWorkout(
+      {this.name, this.bMin, this.bSec, this.pMin, this.pSec, this.setsCount});
 
   Map toMap() => {
     'name': name,
@@ -45,12 +169,13 @@ class SavedWorkout {
 }
 
 class SharedPref {
-  Future<List<String>> read() async {
+  Future<List<String>> read(String str) async {
+    //List , Adv
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getStringList('List') == null) {
+    if (prefs.getStringList(str) == null) {
       return [];
     } else {
-      return prefs.getStringList('List');
+      return prefs.getStringList(str);
     }
   }
 
@@ -93,9 +218,9 @@ class SharedPref {
     // prefs.setString(key, json.encode(value));
   }
 
-  save(List value) async {
+  save(String str, List value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("List", value);
+    prefs.setStringList(str, value);
     // prefs.setString(key, json.encode(value));
   }
 

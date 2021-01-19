@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
-import 'package:in_app_purchase/in_app_purchase.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/pages/DonatePage.dart';
 import 'package:workout_timer/pages/aboutPage.dart';
+import 'package:workout_timer/pages/advancedPage.dart';
 import 'package:workout_timer/pages/drawerPage.dart';
 import 'package:workout_timer/pages/homepage.dart';
 import 'package:workout_timer/pages/settingsPage.dart';
@@ -42,7 +42,7 @@ void main() {
             DeviceOrientation.portraitUp,
             DeviceOrientation.portraitDown,
           ]));
-  InAppPurchaseConnection.enablePendingPurchases();
+  // InAppPurchaseConnection.enablePendingPurchases();
   runApp(MaterialApp(
     debugShowMaterialGrid: false,
     debugShowCheckedModeBanner: false,
@@ -161,18 +161,32 @@ class _mainPageState extends State<mainPage> {
                       child: GestureDetector(
                         onTap: () async {
                           final periodTime = TimeClass(
-                            type: 'Workout',
+                            name: 'Workout',
+                            isWork: true,
                             sec: Duration(
                               minutes: int.parse(controller['periodMin'].text),
                               seconds: int.parse(controller['periodSec'].text),
                             ).inSeconds,
                           );
                           final breakTime = TimeClass(
-                            type: 'Break',
+                            name: 'Break',
+                            isWork: false,
                             sec: Duration(
                               minutes: int.parse(controller['breakMin'].text),
                               seconds: int.parse(controller['breakSec'].text),
                             ).inSeconds,
+                          );
+                          final set1 = SetClass(
+                            timeList: [
+                              periodTime,
+                            ],
+                            sets: 1,
+                          );
+                          final page = TimerPage(
+                            isRest: true,
+                            args: [set1],
+                            sets: int.parse(controller['sets'].text),
+                            breakTime: breakTime,
                           );
                           await Navigator.push(
                               context,
@@ -193,16 +207,7 @@ class _mainPageState extends State<mainPage> {
                                   pageBuilder: (BuildContext context,
                                       Animation<double> animation,
                                       Animation<double> secAnimation) {
-                                    return TimerPage(
-                                      isRest: true,
-                                      args: [
-                                        SetClass(timeList: [
-                                          periodTime,
-                                          breakTime,
-                                        ], sets: 1)
-                                      ],
-                                      sets: int.parse(controller['sets'].text),
-                                    );
+                                    return page;
                                   }));
                         },
                         child: ValueListenableBuilder(
@@ -255,6 +260,7 @@ class _mainPageState extends State<mainPage> {
                             DonatePage(),
                             AboutPage(),
                             SettingsPage(),
+                            AdvancedPage(),
                           ],
                         );
                       },

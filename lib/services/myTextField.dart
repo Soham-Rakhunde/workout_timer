@@ -5,14 +5,18 @@ import '../constants.dart';
 
 class myTextField extends StatelessWidget {
   int temp;
-  String controllerName;
+  String controllerName = ' ';
+  TextEditingController control;
   Function func;
-  myTextField({this.controllerName, this.func});
+  bool isStringName = true;
+
+  myTextField(
+      {this.controllerName, this.func, this.isStringName, this.control});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: controller[controllerName],
+      controller: isStringName ? controller[controllerName] : control,
       style: kTextStyle.copyWith(
         fontWeight: FontWeight.bold,
         fontSize: 25,

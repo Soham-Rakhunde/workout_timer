@@ -1,15 +1,16 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
-import 'package:workout_timer/pages/savedAccesspage.dart';
-import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/GenericFunctions.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/animIcon/gradientIcon.dart';
+import 'package:workout_timer/services/innerShadow.dart';
 import 'package:workout_timer/services/myTextField.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
@@ -20,26 +21,47 @@ class AdvancedPage extends StatefulWidget {
 
 class _AdvancedPageState extends State<AdvancedPage>
     with SingleTickerProviderStateMixin {
-  AnimationController playGradientControl;
-  Animation<Color> colAnim1, colAnim2;
-  ValueNotifier<String> _titleName = ValueNotifier<String>('Timer');
-  TextEditingController dialogController = TextEditingController();
-  double _opacity = 0;
   double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
+  double logoAnim = 0;
   bool isBackPressed = false;
-  List<String> savedList = List<String>();
-  SharedPref savedData = SharedPref();
+  AnimationController playGradientControl;
+  Animation<Color> colAnim1, colAnim2;
+  TextEditingController dialogController = TextEditingController();
+  List<SetClass> groups = [];
+
+  SharedPref prefs = SharedPref();
+  List<SavedAdvanced> savedListObjs;
+  List<String> savedList;
+
+  Future<List<SavedAdvanced>> _getAdvData() async {
+    savedList = await prefs.read('Adv');
+    savedListObjs = savedList
+        .map((item) => SavedAdvanced.fromMap(jsonDecode(item)))
+        .toList();
+    return savedListObjs;
+  }
 
   @override
   void initState() {
     super.initState();
-    isBackPressed = false;
-    for (String controllerName in controller.keys) {
-      initListenerMaker(controllerName);
-    }
+    BackButtonInterceptor.add(myInterceptor);
+    groups.add(
+      SetClass(
+          grpName: 'Group ${groups.length + 1}',
+          timeList: [
+            TimeClass(
+              name: 'Work',
+              isWork: true,
+              sec: 30,
+            ),
+            TimeClass(name: 'Break', isWork: false, sec: 30),
+          ],
+          sets: 3),
+    );
+
     playGradientControl = AnimationController(
       vsync: this,
       duration: Duration(milliseconds: 1000),
@@ -53,8 +75,19 @@ class _AdvancedPageState extends State<AdvancedPage>
       begin: lightGradient,
       end: darkGradient,
     ).animate(playGradientControl);
+    setState(() {
+      groups.first.listenerMaker();
+      groups.first.timeList.forEach((element) {
+        element.initListenerMaker();
+      });
 
-    _opacity = 0;
+      xOffset = 250;
+      yOffset = 140;
+      isBackPressed = false;
+      scaleFactor = 0.7;
+      isDrawerOpen = true;
+      isAdvancedOpen = false;
+    });
 
     playGradientControl.forward();
     playGradientControl.addStatusListener((status) {
@@ -65,31 +98,54 @@ class _AdvancedPageState extends State<AdvancedPage>
         playGradientControl.forward();
       }
     });
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: isHomeOpen ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: isHomeOpen ? backgroundColor : drawerColor,
-      systemNavigationBarIconBrightness:
-          isHomeOpen ? Brightness.dark : Brightness.light,
-      systemNavigationBarDividerColor:
-          isHomeOpen ? backgroundColor : drawerColor,
-    ));
   }
 
   @override
   void dispose() {
-    super.dispose();
-    for (String controllerName in controller.keys) {
-      controller[controllerName].dispose();
-    }
+    BackButtonInterceptor.remove(myInterceptor);
     dialogController.dispose();
-    _titleName.dispose();
-    playGradientControl.dispose();
+    groups.forEach((element) {
+      element.nameController.dispose();
+      element.textController.dispose();
+      element.timeList.forEach((ele) {
+        ele.controllers.forEach((key, value) {
+          ele.controllers[key].dispose();
+        });
+      });
+    });
+    super.dispose();
   }
+
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
+    if (isAdvancedOpen) {
+      setState(() {
+        isBackPressed = true;
+        xOffset = adjusted(250);
+        yOffset = adjusted(140);
+        scaleFactor = 0.7;
+        isDrawerOpen = true;
+        isAdvancedOpen = false;
+        SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness:
+              isAdvancedOpen ? Brightness.dark : Brightness.light,
+          systemNavigationBarColor:
+              isAdvancedOpen ? backgroundColor : drawerColor,
+          systemNavigationBarIconBrightness:
+              isAdvancedOpen ? Brightness.dark : Brightness.light,
+          systemNavigationBarDividerColor:
+              isAdvancedOpen ? backgroundColor : drawerColor,
+        ));
+      });
+      return true;
+    } else
+      return false;
+  }
+
+  double adjusted(double val) => val * screenWidth * perPixel;
 
   @override
   Widget build(BuildContext context) {
-    _opacity = 1;
     screenWidth = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
       valueListenable: isDark,
@@ -99,549 +155,881 @@ class _AdvancedPageState extends State<AdvancedPage>
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
-          if (!isHomeOpen && indexOfMenu.value == 0 && !isBackPressed) {
+          if (!isAdvancedOpen && indexOfMenu.value == 5 && !isBackPressed) {
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
                 xOffset = 0;
-                playGradientControl.reverse();
                 yOffset = 0;
                 scaleFactor = 1;
                 isDrawerOpen = false;
-                isHomeOpen = true;
+                isAdvancedOpen = true;
               });
             });
-          } else if (indexOfMenu.value != 0) isBackPressed = false;
+          } else if (indexOfMenu.value != 5) isBackPressed = false;
           return child;
         },
         child: AnimatedContainer(
-          padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
           duration: Duration(milliseconds: drawerAnimDur),
           curve: Curves.easeInOutQuart,
           transform: Matrix4.translationValues(xOffset, yOffset, 100)
             ..scale(scaleFactor),
           height: MediaQuery.of(context).size.height,
-          width: double.infinity,
+          width: MediaQuery.of(context).size.width,
           onEnd: (() {
-            if (isHomeOpen && indexOfMenu.value == 0) {
+            if (isAdvancedOpen && indexOfMenu.value == 5) {
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
-                // isHomeOpen
-                //     ? backgroundColor
-                //     : drawerColor,
                 statusBarIconBrightness:
-                    isHomeOpen ? Brightness.dark : Brightness.light,
+                    isAdvancedOpen ? Brightness.dark : Brightness.light,
                 systemNavigationBarColor:
-                    isHomeOpen ? backgroundColor : drawerColor,
+                    isAdvancedOpen ? backgroundColor : drawerColor,
                 systemNavigationBarIconBrightness:
-                    isHomeOpen ? Brightness.dark : Brightness.light,
+                    isAdvancedOpen ? Brightness.dark : Brightness.light,
                 systemNavigationBarDividerColor:
-                    isHomeOpen ? backgroundColor : drawerColor,
+                    isAdvancedOpen ? backgroundColor : drawerColor,
               ));
             }
           }),
           decoration: BoxDecoration(
             color: backgroundColor,
-            borderRadius: BorderRadius.circular(isHomeOpen ? 0 : 28),
+            borderRadius: BorderRadius.circular(isDrawerOpen ? 28 : 0),
           ),
           child: GestureDetector(
             onTap: (() {
-              if (!isHomeOpen && indexOfMenu.value == 0) {
+              if (!isAdvancedOpen && indexOfMenu.value == 5) {
                 setState(() {
                   xOffset = 0;
                   yOffset = 0;
                   scaleFactor = 1;
                   isDrawerOpen = false;
-                  isHomeOpen = true;
+                  isAdvancedOpen = true;
                 });
               }
             }),
             onHorizontalDragEnd: ((_) {
-              if (!isHomeOpen && indexOfMenu.value == 0) {
+              if (!isAdvancedOpen && indexOfMenu.value == 5) {
                 setState(() {
                   xOffset = 0;
                   yOffset = 0;
                   scaleFactor = 1;
                   isDrawerOpen = false;
-                  isHomeOpen = true;
+                  isAdvancedOpen = true;
                 });
               }
             }),
-            child: AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: _opacity,
-              child: AbsorbPointer(
-                absorbing: !isHomeOpen,
+            child: AbsorbPointer(
+              absorbing: !isAdvancedOpen,
+              child: Container(
+                height: double.infinity,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: backgroundColor,
+                  borderRadius: BorderRadius.circular(isAdvancedOpen ? 0 : 28),
+                ),
                 child: Column(
-                  // mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Expanded(
-                      flex: 6,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left: 27),
-                            child: ValueListenableBuilder<String>(
-                              valueListenable: _titleName,
-                              builder: (context, value, child) {
-                                return Text(
-                                  _titleName.value,
-                                  style: TextStyle(
-                                    color: textColor,
-                                    letterSpacing: 2.0,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
+                      flex: 8,
+                      child: Padding(
+                        padding: EdgeInsets.only(
+                          top: 50,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(left: 27),
+                              child: Text(
+                                'Advanced',
+                                style: TextStyle(
+                                  color: textColor,
+                                  letterSpacing: 2.0,
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            NeuButton(
+                              ico: Icon(
+                                Icons.menu_rounded,
+                                size: 30,
+                                color: textColor,
+                              ),
+                              onPress: (() {
+                                setState(() {
+                                  isBackPressed = true;
+                                  xOffset = adjusted(250);
+                                  yOffset = adjusted(140);
+                                  scaleFactor = 0.7;
+                                  isDrawerOpen = true;
+                                  isAdvancedOpen = false;
+                                  SystemChrome.setSystemUIOverlayStyle(
+                                      SystemUiOverlayStyle(
+                                    statusBarColor: Colors.transparent,
+                                    statusBarIconBrightness: isAdvancedOpen
+                                        ? Brightness.dark
+                                        : Brightness.light,
+                                    systemNavigationBarColor: isAdvancedOpen
+                                        ? backgroundColor
+                                        : drawerColor,
+                                    systemNavigationBarIconBrightness:
+                                        isAdvancedOpen
+                                            ? Brightness.dark
+                                            : Brightness.light,
+                                    systemNavigationBarDividerColor:
+                                        isAdvancedOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                  ));
+                                });
+                              }),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      flex: 30,
+                      child: AnimatedList(
+                        initialItemCount: groups.length,
+                        key: ValueKey('0${groups.length}'),
+                        physics: BouncingScrollPhysics(),
+                        itemBuilder:
+                            (BuildContext context, int index, animation) {
+                          return Dismissible(
+                            background: Container(
+                              padding: EdgeInsets.only(left: 30),
+                              alignment: Alignment.centerLeft,
+                              child: Wrap(direction: Axis.vertical, children: [
+                                RotatedBox(
+                                    quarterTurns: 3,
+                                    child: Center(
+                                      child: Text(
+                                        'Delete',
+                                        style: kTextStyle.copyWith(
+                                          color: textColor,
+                                          fontSize: 25,
+                                        ),
+                                      ),
+                                    )),
+                              ]),
+                              // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
+                            ),
+                            direction: DismissDirection.startToEnd,
+                            key: ValueKey('$index name'),
+                            onDismissed: (direction) async {
+                              setState(() {
+                                groups.removeAt(index);
+                              });
+                            },
+                            child: Container(
+                              // key: UniqueKey(),
+                              margin: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 20),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 15),
+                              height: groups[index].height,
+                              width: screenWidth,
+                              decoration: BoxDecoration(
+                                color: backgroundColor,
+                                // gradient: LinearGradient(
+                                //     colors: gradientList[index % 5],
+                                //     begin: Alignment.centerLeft,
+                                //     end: Alignment.centerRight),
+                                borderRadius: BorderRadius.circular(32),
+                                boxShadow: [
+                                  BoxShadow(
+                                      color: shadowColor,
+                                      offset: Offset(8, 6),
+                                      blurRadius: 12),
+                                  BoxShadow(
+                                      color: lightShadowColor,
+                                      offset: Offset(-8, -6),
+                                      blurRadius: 12),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        flex: 15,
+                                        child: TextField(
+                                          controller:
+                                              groups[index].nameController,
+                                          style: kTextStyle.copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                            color: isDark.value
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
+                                          textAlign: TextAlign.center,
+                                          decoration: kInputDecor,
+                                          cursorColor: Colors.grey,
+                                        ),
+                                        // Text(
+                                        //   groups[index].grpName,
+                                        //   style: kTextStyle.copyWith(
+                                        //     color:textColor,
+                                        //     // backgroundColor,
+                                        //     fontWeight: FontWeight.bold,
+                                        //     fontSize: 26.5,
+                                        //   ),
+                                        // ),
+                                      ),
+                                      Expanded(
+                                        flex: 4,
+                                        child: NeuButton(
+                                          length: 50,
+                                          breadth: 50,
+                                          ico: FaIcon(
+                                            FontAwesomeIcons.plus,
+                                            color: textColor,
+                                            size: 20,
+                                          ),
+                                          onPress: (() {
+                                            setState(() {
+                                              groups[index].height += 68;
+                                              groups[index]
+                                                  .timeList
+                                                  .add(TimeClass(
+                                                    name: 'Work',
+                                                    isWork: true,
+                                                    sec: 30,
+                                                  ));
+                                            });
+                                          }),
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                  SizedBox(
+                                    height: 10,
+                                  ),
+                                  Expanded(
+                                    child: AnimatedList(
+                                        initialItemCount:
+                                            groups[index].timeList.length,
+                                        shrinkWrap: true,
+                                        physics: BouncingScrollPhysics(),
+                                        itemBuilder: (BuildContext context,
+                                            int j, animation) {
+                                          return Dismissible(
+                                            background: Container(
+                                              alignment: Alignment.centerLeft,
+                                              child: Wrap(
+                                                  direction: Axis.vertical,
+                                                  children: [
+                                                    RotatedBox(
+                                                        quarterTurns: 3,
+                                                        child: Center(
+                                                          child: Text(
+                                                            'Delete',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color: textColor,
+                                                              fontSize: 25,
+                                                            ),
+                                                          ),
+                                                        )),
+                                                  ]),
+                                              // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
+                                            ),
+                                            direction:
+                                                DismissDirection.startToEnd,
+                                            key: ValueKey(
+                                                '1${groups[index].timeList.length}'),
+                                            onDismissed: (direction) {
+                                              print('$index & $j');
+                                              groups[index]
+                                                  .timeList[j]
+                                                  .controllers
+                                                  .forEach((key, value) {
+                                                groups[index]
+                                                    .timeList[j]
+                                                    .controllers[key]
+                                                    .dispose();
+                                              });
+                                              groups[index]
+                                                  .timeList
+                                                  .removeAt(j);
+                                              print('$index & $j');
+                                              Future.delayed(
+                                                      Duration(microseconds: 1))
+                                                  .then((value) => setState(() {
+                                                        groups[index].height -=
+                                                            68;
+                                                      }));
+                                            },
+                                            child: Container(
+                                              decoration: ConcaveDecoration(
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                    lerpDouble(0, 100, 0.25),
+                                                  ),
+                                                ),
+                                                colors: [
+                                                  shadowColor,
+                                                  lightShadowColor
+                                                ],
+                                                depression: 10,
+                                              ),
+                                              width: screenWidth - 40,
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 5, horizontal: 0),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 0, horizontal: 5),
+                                              child: Container(
+                                                child: Theme(
+                                                  data: Theme.of(context)
+                                                      .copyWith(
+                                                          dividerColor: Colors
+                                                              .transparent),
+                                                  child: ExpansionTile(
+                                                    childrenPadding:
+                                                        EdgeInsets.only(
+                                                            bottom: 10),
+                                                    maintainState: true,
+                                                    key: ValueKey(
+                                                        '$index + $j +name'),
+                                                    title: Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Expanded(
+                                                          flex: 5,
+                                                          child: TextField(
+                                                            controller: groups[
+                                                                        index]
+                                                                    .timeList[j]
+                                                                    .controllers[
+                                                                'name'],
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                              color: isDark
+                                                                      .value
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .black,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            decoration:
+                                                                kInputDecor,
+                                                            cursorColor:
+                                                                Colors.grey,
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 2,
+                                                          child: TextField(
+                                                            controller: groups[
+                                                                        index]
+                                                                    .timeList[j]
+                                                                    .controllers[
+                                                                'min'],
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                              color: isDark
+                                                                      .value
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .black,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            decoration:
+                                                                kInputDecor,
+                                                            cursorColor:
+                                                                Colors.grey,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          ':',
+                                                          style: kTextStyle
+                                                              .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 20,
+                                                            color: textColor,
+                                                          ),
+                                                        ),
+                                                        Expanded(
+                                                          flex: 2,
+                                                          child: TextField(
+                                                            controller: groups[
+                                                                        index]
+                                                                    .timeList[j]
+                                                                    .controllers[
+                                                                'sec'],
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                              color: isDark
+                                                                      .value
+                                                                  ? Colors.white
+                                                                  : Colors
+                                                                      .black,
+                                                            ),
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                            decoration:
+                                                                kInputDecor,
+                                                            cursorColor:
+                                                                Colors.grey,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    children: [
+                                                      Row(
+                                                        children: [
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: SizedBox(),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 4,
+                                                            child: FittedBox(
+                                                              fit: BoxFit.fill,
+                                                              child: Text(
+                                                                'Type:',
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: SizedBox(),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 10,
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: (() async {
+                                                                setState(() {
+                                                                  groups[index]
+                                                                      .timeList[
+                                                                          j]
+                                                                      .isWork = true;
+                                                                });
+                                                              }),
+                                                              child:
+                                                                  AnimatedContainer(
+                                                                duration: Duration(
+                                                                    milliseconds:
+                                                                        200),
+                                                                curve: Curves
+                                                                    .easeOutQuint,
+                                                                height: 45,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: groups[
+                                                                              index]
+                                                                          .timeList[
+                                                                              j]
+                                                                          .isWork
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : Colors
+                                                                          .transparent,
+                                                                  border: Border.all(
+                                                                      width: 1,
+                                                                      color: Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.8)),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'Work',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: groups[index]
+                                                                              .timeList[j]
+                                                                              .isWork
+                                                                          ? backgroundColor
+                                                                          : textColor,
+                                                                      letterSpacing:
+                                                                          2.0,
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: SizedBox(),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 10,
+                                                            child:
+                                                                GestureDetector(
+                                                              onTap: (() async {
+                                                                setState(() {
+                                                                  groups[index]
+                                                                      .timeList[
+                                                                          j]
+                                                                      .isWork = false;
+                                                                });
+                                                              }),
+                                                              child:
+                                                                  AnimatedContainer(
+                                                                duration: Duration(
+                                                                    milliseconds:
+                                                                        200),
+                                                                curve: Curves
+                                                                    .easeOutQuint,
+                                                                height: 45,
+                                                                decoration:
+                                                                    BoxDecoration(
+                                                                  color: !groups[
+                                                                              index]
+                                                                          .timeList[
+                                                                              j]
+                                                                          .isWork
+                                                                      ? textColor
+                                                                          .withOpacity(
+                                                                              0.5)
+                                                                      : Colors
+                                                                          .transparent,
+                                                                  border: Border.all(
+                                                                      width: 1,
+                                                                      color: Colors
+                                                                          .white
+                                                                          .withOpacity(
+                                                                              0.8)),
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              20),
+                                                                ),
+                                                                child: Center(
+                                                                  child: Text(
+                                                                    'Rest',
+                                                                    style:
+                                                                        TextStyle(
+                                                                      color: !groups[index]
+                                                                              .timeList[j]
+                                                                              .isWork
+                                                                          ? backgroundColor
+                                                                          : textColor,
+                                                                      letterSpacing:
+                                                                          2.0,
+                                                                      fontSize:
+                                                                          20,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .bold,
+                                                                    ),
+                                                                  ),
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Expanded(
+                                                            flex: 1,
+                                                            child: SizedBox(),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        'Sets :',
+                                        style: kTextStyle.copyWith(
+                                          color: textColor,
+                                          // backgroundColor,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 26.5,
+                                        ),
+                                      ),
+                                      NeuButton(
+                                        length: 50,
+                                        breadth: 50,
+                                        ico: Icon(
+                                          Icons.remove_rounded,
+                                          size: 20,
+                                          color: textColor,
+                                        ),
+                                        onPress: (() {
+                                          groups[index].addRemove(false);
+                                        }),
+                                      ),
+                                      Container(
+                                        width: 40,
+                                        child: myTextField(
+                                          isStringName: false,
+                                          control: groups[index].textController,
+                                          func: (val) {
+                                            setState(() {
+                                              groups[index].retain = val;
+                                              groups[index]
+                                                  .textController
+                                                  .text = val;
+                                            });
+                                          },
+                                        ),
+                                      ),
+                                      NeuButton(
+                                        length: 50,
+                                        breadth: 50,
+                                        ico: Icon(
+                                          Icons.add_rounded,
+                                          size: 20,
+                                          color: textColor,
+                                        ),
+                                        onPress: (() {
+                                          groups[index].addRemove(true);
+                                        }),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Expanded(
+                      flex: 9,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 25),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Hero(
+                              tag: 'fg',
+                              child: NeuButton(
+                                ico: Icon(
+                                  Icons.save_outlined,
+                                  size: 30,
+                                  color: textColor,
+                                ),
+                                onPress: (() async {
+                                  await createDialog(context);
+                                  groups.forEach((groupEle) {
+                                    groupEle.sets = int.parse(
+                                        groupEle.textController.value.text);
+                                    groupEle.grpName =
+                                        groupEle.nameController.value.text;
+                                    if (groupEle.textController.value.text ==
+                                        '') {
+                                      groupEle.sets = 1;
+                                    }
+                                    if (groupEle.nameController.value.text ==
+                                        '') {
+                                      groupEle.grpName = 'Work';
+                                    }
+                                    groupEle.timeList.forEach((timeEle) {
+                                      if (timeEle.controllers['name'] == '') {
+                                        timeEle.controllers['name'].value.text =
+                                            'Work';
+                                      }
+                                      if (timeEle.controllers['min'] == '') {
+                                        timeEle.controllers['min'] = '0';
+                                      }
+                                      if (timeEle.controllers['sec'] == '') {
+                                        timeEle.controllers['sec'] = '30';
+                                      }
+                                      timeEle.name = timeEle
+                                          .controllers['name'].value.text;
+                                      timeEle.sec = Duration(
+                                        minutes: int.parse(timeEle
+                                            .controllers['min'].value.text),
+                                        seconds: int.parse(timeEle
+                                            .controllers['sec'].value.text),
+                                      ).inSeconds;
+                                    });
+                                  });
+                                  savedList = await prefs.read('Adv');
+
+                                  SavedAdvanced _data = SavedAdvanced(
+                                    name:
+                                        stringFormatter(dialogController.text),
+                                    groups: groups,
+                                  );
+                                  print('Encoded ${jsonEncode(_data.toMap())}');
+                                  savedList.add(jsonEncode(_data.toMap()));
+                                  await prefs.save('Adv', savedList);
+                                }),
+                              ),
+                            ),
+                            AnimatedBuilder(
+                              animation: playGradientControl,
+                              builder: (BuildContext context, Widget child) {
+                                return NeuButton(
+                                  ico: GradientIcon(
+                                    icon: Icons.play_arrow_rounded,
+                                    size: 55,
+                                    gradient: RadialGradient(colors: <Color>[
+                                      colAnim1.value,
+                                      colAnim2.value,
+                                    ], focal: Alignment.center),
+                                  ),
+                                  length: screenWidth / 4.6,
+                                  breadth: screenWidth / 4.6,
+                                  radii: 50,
+                                  onPress: (() async {
+                                    FocusScopeNode currentFocus =
+                                        FocusScope.of(context);
+                                    if (!currentFocus.hasPrimaryFocus) {
+                                      currentFocus.unfocus();
+                                    }
+                                    if (controller['periodSec'] == '') {
+                                      controller['periodSec'] = '30';
+                                    }
+                                    if (controller['periodMin'] == '') {
+                                      controller['periodMin'] = '0';
+                                    }
+                                    if (controller['periodSec'] == '') {
+                                      controller['periodSec'] = '30';
+                                    }
+                                    if (controller['breakMin'] == '') {
+                                      controller['breakMin'] = '0';
+                                    }
+                                    if (controller['breakSec'] == '') {
+                                      controller['breakSec'] = '30';
+                                    }
+                                    if (controller['sets'] == '') {
+                                      controller['sets'] = '3';
+                                    }
+                                    final periodTime = TimeClass(
+                                      name: 'Workout',
+                                      isWork: true,
+                                      sec: Duration(
+                                        minutes: int.parse(
+                                            controller['periodMin'].text),
+                                        seconds: int.parse(
+                                            controller['periodSec'].text),
+                                      ).inSeconds,
+                                    );
+                                    final breakTime = TimeClass(
+                                      name: 'Break',
+                                      isWork: false,
+                                      sec: Duration(
+                                        minutes: int.parse(
+                                            controller['breakMin'].text),
+                                        seconds: int.parse(
+                                            controller['breakSec'].text),
+                                      ).inSeconds,
+                                    );
+                                    final set1 = SetClass(
+                                      timeList: [
+                                        periodTime,
+                                      ],
+                                      sets: 1,
+                                    );
+                                    // final page = TimerPage(
+                                    //   isRest: true,
+                                    //   args: [set1],
+                                    //   sets: int.parse(controller['sets'].text),
+                                    //   breakTime: breakTime,
+                                    // );
+                                    // // await Future.delayed(Duration(microseconds: 1));
+                                    // await Navigator.push(
+                                    //     context,
+                                    //     PageRouteBuilder(
+                                    //         transitionDuration:
+                                    //         Duration(milliseconds: 250),
+                                    //         reverseTransitionDuration:
+                                    //         Duration(milliseconds: 150),
+                                    //         transitionsBuilder: (BuildContext
+                                    //         context,
+                                    //             Animation<double> animation,
+                                    //             Animation<double> secAnimation,
+                                    //             Widget child) {
+                                    //           return FadeTransition(
+                                    //             opacity: animation,
+                                    //             child: child,
+                                    //           );
+                                    //         },
+                                    //         pageBuilder: (BuildContext context,
+                                    //             Animation<double> animation,
+                                    //             Animation<double> secAnimation) {
+                                    //           return page;
+                                    //         }));
+                                  }),
                                 );
                               },
                             ),
-                          ),
-                          NeuButton(
-                            ico: Icon(
-                              Icons.menu_rounded,
-                              size: 30,
-                              color: textColor,
-                            ),
-                            onPress: (() {
-                              setState(() {
-                                FocusScope.of(context).unfocus();
-                                isBackPressed = true;
-                                xOffset = 250;
-                                yOffset = 140;
-                                scaleFactor = 0.7;
-                                isDrawerOpen = true;
-                                isHomeOpen = false;
-                                SystemChrome.setSystemUIOverlayStyle(
-                                    SystemUiOverlayStyle(
-                                  statusBarColor: Colors.transparent,
-                                  // isHomeOpen
-                                  //     ? backgroundColor
-                                  //     : drawerColor,
-                                  statusBarIconBrightness: isHomeOpen
-                                      ? Brightness.dark
-                                      : Brightness.light,
-                                  systemNavigationBarColor: isHomeOpen
-                                      ? backgroundColor
-                                      : drawerColor,
-                                  systemNavigationBarIconBrightness: isHomeOpen
-                                      ? Brightness.dark
-                                      : Brightness.light,
-                                  systemNavigationBarDividerColor: isHomeOpen
-                                      ? backgroundColor
-                                      : drawerColor,
-                                ));
-                              });
-                            }),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 0,
-                      child: SizedBox(),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: Column(
-                        children: [
-                          Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                'TIME / SET',
-                                style: kTextStyle.copyWith(
-                                  color: isDark.value
-                                      ? Colors.white
-                                      : Colors.black,
+                            Hero(
+                              tag: 'gg',
+                              child: NeuButton(
+                                ico: FaIcon(
+                                  FontAwesomeIcons.plus,
+                                  color: textColor,
+                                  size: 25,
                                 ),
-                              )),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.remove_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(false, 'periodSec');
-                                  }),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.only(left: 5),
-                                  width: 60,
-                                  alignment: Alignment.center,
-                                  child: myTextField(
-                                    controllerName: 'periodMin',
-                                    func: (val) {
-                                      setState(() {
-                                        retain['periodMin'] = val;
-                                        controller['periodMin'].text = val;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                    child: Text(
-                                  ':',
-                                  style: kTextStyle.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 25,
-                                    color: textColor,
-                                  ),
-                                )),
-                                Container(
-                                  padding: EdgeInsets.only(right: 5),
-                                  width: 60,
-                                  alignment: Alignment.center,
-                                  child: myTextField(
-                                    controllerName: 'periodSec',
-                                    func: (val) {
-                                      setState(() {
-                                        retain['periodSec'] = val;
-                                        controller['periodSec'].text = val;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.add_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(true, 'periodSec');
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: Column(
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'BREAK',
-                              style: kTextStyle.copyWith(
-                                color:
-                                    isDark.value ? Colors.white : Colors.black,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.remove_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(false, 'breakSec');
-                                  }),
-                                ),
-                                Container(
-                                  width: 60,
-                                  padding: EdgeInsets.only(left: 5),
-                                  alignment: Alignment.center,
-                                  child: myTextField(
-                                    controllerName: 'breakMin',
-                                    func: (val) {
-                                      setState(() {
-                                        retain['breakMin'] = val;
-                                        controller['breakMin'].text = val;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                Container(
-                                  child: Text(
-                                    ':',
-                                    style: kTextStyle.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 25,
-                                      color: textColor,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                    width: 60,
-                                    padding: EdgeInsets.only(right: 5),
-                                    alignment: Alignment.center,
-                                    child: myTextField(
-                                      controllerName: 'breakSec',
-                                      func: (val) {
-                                        setState(() {
-                                          retain['breakSec'] = val;
-                                          controller['breakSec'].text = val;
-                                        });
-                                      },
-                                    )),
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.add_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(true, 'breakSec');
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 6,
-                      child: Column(
-                        children: [
-                          Container(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'SETS',
-                              style: kTextStyle.copyWith(
-                                color:
-                                    isDark.value ? Colors.white : Colors.black,
-                              ),
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(top: 10),
-                            alignment: Alignment.center,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.remove_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(false, 'sets');
-                                  }),
-                                ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 5),
-                                  width: 130,
-                                  child: myTextField(
-                                    controllerName: 'sets',
-                                    func: (val) {
-                                      setState(() {
-                                        retain['sets'] = val;
-                                        controller['sets'].text = val;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                NeuButton(
-                                  ico: Icon(
-                                    Icons.add_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                  onPress: (() {
-                                    addRemove(true, 'sets');
-                                  }),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Expanded(
-                      flex: 5,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Hero(
-                            tag: 'leftButton',
-                            child: NeuButton(
-                              ico: Icon(
-                                Icons.bookmark_border_rounded,
-                                size: 30,
-                                color: textColor,
-                              ),
-                              onPress: (() async {
-                                await Navigator.push(
-                                    context,
-                                    PageRouteBuilder(
-                                        transitionDuration:
-                                            Duration(milliseconds: 250),
-                                        reverseTransitionDuration:
-                                            Duration(milliseconds: 150),
-                                        transitionsBuilder:
-                                            (BuildContext context,
-                                                Animation<double> animation,
-                                                Animation<double> secAnimation,
-                                                Widget child) {
-                                          return FadeTransition(
-                                            opacity: animation,
-                                            child: child,
-                                          );
-                                        },
-                                        pageBuilder: (BuildContext context,
-                                            Animation<double> animation,
-                                            Animation<double> secAnimation) {
-                                          return savedPage();
-                                        }));
-                              }),
-                            ),
-                          ),
-                          AnimatedBuilder(
-                            animation: playGradientControl,
-                            builder: (BuildContext context, Widget child) {
-                              return NeuButton(
-                                ico: GradientIcon(
-                                  icon: Icons.play_arrow_rounded,
-                                  size: 55,
-                                  gradient: RadialGradient(colors: <Color>[
-                                    colAnim1.value,
-                                    colAnim2.value,
-                                  ], focal: Alignment.center),
-                                ),
-                                length: screenWidth / 4.6,
-                                breadth: screenWidth / 4.6,
-                                radii: 50,
-                                onPress: (() async {
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  print('here');
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['periodMin'] == '') {
-                                    controller['periodMin'] = '0';
-                                  }
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['breakMin'] == '') {
-                                    controller['breakMin'] = '0';
-                                  }
-                                  if (controller['breakSec'] == '') {
-                                    controller['breakSec'] = '30';
-                                  }
-                                  if (controller['sets'] == '') {
-                                    controller['sets'] = '3';
-                                  }
-                                  final periodTime = TimeClass(
-                                    type: 'Workout',
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['periodMin'].text),
-                                      seconds: int.parse(
-                                          controller['periodSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  final breakTime = TimeClass(
-                                    type: 'Break',
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['breakMin'].text),
-                                      seconds: int.parse(
-                                          controller['breakSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  final page = TimerPage(
-                                    args: [
-                                      // 2,
-                                      // periodTime,
-                                      // breakTime,
-                                      // int.parse(controller['sets'].text),
-                                    ],
-                                  );
-                                  // await Future.delayed(Duration(microseconds: 1));
-                                  await Navigator.push(
-                                      context,
-                                      PageRouteBuilder(
-                                          transitionDuration:
-                                              Duration(milliseconds: 250),
-                                          reverseTransitionDuration:
-                                              Duration(milliseconds: 150),
-                                          transitionsBuilder: (BuildContext
-                                                  context,
-                                              Animation<double> animation,
-                                              Animation<double> secAnimation,
-                                              Widget child) {
-                                            return FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            );
-                                          },
-                                          pageBuilder: (BuildContext context,
-                                              Animation<double> animation,
-                                              Animation<double> secAnimation) {
-                                            return page;
-                                          }));
+                                onPress: (() {
+                                  setState(() {
+                                    groups.add(
+                                      SetClass(
+                                          grpName: 'Group ${groups.length + 1}',
+                                          timeList: [
+                                            TimeClass(
+                                              name: 'Work',
+                                              isWork: true,
+                                              sec: 30,
+                                            ),
+                                            TimeClass(
+                                                name: 'Break',
+                                                isWork: false,
+                                                sec: 30),
+                                          ],
+                                          sets: 3),
+                                    );
+                                  });
                                 }),
-                              );
-                            },
-                          ),
-                          Hero(
-                            tag: 'rightButton',
-                            child: NeuButton(
-                              ico: Icon(
-                                Icons.save_outlined,
-                                size: 30,
-                                color: textColor,
                               ),
-                              onPress: (() async {
-                                await createDialog(context);
-                                if (controller['periodSec'] == '') {
-                                  controller['periodSec'] = '30';
-                                }
-                                if (controller['periodMin'] == '') {
-                                  controller['periodMin'] = '0';
-                                }
-                                if (controller['periodSec'] == '') {
-                                  controller['periodSec'] = '30';
-                                }
-                                if (controller['breakMin'] == '') {
-                                  controller['breakMin'] = '0';
-                                }
-                                if (controller['breakSec'] == '') {
-                                  controller['breakSec'] = '30';
-                                }
-                                if (controller['sets'] == '') {
-                                  controller['sets'] = '3';
-                                }
-                                savedList = await savedData.read();
-                                SavedWorkout _data = SavedWorkout(
-                                  name: stringFormatter(dialogController.text),
-                                  pSec: int.parse(controller['periodSec'].text),
-                                  pMin: int.parse(controller['periodMin'].text),
-                                  bSec: int.parse(controller['breakSec'].text),
-                                  bMin: int.parse(controller['breakMin'].text),
-                                  setsCount: int.parse(controller['sets'].text),
-                                );
-                                // print('Encoded ${jsonEncode(_data.toMap())}');
-                                savedList.add(jsonEncode(_data.toMap()));
-                                await savedData.save(savedList);
-                              }),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ],
@@ -652,78 +1040,6 @@ class _AdvancedPageState extends State<AdvancedPage>
         ),
       ),
     );
-  }
-
-  void addRemove(bool flag, String _controllerName) {
-    int intValue = int.parse(controller[_controllerName].text);
-    intValue = intValue - (flag ? -1 : 1);
-    if (_controllerName == 'sets') {
-      if (intValue <= 0) {
-        intValue = 1;
-      } else if (intValue >= 100) {
-        intValue = 99;
-      }
-    } else if (_controllerName == 'breakSec') {
-      if (intValue < 0) {
-        intValue = 59;
-        addRemove(false, 'breakMin');
-      } else if (intValue >= 60) {
-        intValue = 00;
-        addRemove(true, 'breakMin');
-      }
-    } else if (_controllerName == 'periodSec') {
-      if (intValue < 0) {
-        intValue = 59;
-        addRemove(false, 'periodMin');
-      } else if (intValue >= 60) {
-        intValue = 00;
-        addRemove(true, 'periodMin');
-      }
-    } else {
-      if (intValue < 0) {
-        intValue = 59;
-      } else if (intValue >= 60) {
-        intValue = 00;
-      }
-    }
-    String v = '$intValue';
-    v = v.length == 1 ? '0$v' : v;
-    setState(() {
-      controller[_controllerName].text = v;
-    });
-  }
-
-  double adjusted(double val) => val * screenWidth * perPixel;
-
-  void initListenerMaker(String key) {
-    if (retain[key] == '-1') {
-      if (key == 'sets') {
-        setState(() {
-          retain[key] = '03';
-          controller[key].text = '03';
-        });
-      } else if ((key == 'breakSec') || (key == 'periodSec')) {
-        setState(() {
-          retain[key] = '30';
-          controller[key].text = '30';
-        });
-      } else {
-        setState(() {
-          retain[key] = '00';
-          controller[key].text = '00';
-        });
-      }
-    } else {
-      setState(() {
-        controller[key].text = retain[key];
-      });
-    }
-    controller[key].addListener(() {
-      controller[key].selection = TextSelection(
-        baseOffset: controller[key].text.length,
-        extentOffset: controller[key].text.length,
-      );
-    });
   }
 
   Future<String> createDialog(BuildContext context) {
@@ -797,8 +1113,6 @@ class _AdvancedPageState extends State<AdvancedPage>
                 onPressed: (() {
                   if (dialogController.value.text != '') {
                     Navigator.pop(context);
-                    _titleName.value =
-                        stringFormatter(dialogController.value.text);
                   }
                 }),
                 child: Text(

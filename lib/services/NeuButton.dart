@@ -44,13 +44,17 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
 
   @override
   Widget build(BuildContext context) {
-    screenWidth = MediaQuery.of(context).size.width;//390
-    widget.length = widget.length == 60 ?screenWidth / 6.5 : widget.length;
-    widget.breadth = widget.length;
+    screenWidth = MediaQuery.of(context).size.width; //390
+    widget.length = widget.length == 60 ? screenWidth / 6.5 : widget.length;
+    if (widget.length == 60) {
+      widget.breadth = widget.length;
+    }
     return RawMaterialButton(
       onPressed: (() {
-        if(widget.animated) {
-          widget.flag ? playPauseController.forward() : playPauseController.reverse();
+        if (widget.animated) {
+          widget.flag
+              ? playPauseController.forward()
+              : playPauseController.reverse();
         }
         setState(() {
           offsetFactor = 0;
@@ -87,7 +91,7 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
                 ),
               ),
               Positioned.fill(
-                child: widget.animated
+                  child: widget.animated
                       ? Center(
                           child: AnimatedIcon(
                             icon: widget.ico,
@@ -96,7 +100,7 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
                             progress: playPauseController,
                           ),
                         )
-                      : widget.ico),
+                      : Center(child: widget.ico)),
             ],
           );
         },

@@ -15,11 +15,19 @@ class savedPage extends StatefulWidget {
 class _savedPageState extends State<savedPage> {
   SharedPref _data = SharedPref();
   List<SavedWorkout> savedListObjs;
-
+  ValueNotifier<bool> isSimpleOpen = ValueNotifier<bool>(true);
   List<String> savedList;
 
   Future<List<SavedWorkout>> _getData() async {
-    savedList = await _data.read();
+    savedList = await _data.read('List');
+    savedListObjs = savedList
+        .map((item) => SavedWorkout.fromMap(jsonDecode(item)))
+        .toList();
+    return savedListObjs;
+  }
+
+  Future<List<SavedWorkout>> _getAdvData() async {
+    savedList = await _data.read('List');
     savedListObjs = savedList
         .map((item) => SavedWorkout.fromMap(jsonDecode(item)))
         .toList();
@@ -36,6 +44,50 @@ class _savedPageState extends State<savedPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: backgroundColor,
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: 0,
+        // this will be set
+        elevation: 0,
+        onTap: (index) {
+          setState(() {
+            isSimpleOpen.value = index == 0 ? true : false;
+          });
+          print(index);
+        },
+        backgroundColor: Colors.transparent,
+        selectedItemColor: Colors.grey,
+        unselectedItemColor: Colors.grey,
+        items: [
+          BottomNavigationBarItem(
+            icon: FaIcon(
+              FontAwesomeIcons.spa,
+              size: 20,
+              color: isSimpleOpen.value ? Colors.blue : null,
+            ),
+            title: Text(
+              'Simple',
+              style: TextStyle(
+                color: isSimpleOpen.value ? Colors.blue : null,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+          ),
+          BottomNavigationBarItem(
+            icon: FaIcon(
+              FontAwesomeIcons.dumbbell,
+              size: 20,
+              color: !isSimpleOpen.value ? Colors.blue : null,
+            ),
+            title: Text(
+              'Advanced',
+              style: TextStyle(
+                color: !isSimpleOpen.value ? Colors.blue : null,
+              ),
+            ),
+            backgroundColor: Colors.transparent,
+          ),
+        ],
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -58,297 +110,626 @@ class _savedPageState extends State<savedPage> {
             ),
           ),
           Expanded(
-            child: FutureBuilder(
-              future: _getData(),
-              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                if (snapshot.data == null) {
-                  return Center(child: Text('Loading'));
-                } else {
-                  return snapshot.data.length == 0
-                      ? Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Center(
-                                  child: FaIcon(
-                                FontAwesomeIcons.puzzlePiece,
-                                size: 100,
-                                color: Colors.teal,
-                              )),
-                              SizedBox(
-                                height: 40,
-                              ),
-                              Center(
-                                  child: Text(
-                                'No Data Saved',
-                                style: TextStyle(fontSize: 25),
-                              )),
-                              Center(
-                                  child: Text(
-                                'Save data from homescreen',
-                                style: TextStyle(fontSize: 20),
-                              )),
-                            ],
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: snapshot.data.length,
-                          physics: BouncingScrollPhysics(),
-                          itemBuilder: (BuildContext context, int index) {
-                            return Dismissible(
-                              background: Container(
-                                padding: EdgeInsets.only(left: 30),
-                                alignment: Alignment.centerLeft,
-                                child:
-                                    Wrap(direction: Axis.vertical, children: [
-                                  RotatedBox(
-                                      quarterTurns: 3,
-                                      child: Center(
+            child: ValueListenableBuilder(
+                valueListenable: isSimpleOpen,
+                builder: (context, isSimple, _) {
+                  return FutureBuilder(
+                    future: isSimple ? _getData() : _getAdvData(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      if (snapshot.data == null) {
+                        return Center(child: Text('Loading'));
+                      } else {
+                        return snapshot.data.length == 0
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Center(
+                                        child: FaIcon(
+                                      FontAwesomeIcons.puzzlePiece,
+                                      size: 100,
+                                      color: Colors.teal,
+                                    )),
+                                    SizedBox(
+                                      height: 40,
+                                    ),
+                                    Center(
                                         child: Text(
-                                          'Delete',
-                                          style: kTextStyle.copyWith(
-                                            color: textColor,
-                                            fontSize: 25,
+                                      'No Data Saved',
+                                      style: TextStyle(fontSize: 25),
+                                    )),
+                                    Center(
+                                        child: Text(
+                                      'Save data from homescreen',
+                                      style: TextStyle(fontSize: 20),
+                                    )),
+                                  ],
+                                ),
+                              )
+                            : ListView.builder(
+                                itemCount: snapshot.data.length,
+                                physics: BouncingScrollPhysics(),
+                                itemBuilder: (BuildContext context, int index) {
+                                  return isSimple
+                                      ? Dismissible(
+                                          background: Container(
+                                            padding: EdgeInsets.only(left: 30),
+                                            alignment: Alignment.centerLeft,
+                                            child: Wrap(
+                                                direction: Axis.vertical,
+                                                children: [
+                                                  RotatedBox(
+                                                      quarterTurns: 3,
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Delete',
+                                                          style: kTextStyle
+                                                              .copyWith(
+                                                            color: textColor,
+                                                            fontSize: 25,
+                                                          ),
+                                                        ),
+                                                      )),
+                                                ]),
+                                            // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
                                           ),
-                                        ),
-                                      )),
-                                ]),
-                                // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
-                              ),
-                              direction: DismissDirection.startToEnd,
-                              key: UniqueKey(),
-                              onDismissed: (direction) async {
-                                savedListObjs.removeAt(index);
-                                savedList = [];
-                                savedList = savedListObjs
-                                    .map((item) => (jsonEncode(item.toMap())))
-                                    .toList();
-                                await _data.save(savedList);
-                              },
-                              child: GestureDetector(
-                                onTap: (() async {
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['periodMin'] == '') {
-                                    controller['periodMin'] = '0';
-                                  }
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['breakMin'] == '') {
-                                    controller['breakMin'] = '0';
-                                  }
-                                  if (controller['breakSec'] == '') {
-                                    controller['breakSec'] = '30';
-                                  }
-                                  if (controller['sets'] == '') {
-                                    controller['sets'] = '3';
-                                  }
-                                  final periodTime = TimeClass(
-                                    type: snapshot.data[index].type,
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['periodMin'].text),
-                                      seconds: int.parse(
-                                          controller['periodSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  final breakTime = TimeClass(
-                                    type: 'Break',
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['breakMin'].text),
-                                      seconds: int.parse(
-                                          controller['breakSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  await Navigator.pushReplacement(
-                                      context,
-                                      PageRouteBuilder(
-                                          transitionDuration:
-                                              Duration(milliseconds: 250),
-                                          reverseTransitionDuration:
-                                              Duration(milliseconds: 150),
-                                          transitionsBuilder: (BuildContext
-                                                  context,
-                                              Animation<double> animation,
-                                              Animation<double> secAnimation,
-                                              Widget child) {
-                                            return FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            );
+                                          direction:
+                                              DismissDirection.startToEnd,
+                                          key: UniqueKey(),
+                                          onDismissed: (direction) async {
+                                            savedListObjs.removeAt(index);
+                                            savedList = [];
+                                            savedList = savedListObjs
+                                                .map((item) =>
+                                                    (jsonEncode(item.toMap())))
+                                                .toList();
+                                            await _data.save('List', savedList);
                                           },
-                                          pageBuilder: (BuildContext context,
-                                              Animation<double> animation,
-                                              Animation<double> secAnimation) {
-                                            return TimerPage(
-                                              isRest: true,
-                                              args: [
-                                                SetClass(timeList: [
+                                          child: GestureDetector(
+                                            onTap: (() async {
+                                              final periodTime = TimeClass(
+                                                name: snapshot.data[index].name,
+                                                isWork: true,
+                                                sec: Duration(
+                                                  minutes:
+                                                      snapshot.data[index].pMin,
+                                                  seconds:
+                                                      snapshot.data[index].pSec,
+                                                ).inSeconds,
+                                              );
+                                              final breakTime = TimeClass(
+                                                name: 'Break',
+                                                isWork: false,
+                                                sec: Duration(
+                                                  minutes:
+                                                      snapshot.data[index].bMin,
+                                                  seconds:
+                                                      snapshot.data[index].bSec,
+                                                ).inSeconds,
+                                              );
+                                              final set1 = SetClass(
+                                                timeList: [
                                                   periodTime,
-                                                  breakTime,
-                                                ], sets: 1)
-                                              ],
-                                              sets: int.parse(
-                                                  controller['sets'].text),
-                                            );
-                                          }));
-                                }),
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(
-                                      vertical: 15, horizontal: 20),
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: 20, horizontal: 25),
-                                  height: 140,
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        margin: EdgeInsets.only(left: 10),
-                                        child: FittedBox(
-                                          fit: BoxFit.fitWidth,
-                                          child: Text(
-                                            snapshot.data[index].type == ''
-                                                ? 'Name'
-                                                : '${snapshot.data[index].type}',
-                                            style: kTextStyle.copyWith(
-                                              color: backgroundColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 26.5,
+                                                ],
+                                                sets: 1,
+                                              );
+                                              final page = TimerPage(
+                                                isRest: true,
+                                                args: [set1],
+                                                sets: snapshot
+                                                    .data[index].setsCount,
+                                                breakTime: breakTime,
+                                              );
+                                              await Navigator.pushReplacement(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                      transitionDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  250),
+                                                      reverseTransitionDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  150),
+                                                      transitionsBuilder:
+                                                          (BuildContext context,
+                                                              Animation<double>
+                                                                  animation,
+                                                              Animation<double>
+                                                                  secAnimation,
+                                                              Widget child) {
+                                                        return FadeTransition(
+                                                          opacity: animation,
+                                                          child: child,
+                                                        );
+                                                      },
+                                                      pageBuilder: (BuildContext
+                                                              context,
+                                                          Animation<double>
+                                                              animation,
+                                                          Animation<double>
+                                                              secAnimation) {
+                                                        return page;
+                                                      }));
+                                            }),
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 20),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 20, horizontal: 25),
+                                              height: 140,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 10),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.fitWidth,
+                                                      child: Text(
+                                                        snapshot.data[index]
+                                                                    .name ==
+                                                                ''
+                                                            ? 'Name'
+                                                            : '${snapshot.data[index].name}',
+                                                        style:
+                                                            kTextStyle.copyWith(
+                                                          color:
+                                                              backgroundColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 26.5,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                    height: 15,
+                                                  ),
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Time',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].pMin}:${snapshot.data[index].pSec}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        width: 1.3,
+                                                        color: backgroundColor,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Break',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].bMin}:${snapshot.data[index].bSec}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        width: 1.3,
+                                                        color: backgroundColor,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Sets',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].setsCount}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ],
+                                              ),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    colors:
+                                                        gradientList[index % 5],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight),
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      color: gradientList[
+                                                              index % 5][1]
+                                                          .withOpacity(0.22),
+                                                      offset: Offset(8, 6),
+                                                      blurRadius: 15),
+                                                  BoxShadow(
+                                                      color: gradientList[
+                                                              index % 5][0]
+                                                          .withOpacity(0.22),
+                                                      offset: Offset(-8, -6),
+                                                      blurRadius: 15),
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        height: 15,
-                                      ),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  'Time',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontSize: 20,
-                                                  ),
-                                                ),
-                                              ),
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  '${snapshot.data[index].pMin}:${snapshot.data[index].pSec}',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
+                                        )
+                                      : Dismissible(
+                                          background: Container(
+                                            padding: EdgeInsets.only(left: 30),
+                                            alignment: Alignment.centerLeft,
+                                            child: Wrap(
+                                                direction: Axis.vertical,
+                                                children: [
+                                                  RotatedBox(
+                                                      quarterTurns: 3,
+                                                      child: Center(
+                                                        child: Text(
+                                                          'Delete',
+                                                          style: kTextStyle
+                                                              .copyWith(
+                                                            color: textColor,
+                                                            fontSize: 25,
+                                                          ),
+                                                        ),
+                                                      )),
+                                                ]),
+                                            // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
                                           ),
-                                          Container(
-                                            height: 45,
-                                            width: 1.3,
-                                            color: backgroundColor,
-                                          ),
-                                          Column(
-                                            children: [
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  'Break',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontSize: 20,
+                                          direction:
+                                              DismissDirection.startToEnd,
+                                          key: UniqueKey(),
+                                          onDismissed: (direction) async {
+                                            savedListObjs.removeAt(index);
+                                            savedList = [];
+                                            savedList = savedListObjs
+                                                .map((item) =>
+                                                    (jsonEncode(item.toMap())))
+                                                .toList();
+                                            await _data.save('List', savedList);
+                                          },
+                                          child: GestureDetector(
+                                            onTap: (() async {
+                                              final periodTime = TimeClass(
+                                                name: snapshot.data[index].name,
+                                                isWork: true,
+                                                sec: Duration(
+                                                  minutes:
+                                                      snapshot.data[index].pMin,
+                                                  seconds:
+                                                      snapshot.data[index].pSec,
+                                                ).inSeconds,
+                                              );
+                                              final breakTime = TimeClass(
+                                                name: 'Break',
+                                                isWork: false,
+                                                sec: Duration(
+                                                  minutes:
+                                                      snapshot.data[index].bMin,
+                                                  seconds:
+                                                      snapshot.data[index].bSec,
+                                                ).inSeconds,
+                                              );
+                                              final set1 = SetClass(
+                                                timeList: [
+                                                  periodTime,
+                                                ],
+                                                sets: 1,
+                                              );
+                                              final page = TimerPage(
+                                                isRest: true,
+                                                args: [set1],
+                                                sets: snapshot
+                                                    .data[index].setsCount,
+                                                breakTime: breakTime,
+                                              );
+                                              await Navigator.pushReplacement(
+                                                  context,
+                                                  PageRouteBuilder(
+                                                      transitionDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  250),
+                                                      reverseTransitionDuration:
+                                                          Duration(
+                                                              milliseconds:
+                                                                  150),
+                                                      transitionsBuilder:
+                                                          (BuildContext context,
+                                                              Animation<double>
+                                                                  animation,
+                                                              Animation<double>
+                                                                  secAnimation,
+                                                              Widget child) {
+                                                        return FadeTransition(
+                                                          opacity: animation,
+                                                          child: child,
+                                                        );
+                                                      },
+                                                      pageBuilder: (BuildContext
+                                                              context,
+                                                          Animation<double>
+                                                              animation,
+                                                          Animation<double>
+                                                              secAnimation) {
+                                                        return page;
+                                                      }));
+                                            }),
+                                            child: Container(
+                                              margin: EdgeInsets.symmetric(
+                                                  vertical: 15, horizontal: 20),
+                                              padding: EdgeInsets.symmetric(
+                                                  vertical: 20, horizontal: 25),
+                                              height: 140,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Container(
+                                                    margin: EdgeInsets.only(
+                                                        left: 10),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.fitWidth,
+                                                      child: Text(
+                                                        snapshot.data[index]
+                                                                    .name ==
+                                                                ''
+                                                            ? 'Name'
+                                                            : '${snapshot.data[index].name}',
+                                                        style:
+                                                            kTextStyle.copyWith(
+                                                          color:
+                                                              backgroundColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 26.5,
+                                                        ),
+                                                      ),
+                                                    ),
                                                   ),
-                                                ),
-                                              ),
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  '${snapshot.data[index].bMin}:${snapshot.data[index].bSec}',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20,
+                                                  SizedBox(
+                                                    height: 15,
                                                   ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          Container(
-                                            height: 45,
-                                            width: 1.3,
-                                            color: backgroundColor,
-                                          ),
-                                          Column(
-                                            children: [
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  'Sets',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontSize: 20,
+                                                  Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .center,
+                                                    children: [
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Time',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].pMin}:${snapshot.data[index].pSec}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        width: 1.3,
+                                                        color: backgroundColor,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Break',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].bMin}:${snapshot.data[index].bSec}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      Container(
+                                                        height: 45,
+                                                        width: 1.3,
+                                                        color: backgroundColor,
+                                                      ),
+                                                      Column(
+                                                        children: [
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              'Sets',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          FittedBox(
+                                                            fit:
+                                                                BoxFit.fitWidth,
+                                                            child: Text(
+                                                              '${snapshot.data[index].setsCount}',
+                                                              style: kTextStyle
+                                                                  .copyWith(
+                                                                color:
+                                                                    backgroundColor,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize: 20,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ],
                                                   ),
-                                                ),
+                                                ],
                                               ),
-                                              FittedBox(
-                                                fit: BoxFit.fitWidth,
-                                                child: Text(
-                                                  '${snapshot.data[index].setsCount}',
-                                                  style: kTextStyle.copyWith(
-                                                    color: backgroundColor,
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 20,
-                                                  ),
-                                                ),
+                                              decoration: BoxDecoration(
+                                                gradient: LinearGradient(
+                                                    colors:
+                                                        gradientList[index % 5],
+                                                    begin: Alignment.centerLeft,
+                                                    end: Alignment.centerRight),
+                                                borderRadius:
+                                                    BorderRadius.circular(25),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                      color: gradientList[
+                                                              index % 5][1]
+                                                          .withOpacity(0.22),
+                                                      offset: Offset(8, 6),
+                                                      blurRadius: 15),
+                                                  BoxShadow(
+                                                      color: gradientList[
+                                                              index % 5][0]
+                                                          .withOpacity(0.22),
+                                                      offset: Offset(-8, -6),
+                                                      blurRadius: 15),
+                                                ],
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                        colors: gradientList[index % 5],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight),
-                                    borderRadius: BorderRadius.circular(25),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: gradientList[index % 5][1]
-                                              .withOpacity(0.22),
-                                          offset: Offset(8, 6),
-                                          blurRadius: 15),
-                                      BoxShadow(
-                                          color: gradientList[index % 5][0]
-                                              .withOpacity(0.22),
-                                          offset: Offset(-8, -6),
-                                          blurRadius: 15),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
+                                        );
+                                },
+                              );
+                      }
+                    },
                   );
-                }
-              },
-            ),
+                }),
           ),
         ],
       ),

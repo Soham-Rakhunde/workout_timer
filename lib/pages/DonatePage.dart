@@ -42,7 +42,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   StreamSubscription<List<PurchaseDetails>> _subscription;
   List<ProductDetails> _products = [];
 
-  // static const String iapId = 'android.test.purchased';
+  // static const String iapId = '80_spoon';
   // List<IAPItem> _items = [];
   // FlutterInappPurchase InappPurchase;
 
@@ -50,7 +50,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    // InappPurchase = FlutterInappPurchase(InappPurchase);
     Stream purchaseUpdated =
         InAppPurchaseConnection.instance.purchaseUpdatedStream;
     _subscription = purchaseUpdated.listen((purchaseDetailsList) {
@@ -62,7 +62,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
     });
     initStoreInfo();
 
-    // initPlatformState(InappPurchase);
+    // initPlatformState();
     BackButtonInterceptor.add(myInterceptor);
     xcontroller = AnimationController(
       duration: const Duration(milliseconds: 500),
@@ -469,8 +469,8 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                         trailingIcon: Icon(
                                             Icons.restaurant_rounded,
                                             color: textColor),
-                                        onPressed: () async =>
-                                            await _buyProduct(0),
+                                        onPressed: () => null,
+                                        // await _buyProduct(0),
                                       ),
                                       FocusedMenuItem(
                                         title: Padding(
@@ -1000,7 +1000,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
     );
   }
 
-// Future<void> initPlatformState(FlutterInappPurchase InappPurchase) async {
+// Future<void> initPlatformState() async {
 //   // prepare
 //   var result = await InappPurchase.initConnection;
 //   print('result: $result');
@@ -1013,10 +1013,10 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
 //   // refresh items for android
 //   String msg = await InappPurchase.consumeAllItems;
 //   print('consumeAllItems: $msg');
-//   await _getProduct(InappPurchase);
+//   await _getProduct();
 // }
 //
-// Future<Null> _getProduct(FlutterInappPurchase InappPurchase) async {
+// Future<Null> _getProduct() async {
 //   List<IAPItem> items = await InappPurchase.getProducts([iapId]);
 //   for (var item in items) {
 //     print('${item.toString()}');
@@ -1028,7 +1028,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
 //   });
 // }
 //
-// Future<Null> _buyProduct(IAPItem item,FlutterInappPurchase InappPurchase) async {
+// Future<Null> _buyProduct(IAPItem item) async {
 //   try {
 //     PurchasedItem purchased = await InappPurchase.requestPurchase(item.productId);
 //     print(purchased);

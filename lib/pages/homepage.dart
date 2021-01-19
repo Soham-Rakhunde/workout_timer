@@ -333,14 +333,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'periodMin',
-                                            func: (val) {
-                                              setState(() {
-                                                retain['periodMin'] = val;
-                                                controller['periodMin'].text =
-                                                    val;
-                                              });
-                                            },
-                                          ),
+                                    isStringName: true,
+                                    func: (val) {
+                                      setState(() {
+                                        retain['periodMin'] = val;
+                                        controller['periodMin'].text = val;
+                                      });
+                                    },
+                                  ),
                                         ),
                                         Container(
                                             child: Text(
@@ -357,14 +357,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'periodSec',
-                                            func: (val) {
-                                              setState(() {
-                                                retain['periodSec'] = val;
-                                                controller['periodSec'].text =
-                                                    val;
-                                              });
-                                            },
-                                          ),
+                                    isStringName: true,
+                                    func: (val) {
+                                      setState(() {
+                                        retain['periodSec'] = val;
+                                        controller['periodSec'].text = val;
+                                      });
+                                    },
+                                  ),
                                         ),
                                         NeuButton(
                                           ico: Icon(
@@ -420,14 +420,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'breakMin',
-                                            func: (val) {
-                                              setState(() {
-                                                retain['breakMin'] = val;
-                                                controller['breakMin'].text =
-                                                    val;
-                                              });
-                                            },
-                                          ),
+                                    isStringName: true,
+                                    func: (val) {
+                                      setState(() {
+                                        retain['breakMin'] = val;
+                                        controller['breakMin'].text = val;
+                                      });
+                                    },
+                                  ),
                                         ),
                                         Container(
                                           child: Text(
@@ -445,14 +445,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             alignment: Alignment.center,
                                             child: myTextField(
                                               controllerName: 'breakSec',
-                                              func: (val) {
-                                                setState(() {
-                                                  retain['breakSec'] = val;
-                                                  controller['breakSec'].text =
-                                                      val;
-                                                });
-                                              },
-                                            )),
+                                      isStringName: true,
+                                      func: (val) {
+                                        setState(() {
+                                          retain['breakSec'] = val;
+                                          controller['breakSec'].text = val;
+                                        });
+                                      },
+                                    )),
                                         NeuButton(
                                           ico: Icon(
                                             Icons.add_rounded,
@@ -507,13 +507,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           width: 130,
                                           child: myTextField(
                                             controllerName: 'sets',
-                                            func: (val) {
-                                              setState(() {
-                                                retain['sets'] = val;
-                                                controller['sets'].text = val;
-                                              });
-                                            },
-                                          ),
+                                    isStringName: true,
+                                    func: (val) {
+                                      setState(() {
+                                        retain['sets'] = val;
+                                        controller['sets'].text = val;
+                                      });
+                                    },
+                                  ),
                                         ),
                                         NeuButton(
                                           ico: Icon(
@@ -567,16 +568,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                                 },
                                                 pageBuilder: (BuildContext
                                                         context,
-                                                    Animation<double> animation,
-                                                    Animation<double>
-                                                        secAnimation) {
-                                                  return savedPage();
-                                                }));
-                                      }),
-                                    ),
-                                  ),
-                                  AnimatedBuilder(
-                                    animation: playGradientControl,
+                                            Animation<double> animation,
+                                            Animation<double> secAnimation) {
+                                          return savedPage();
+                                        }));
+                              }),
+                            ),
+                          ),
+                          AnimatedBuilder(
+                            animation: playGradientControl,
                             builder: (BuildContext context, Widget child) {
                               return NeuButton(
                                 ico: GradientIcon(
@@ -593,7 +593,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                 onPress: (() async {
                                   FocusScopeNode currentFocus =
                                       FocusScope.of(context);
-                                  print('here');
                                   if (!currentFocus.hasPrimaryFocus) {
                                     currentFocus.unfocus();
                                   }
@@ -617,7 +616,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   }
                                   final periodTime = TimeClass(
                                     name: 'Workout',
-                                    type: 'start',
+                                    isWork: true,
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['periodMin'].text),
@@ -627,7 +626,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   );
                                   final breakTime = TimeClass(
                                     name: 'Break',
-                                    type: 'rest',
+                                    isWork: false,
                                     sec: Duration(
                                       minutes: int.parse(
                                           controller['breakMin'].text),
@@ -639,12 +638,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     timeList: [
                                       periodTime,
                                     ],
-                                    sets: 1,
+                                    sets: int.parse(controller['sets'].text),
                                   );
                                   final page = TimerPage(
                                     isRest: true,
                                     args: [set1],
-                                    sets: int.parse(controller['sets'].text),
+                                    sets: 1,
                                     breakTime: breakTime,
                                   );
                                   // await Future.delayed(Duration(microseconds: 1));
@@ -674,17 +673,17 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                               );
                             },
                           ),
-                                  Hero(
-                                    tag: 'rightButton',
-                                    child: NeuButton(
-                                      ico: Icon(
-                                        Icons.save_outlined,
-                                        size: 30,
-                                        color: textColor,
-                                      ),
-                                      onPress: (() async {
-                                        await createDialog(context);
-                                        if (controller['periodSec'] == '') {
+                          Hero(
+                            tag: 'rightButton',
+                            child: NeuButton(
+                              ico: Icon(
+                                Icons.save_outlined,
+                                size: 30,
+                                color: textColor,
+                              ),
+                              onPress: (() async {
+                                await createDialog(context);
+                                if (controller['periodSec'] == '') {
                                           controller['periodSec'] = '30';
                                         }
                                         if (controller['periodMin'] == '') {
@@ -692,36 +691,29 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         }
                                         if (controller['periodSec'] == '') {
                                           controller['periodSec'] = '30';
-                                        }
-                                        if (controller['breakMin'] == '') {
-                                          controller['breakMin'] = '0';
-                                        }
-                                        if (controller['breakSec'] == '') {
-                                          controller['breakSec'] = '30';
-                                        }
-                                        if (controller['sets'] == '') {
-                                          controller['sets'] = '3';
-                                        }
-                                        savedList = await savedData.read();
-                                        SavedWorkout _data = SavedWorkout(
-                                          name: stringFormatter(
-                                              dialogController.text),
-                                          pSec: int.parse(
-                                              controller['periodSec'].text),
-                                          pMin: int.parse(
-                                              controller['periodMin'].text),
-                                          bSec: int.parse(
-                                              controller['breakSec'].text),
-                                          bMin: int.parse(
-                                              controller['breakMin'].text),
-                                          setsCount: int.parse(
-                                              controller['sets'].text),
-                                        );
-                                        // print('Encoded ${jsonEncode(_data.toMap())}');
-                                        savedList
-                                            .add(jsonEncode(_data.toMap()));
-                                        await savedData.save(savedList);
-                                      }),
+                                }
+                                if (controller['breakMin'] == '') {
+                                  controller['breakMin'] = '0';
+                                }
+                                if (controller['breakSec'] == '') {
+                                  controller['breakSec'] = '30';
+                                }
+                                if (controller['sets'] == '') {
+                                  controller['sets'] = '3';
+                                }
+                                savedList = await savedData.read('List');
+                                SavedWorkout _data = SavedWorkout(
+                                  name: stringFormatter(dialogController.text),
+                                  pSec: int.parse(controller['periodSec'].text),
+                                  pMin: int.parse(controller['periodMin'].text),
+                                  bSec: int.parse(controller['breakSec'].text),
+                                  bMin: int.parse(controller['breakMin'].text),
+                                  setsCount: int.parse(controller['sets'].text),
+                                );
+                                // print('Encoded ${jsonEncode(_data.toMap())}');
+                                savedList.add(jsonEncode(_data.toMap()));
+                                await savedData.save('List', savedList);
+                              }),
                                     ),
                                   ),
                                 ],

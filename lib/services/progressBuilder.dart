@@ -208,12 +208,28 @@ class _buildStackState extends State<buildStack> {
                     ValueListenableBuilder(
                       valueListenable: widget.timeInSec,
                       builder: (context, value, child) {
-                        return Text(
-                          '${widget.timeInSec.value}',
-                          style: kTextStyle.copyWith(
-                            color: isDark.value ? Colors.white : Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 50,
+                        return AnimatedSwitcher(
+                          duration: Duration(milliseconds: 250),
+                          reverseDuration: Duration(milliseconds: 0),
+                          switchInCurve: Curves.easeOutCirc,
+                          switchOutCurve: Curves.easeInBack,
+                          transitionBuilder:
+                              (Widget child, Animation<double> anim) {
+                            final tweenAnim =
+                                Tween<double>(begin: 0.0, end: 1).animate(anim);
+                            return ScaleTransition(
+                              scale: tweenAnim,
+                              child: child,
+                            );
+                          },
+                          child: Text(
+                            '${widget.timeInSec.value}',
+                            key: ValueKey<String>('${widget.timeInSec.value}'),
+                            style: kTextStyle.copyWith(
+                              color: isDark.value ? Colors.white : Colors.black,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 50,
+                            ),
                           ),
                         );
                       },

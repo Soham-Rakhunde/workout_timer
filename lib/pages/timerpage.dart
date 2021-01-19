@@ -108,7 +108,7 @@ class _TimerPageState extends State<TimerPage> {
       }
       print('c');
       tickTime.value = ((time - timeInSec.value) / time) * 100;
-      progress.value += 100 / totalTime;
+      if (timeInSec.value != 0) progress.value += 100 / totalTime;
       if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice) {
         print('d');
         audioPlayer.play('${timeInSec.value}-$voice.mp3');
@@ -201,8 +201,7 @@ class _TimerPageState extends State<TimerPage> {
       setList = widget.args;
       isRest = widget.isRest;
       breakT = widget.breakTime;
-      totalTime = 150;
-      // _timeT[0].sec * s + _timeT[1].sec * (s - 1);
+      totalTime = setList.first.timeList.first.sec * s + breakT.sec * (s - 1);
     }
     return WillPopScope(
       onWillPop: () async => createAlertDialog(context),
