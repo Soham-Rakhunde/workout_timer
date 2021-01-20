@@ -1,25 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:json_annotation/json_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+part 'timeValueHandler.g.dart';
+
+@JsonSerializable(explicitToJson: true)
 class SetClass {
   List<TimeClass> timeList;
   int sets;
+
+  @JsonKey(ignore: true)
   double height = 300;
   String grpName = 'Group';
+
+  @JsonKey(ignore: true)
   TextEditingController nameController = TextEditingController(text: 'Group');
+
+  @JsonKey(ignore: true)
   TextEditingController textController = TextEditingController(text: '01');
+
+  @JsonKey(ignore: true)
   String retain = '-1';
 
-  Map<String, dynamic> toJson() {
-    List<Map> timeList = this.timeList != null
-        ? this.timeList.map((i) => i.toJson()).toList()
-        : null;
-    return {
-      "grpName": this.grpName,
-      "sets": this.sets,
-      "timeList": timeList,
-    };
-  }
+  factory SetClass.fromJson(Map<String, dynamic> json) =>
+      _$SetClassFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SetClassToJson(this);
+
+  // Map<String, dynamic> toJson() {
+  //   List<Map> timeList = this.timeList != null
+  //       ? this.timeList.map((i) => i.toJson()).toList()
+  //       : null;
+  //   return {
+  //     "grpName": this.grpName,
+  //     "sets": this.sets,
+  //     "timeList": timeList,
+  //   };
+  // }
+  //
+  // SetClass.fromMap(Map map)
+  //     : grpName = map['grpName'],
+  //       sets = map['sets'],
+  //       timeList = map['timeList'].map((ele) => TimeClass.fromMap(ele)).toList();
 
   void addRemove(bool flag) {
     int intValue = int.parse(textController.text);
@@ -66,26 +88,30 @@ class SetClass {
     });
   }
 
-  SetClass({@required this.timeList, @required this.sets, this.grpName});
+  SetClass({this.timeList, this.sets, this.grpName});
 }
 
+@JsonSerializable(explicitToJson: true)
 class TimeClass {
   int sec = 30;
   bool isWork = true;
   String name = 'Work';
+
+  @JsonKey(ignore: true)
   Map controllers = {
     'name': TextEditingController(text: 'Work'),
     'min': TextEditingController(text: '00'),
     'sec': TextEditingController(text: '30'),
   };
 
+  @JsonKey(ignore: true)
   Map retained = {
     'name': '-1',
     'min': '-1',
     'sec': '-1',
   };
 
-  TimeClass({@required this.isWork, @required this.sec, this.name});
+  TimeClass({this.isWork, this.sec, this.name});
 
   void initListenerMaker() {
     retained.forEach((key, value) {
@@ -112,31 +138,63 @@ class TimeClass {
     });
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      "name": this.name,
-      "sec": this.sec,
-      "isWork": this.isWork,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     "name": this.name,
+  //     "sec": this.sec,
+  //     "isWork": this.isWork,
+  //   };
+  // }
+  //
+  // TimeClass.fromMap(Map map)
+  //     : name = map['name'],
+  //       sec = map['sec'],
+  //       isWork = map['isWork'];
+
+  factory TimeClass.fromJson(Map<String, dynamic> json) =>
+      _$TimeClassFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TimeClassToJson(this);
 }
 
+@JsonSerializable(explicitToJson: true)
 class SavedAdvanced {
   String name;
   List<SetClass> groups;
 
   SavedAdvanced({this.name, this.groups});
 
-  Map toMap() {
-    List<Map> groups = this.groups != null
-        ? this.groups.map((i) => i.toJson()).toList()
-        : null;
-    return {'name': name, 'groups': groups};
-  }
+  factory SavedAdvanced.fromJson(Map<String, dynamic> json) =>
+      _$SavedAdvancedFromJson(json);
 
-  SavedAdvanced.fromMap(Map map)
-      : name = map['name'],
-        groups = map['groups'];
+  Map<String, dynamic> toJson() => _$SavedAdvancedToJson(this);
+
+// Map toMap() {
+//   List<Map> groups = this.groups != null
+//       ? this.groups.map((i) => i.toJson()).toList()
+//       : null;
+//   return {'name': name, 'groups': groups};
+// }
+
+// SavedAdvanced.fromJson(Map json) {
+//   if (json['groups'] != null) {
+//     var groupsJson = json['groups'] as List;
+//     List<SetClass> _groups = groupsJson
+//
+//     return SavedAdvanced(
+//       name: json['name'],
+//       groups: _groups,
+//     );
+//   } else {
+//     return SavedAdvanced(
+//         json['name'] as String,
+//     );
+//   }
+// }
+//
+// SavedAdvanced.fromMap(Map map)
+//     : name = map['name'],
+//       groups = map['groups'].map((tagJson) => SetClass.fromMap(tagJson)).toList();
 }
 
 class SavedWorkout {

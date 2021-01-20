@@ -643,7 +643,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                   final page = TimerPage(
                                     isRest: true,
                                     args: [set1],
-                                    sets: 1,
                                     breakTime: breakTime,
                                   );
                                   // await Future.delayed(Duration(microseconds: 1));

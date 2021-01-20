@@ -13,10 +13,9 @@ import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 class TimerPage extends StatefulWidget {
-  TimerPage({this.args, this.sets, this.isRest, this.breakTime});
+  TimerPage({this.args, this.isRest, this.breakTime});
 
   List<SetClass> args = [];
-  int sets;
   bool isRest;
   TimeClass breakTime;
 
@@ -146,39 +145,37 @@ class _TimerPageState extends State<TimerPage> {
     print('1');
     if (timeInSec.value > 0) {
       print('2');
-      do {
-        //overall sets
-        print('3');
         for (int index = 0; index < setList.length; index++) {
           print('4');
-          for (int setNum = 1; setNum <= setList[index].sets; setNum++) {
-            print('5');
-            for (int j = 0; j < setList[index].timeList.length; j++) {
-              print('6');
-              if (isVoice) audioPlayer.play('start-$voice.mp3');
-              print(
-                  '${setList[index].timeList[j].name} aasas ${setList[index].timeList[j].sec}');
-              _titleName.value = setList[index].timeList[j].name;
-              timeInSec.value = setList[index].timeList[j].sec;
-              if (timeInSec.value > 0)
-                await startTimer(setList[index].timeList[j].sec);
-              print(isRest);
-              if (i.value != s && isRest) {
-                print('7');
+        s = setList[index].sets;
+        for (i.value = 1; i.value <= setList[index].sets; i.value++) {
+          print('5');
+          for (int j = 0; j < setList[index].timeList.length; j++) {
+            print('6');
+            if (isVoice)
+              audioPlayer.play(
+                  '${setList[index].timeList[j].isWork ? 'start' : 'rest'}-$voice.mp3');
+            _titleName.value = setList[index].timeList[j].name;
+            timeInSec.value = setList[index].timeList[j].sec;
+            if (timeInSec.value > 0)
+              await startTimer(setList[index].timeList[j].sec);
+            print(isRest);
+            if (i.value != s && isRest) {
+              print('7');
                 _titleName.value = breakT.name;
-                timeInSec.value = breakT.sec;
-                if (i.value != s + 1 && isVoice) {
-                  audioPlayer.play('rest-$voice.mp3');
-                }
-                if (timeInSec.value > 0) await startTimer(breakT.sec);
+              timeInSec.value = breakT.sec;
+              if (i.value != s + 1 && isVoice) {
+                audioPlayer.play('rest-$voice.mp3');
               }
+              if (timeInSec.value > 0) await startTimer(breakT.sec);
             }
           }
-          print('8');
         }
-        i.value++;
-        print('9');
-      } while (i.value <= s);
+        print('8');
+      }
+      //   i.value++;
+      //   print('9');
+      // } while (i.value <= s);
       i.value--;
     }
     timeInSec.value = 0;
@@ -197,8 +194,8 @@ class _TimerPageState extends State<TimerPage> {
   build(BuildContext context) {
     flexFactor = (MediaQuery.of(context).size.width - 50) ~/ 10;
     if (firstInstance) {
-      s = widget.sets;
       setList = widget.args;
+      s = setList.first.sets;
       isRest = widget.isRest;
       breakT = widget.breakTime;
       totalTime = setList.first.timeList.first.sec * s + breakT.sec * (s - 1);

@@ -180,12 +180,11 @@ class _mainPageState extends State<mainPage> {
                             timeList: [
                               periodTime,
                             ],
-                            sets: 1,
+                            sets: int.parse(controller['sets'].text),
                           );
                           final page = TimerPage(
                             isRest: true,
                             args: [set1],
-                            sets: int.parse(controller['sets'].text),
                             breakTime: breakTime,
                           );
                           await Navigator.push(

@@ -36,6 +36,7 @@ dependencies:
   in_app_purchase: ^0.3.4+16
   flutter_inapp_purchase: ^3.0.1
   flutter_displaymode: ^0.1.1
+  json_annotation: ^3.1.1
   #  rate_my_app: ^0.7.2
 
   # The following adds the Cupertino Icons font to your application.
@@ -43,6 +44,8 @@ dependencies:
   # cupertino_icons: ^1.0.0
 
 dev_dependencies:
+  build_runner: ^1.10.13
+  json_serializable: ^3.5.1
   flutter_test:
     sdk: flutter
 

@@ -39,7 +39,7 @@ class _AdvancedPageState extends State<AdvancedPage>
   Future<List<SavedAdvanced>> _getAdvData() async {
     savedList = await prefs.read('Adv');
     savedListObjs = savedList
-        .map((item) => SavedAdvanced.fromMap(jsonDecode(item)))
+        .map((item) => SavedAdvanced.fromJson(jsonDecode(item)))
         .toList();
     return savedListObjs;
   }
@@ -888,14 +888,15 @@ class _AdvancedPageState extends State<AdvancedPage>
                                     });
                                   });
                                   savedList = await prefs.read('Adv');
-
+                                  print(savedList);
                                   SavedAdvanced _data = SavedAdvanced(
                                     name:
                                         stringFormatter(dialogController.text),
                                     groups: groups,
                                   );
-                                  print('Encoded ${jsonEncode(_data.toMap())}');
-                                  savedList.add(jsonEncode(_data.toMap()));
+                                  print(
+                                      'Encoded ${jsonEncode(_data.toJson())}');
+                                  savedList.add(jsonEncode(_data.toJson()));
                                   await prefs.save('Adv', savedList);
                                 }),
                               ),
