@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:workout_timer/constants.dart';
 
 class NeuButton extends StatefulWidget {
@@ -51,6 +52,7 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
     }
     return RawMaterialButton(
       onPressed: (() {
+        HapticFeedback.lightImpact();
         if (widget.animated) {
           widget.flag
               ? playPauseController.forward()
@@ -58,52 +60,46 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
         }
         setState(() {
           offsetFactor = 0;
-          Timer(Duration(milliseconds: 150), () {
+          Timer(Duration(milliseconds: 200), () {
             setState(() {
               offsetFactor = 1;
             });
-
           });
-
         });
         widget.onPress();
       }),
-      child: TweenAnimationBuilder(
-        tween: Tween<double>(begin: 1,end: 0),
-        duration: Duration( milliseconds: 200),
-        builder: (BuildContext context, double value, Widget _) {
-          return Stack(
-            children: <Widget>[
-              Container(
-                width: widget.breadth,
-                height: widget.length,
-                decoration: BoxDecoration(
-                  color: backgroundColor,
-                  borderRadius: BorderRadius.circular(widget.radii),
-                  boxShadow: [
-                    BoxShadow(
-                        color: shadowColor, offset: Offset((8 - value*8)*offsetFactor, (6 - value*6)*offsetFactor), blurRadius: 12),
-                    BoxShadow(
-                        color: lightShadowColor,
-                        offset: Offset((-8 + value*8)*offsetFactor, (-6 + value*6)*offsetFactor),
-                        blurRadius: 12),
-                  ],
-                ),
-              ),
-              Positioned.fill(
-                  child: widget.animated
-                      ? Center(
-                          child: AnimatedIcon(
-                            icon: widget.ico,
-                            size: 30,
-                            color: textColor,
-                            progress: playPauseController,
-                          ),
-                        )
-                      : Center(child: widget.ico)),
-            ],
-          );
-        },
+      child: Stack(
+        children: <Widget>[
+          Container(
+            width: widget.breadth,
+            height: widget.length,
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(widget.radii),
+              boxShadow: [
+                BoxShadow(
+                    color: shadowColor,
+                    offset: Offset((8) * offsetFactor, (6) * offsetFactor),
+                    blurRadius: 12),
+                BoxShadow(
+                    color: lightShadowColor,
+                    offset: Offset((-8) * offsetFactor, (-6) * offsetFactor),
+                    blurRadius: 12),
+              ],
+            ),
+          ),
+          Positioned.fill(
+              child: widget.animated
+                  ? Center(
+                      child: AnimatedIcon(
+                        icon: widget.ico,
+                        size: 30,
+                        color: textColor,
+                        progress: playPauseController,
+                      ),
+                    )
+                  : Center(child: widget.ico)),
+        ],
       ),
       padding: EdgeInsets.all(1.0),
       shape: CircleBorder(),

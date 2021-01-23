@@ -88,7 +88,9 @@ class SetClass {
     });
   }
 
-  SetClass({this.timeList, this.sets, this.grpName});
+  SetClass({this.timeList, this.sets, this.grpName}) {
+    nameController = TextEditingController(text: grpName);
+  }
 }
 
 @JsonSerializable(explicitToJson: true)
@@ -111,7 +113,9 @@ class TimeClass {
     'sec': '-1',
   };
 
-  TimeClass({this.isWork, this.sec, this.name});
+  TimeClass({this.isWork, this.sec, this.name}) {
+    controllers['name'] = TextEditingController(text: name);
+  }
 
   void initListenerMaker() {
     retained.forEach((key, value) {
@@ -161,8 +165,9 @@ class TimeClass {
 class SavedAdvanced {
   String name;
   List<SetClass> groups;
+  int totalTime = 0;
 
-  SavedAdvanced({this.name, this.groups});
+  SavedAdvanced({this.name, this.groups, @required this.totalTime});
 
   factory SavedAdvanced.fromJson(Map<String, dynamic> json) =>
       _$SavedAdvancedFromJson(json);
@@ -272,7 +277,7 @@ class SharedPref {
 
   reset(String key, List value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setStringList("List", []);
+    prefs.setStringList(key, []);
     // prefs.setString(key, json.encode(value));
   }
 

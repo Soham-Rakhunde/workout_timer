@@ -177,6 +177,7 @@ class _mainPageState extends State<mainPage> {
                             ).inSeconds,
                           );
                           final set1 = SetClass(
+                            grpName: '',
                             timeList: [
                               periodTime,
                             ],

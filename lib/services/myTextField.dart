@@ -9,9 +9,14 @@ class myTextField extends StatelessWidget {
   TextEditingController control;
   Function func;
   bool isStringName = true;
+  TextInputType keyboardType;
 
   myTextField(
-      {this.controllerName, this.func, this.isStringName, this.control});
+      {this.controllerName,
+      this.func,
+      this.isStringName,
+      this.control,
+      @required this.keyboardType});
 
   @override
   Widget build(BuildContext context) {
@@ -29,13 +34,13 @@ class myTextField extends StatelessWidget {
       textAlign: TextAlign.center,
       cursorColor: Colors.grey,
       onChanged: ((val) {
-        temp = int.parse(val);//check value bounds
-        if(controllerName != 'sets' && (temp<0 || temp>60)){
+        temp = int.parse(val); //check value bounds
+        if (controllerName != 'sets' && (temp < 0 || temp > 60)) {
           val = retain[controllerName];
         }
         func(val);
       }),
-      keyboardType: TextInputType.number,
+      keyboardType: keyboardType,
       decoration: kInputDecor,
     );
   }

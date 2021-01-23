@@ -329,10 +329,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         ),
                                         Container(
                                           padding: EdgeInsets.only(left: 5),
-                                          width: 60,
-                                          alignment: Alignment.center,
-                                          child: myTextField(
-                                            controllerName: 'periodMin',
+                                  width: 60,
+                                  alignment: Alignment.center,
+                                  child: myTextField(
+                                    controllerName: 'periodMin',
                                     isStringName: true,
                                     func: (val) {
                                       setState(() {
@@ -340,8 +340,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         controller['periodMin'].text = val;
                                       });
                                     },
+                                    keyboardType: TextInputType.number,
                                   ),
-                                        ),
+                                ),
                                         Container(
                                             child: Text(
                                           ':',
@@ -353,10 +354,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                         )),
                                         Container(
                                           padding: EdgeInsets.only(right: 5),
-                                          width: 60,
-                                          alignment: Alignment.center,
-                                          child: myTextField(
-                                            controllerName: 'periodSec',
+                                  width: 60,
+                                  alignment: Alignment.center,
+                                  child: myTextField(
+                                    keyboardType: TextInputType.number,
+                                    controllerName: 'periodSec',
                                     isStringName: true,
                                     func: (val) {
                                       setState(() {
@@ -365,7 +367,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       });
                                     },
                                   ),
-                                        ),
+                                ),
                                         NeuButton(
                                           ico: Icon(
                                             Icons.add_rounded,
@@ -420,6 +422,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           alignment: Alignment.center,
                                           child: myTextField(
                                             controllerName: 'breakMin',
+                                    keyboardType: TextInputType.number,
                                     isStringName: true,
                                     func: (val) {
                                       setState(() {
@@ -445,6 +448,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                             alignment: Alignment.center,
                                             child: myTextField(
                                               controllerName: 'breakSec',
+                                      keyboardType: TextInputType.number,
                                       isStringName: true,
                                       func: (val) {
                                         setState(() {
@@ -507,6 +511,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           width: 130,
                                           child: myTextField(
                                             controllerName: 'sets',
+                                    keyboardType: TextInputType.number,
                                     isStringName: true,
                                     func: (val) {
                                       setState(() {
@@ -635,6 +640,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                     ).inSeconds,
                                   );
                                   final set1 = SetClass(
+                                    grpName: '',
                                     timeList: [
                                       periodTime,
                                     ],
@@ -806,6 +812,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     ],
                   ),
                   child: TextField(
+                    keyboardType: TextInputType.name,
                     controller: dialogController,
                     style: kTextStyle.copyWith(
                       fontWeight: FontWeight.bold,

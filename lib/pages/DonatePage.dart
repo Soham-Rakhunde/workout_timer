@@ -452,7 +452,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                                         trailingIcon: Icon(
                                             Icons.local_bar_rounded,
                                             color: textColor),
-                                        onPressed: () => print('fuck'),
+                                        onPressed: () => null,
                                       ),
                                       FocusedMenuItem(
                                         title: Padding(

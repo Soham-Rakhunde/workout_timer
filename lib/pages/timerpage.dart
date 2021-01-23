@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:audioplayers/audio_cache.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
@@ -13,11 +11,12 @@ import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 class TimerPage extends StatefulWidget {
-  TimerPage({this.args, this.isRest, this.breakTime});
+  TimerPage({this.args, this.isRest, this.breakTime, this.totalTime});
 
   List<SetClass> args = [];
   bool isRest;
   TimeClass breakTime;
+  int totalTime;
 
   @override
   _TimerPageState createState() => _TimerPageState();
@@ -35,6 +34,8 @@ class _TimerPageState extends State<TimerPage> {
   ValueNotifier<double> tickTime = ValueNotifier<double>(0);
 
   ValueNotifier<double> progress = ValueNotifier<double>(0);
+
+  ValueNotifier<int> groupNum = ValueNotifier<int>(1);
 
   int s, totalTime;
 
@@ -66,11 +67,9 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void dispose() {
     super.dispose();
-    print('dispose');
     tickTime.dispose();
     progress.dispose();
     resumeFlag.dispose();
-    Wakelock.disable();
   }
 
   Future<bool> _getData() async {
@@ -147,6 +146,7 @@ class _TimerPageState extends State<TimerPage> {
       print('2');
         for (int index = 0; index < setList.length; index++) {
           print('4');
+        groupNum.value = index + 1;
         s = setList[index].sets;
         for (i.value = 1; i.value <= setList[index].sets; i.value++) {
           print('5');
@@ -155,14 +155,15 @@ class _TimerPageState extends State<TimerPage> {
             if (isVoice)
               audioPlayer.play(
                   '${setList[index].timeList[j].isWork ? 'start' : 'rest'}-$voice.mp3');
-            _titleName.value = setList[index].timeList[j].name;
+            _titleName.value =
+                '${setList[index].grpName}${isRest ? '' : '-'}${setList[index].timeList[j].name}';
             timeInSec.value = setList[index].timeList[j].sec;
             if (timeInSec.value > 0)
               await startTimer(setList[index].timeList[j].sec);
             print(isRest);
             if (i.value != s && isRest) {
               print('7');
-                _titleName.value = breakT.name;
+              _titleName.value = breakT.name;
               timeInSec.value = breakT.sec;
               if (i.value != s + 1 && isVoice) {
                 audioPlayer.play('rest-$voice.mp3');
@@ -198,7 +199,9 @@ class _TimerPageState extends State<TimerPage> {
       s = setList.first.sets;
       isRest = widget.isRest;
       breakT = widget.breakTime;
-      totalTime = setList.first.timeList.first.sec * s + breakT.sec * (s - 1);
+      totalTime = isRest
+          ? (setList.first.timeList.first.sec * s + breakT.sec * (s - 1))
+          : widget.totalTime;
     }
     return WillPopScope(
       onWillPop: () async => createAlertDialog(context),
@@ -407,8 +410,7 @@ class _TimerPageState extends State<TimerPage> {
                                       audioPlayer.clearCache();
                                       isVoice = false;
                                     }
-                                    // i.value = s + 1;
-                                    // timeInSec.value = 0;
+                                    Wakelock.disable();
                                     Navigator.pop(context);
                                   }),
                                   ico: Icon(
@@ -419,7 +421,52 @@ class _TimerPageState extends State<TimerPage> {
                                 ),
                               ),
                               Spacer(
-                                flex: 10,
+                                flex: isRest ? 4 : 1,
+                              ),
+                              isRest
+                                  ? Spacer(
+                                      flex: 2,
+                                    )
+                                  : Expanded(
+                                      flex: 15,
+                                      child: Container(
+                                        height: 60,
+                                        decoration: BoxDecoration(
+                                          color: backgroundColor,
+                                          borderRadius:
+                                              BorderRadius.circular(20),
+                                          // boxShadow: [
+                                          //   BoxShadow(
+                                          //       color: shadowColor,
+                                          //       offset: Offset(8, 6),
+                                          //       blurRadius: 12),
+                                          //   BoxShadow(
+                                          //       color: lightShadowColor,
+                                          //       offset: Offset(-8, -6),
+                                          //       blurRadius: 12),
+                                          // ],
+                                        ),
+                                        child: ValueListenableBuilder<int>(
+                                            valueListenable: groupNum,
+                                            builder:
+                                                (context, snapshot, widget) {
+                                              return FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  'Group $snapshot of ${setList.length}',
+                                                  style: kTextStyle.copyWith(
+                                                    letterSpacing: 0.1,
+                                                    color: isDark.value
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                  ),
+                                                ),
+                                              );
+                                            }),
+                                      ),
+                                    ),
+                              Spacer(
+                                flex: isRest ? 4 : 1,
                               ),
                               ValueListenableBuilder(
                                 valueListenable: resumeFlag,
@@ -491,7 +538,10 @@ class _TimerPageState extends State<TimerPage> {
               ),
             ),
             MaterialButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () {
+                Wakelock.disable();
+                Navigator.pop(context, true);
+              },
               child: Text(
                 'Yes',
                 style: kTextStyle.copyWith(
