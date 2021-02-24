@@ -2,8 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:workout_timer/constants.dart';
+import 'package:workout_timer/main.dart';
 import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
@@ -425,7 +427,7 @@ class _savedPageState extends State<savedPage> {
                         if (savedAdvListObjs == null) {
                           return Center(child: Text('Loading'));
                         } else {
-                          return snapshot.data.length == 0
+                          return savedAdvListObjs.length == 0
                               ? Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -446,7 +448,7 @@ class _savedPageState extends State<savedPage> {
                                       )),
                                       Center(
                                           child: Text(
-                                        'Save data from homescreen',
+                                            'Save data from Advanced Mode',
                                         style: TextStyle(fontSize: 20),
                                       )),
                                     ],
@@ -539,8 +541,6 @@ class _savedPageState extends State<savedPage> {
                                             child: Container(
                                               margin: EdgeInsets.symmetric(
                                               vertical: 15, horizontal: 20),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 20, horizontal: 25),
                                           height: 140,
                                           width: double.infinity,
                                           child: Column(
@@ -549,152 +549,192 @@ class _savedPageState extends State<savedPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Container(
-                                                margin:
-                                                    EdgeInsets.only(left: 10),
-                                                child: FittedBox(
-                                                  fit: BoxFit.fitWidth,
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Container(
+                                                    padding: EdgeInsets.only(
+                                                        top: 20, left: 25),
+                                                    margin: EdgeInsets.only(
+                                                        left: 10),
+                                                    child: FittedBox(
+                                                      fit: BoxFit.fitWidth,
                                                       child: Text(
                                                         savedAdvListObjs[index]
-                                                            .name ==
-                                                            ''
+                                                                    .name ==
+                                                                ''
                                                             ? 'Name'
                                                             : '${savedAdvListObjs[index].name}',
-                                                        style: kTextStyle.copyWith(
-                                                          color: backgroundColor,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                      fontSize: 26.5,
+                                                        style:
+                                                            kTextStyle.copyWith(
+                                                          color:
+                                                              backgroundColor,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize: 26.5,
+                                                        ),
+                                                      ),
                                                     ),
                                                   ),
-                                                ),
+                                                  Padding(
+                                                    padding: EdgeInsets.only(
+                                                        top: 14),
+                                                    child: FlatButton(
+                                                      shape: CircleBorder(),
+                                                      color: Colors.transparent,
+                                                      child: FaIcon(
+                                                        FontAwesomeIcons.edit,
+                                                        color: backgroundColor,
+                                                      ),
+                                                      onPressed: () {
+                                                        editGroups =
+                                                            savedAdvListObjs[
+                                                                    index]
+                                                                .groups;
+                                                        indexOfMenu.value = 5;
+                                                        Navigator.pop(context);
+                                                      },
+                                                    ),
+                                                  )
+                                                ],
                                               ),
                                               SizedBox(
                                                 height: 15,
                                               ),
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceEvenly,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.center,
-                                                children: [
-                                                  Column(
-                                                    children: [
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          'Time',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontSize: 20,
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                    bottom: 15,
+                                                    left: 25,
+                                                    right: 25),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceEvenly,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    Column(
+                                                      children: [
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            'Time',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          '${Duration(seconds: savedAdvListObjs[index].totalTime).inMinutes}:'
-                                                          '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60 < 10 ? '0' : ''}'
-                                                          '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60}',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 20,
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inMinutes}:'
+                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60 < 10 ? '0' : ''}'
+                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60}',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    height: 45,
-                                                    width: 1.3,
-                                                    color: backgroundColor,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          'Groups',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontSize: 20,
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      height: 45,
+                                                      width: 1.3,
+                                                      color: backgroundColor,
+                                                    ),
+                                                    Column(
+                                                      children: [
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            'Groups',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          '${savedAdvListObjs[index].groups.length}',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 20,
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            '${savedAdvListObjs[index].groups.length}',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  Container(
-                                                    height: 45,
-                                                    width: 1.3,
-                                                    color: backgroundColor,
-                                                  ),
-                                                  Column(
-                                                    children: [
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          'Sets',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontSize: 20,
+                                                      ],
+                                                    ),
+                                                    Container(
+                                                      height: 45,
+                                                      width: 1.3,
+                                                      color: backgroundColor,
+                                                    ),
+                                                    Column(
+                                                      children: [
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            'Sets',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      FittedBox(
-                                                        fit: BoxFit.fitWidth,
-                                                        child: Text(
-                                                          '$setsCount',
-                                                          style: kTextStyle
-                                                              .copyWith(
-                                                            color:
-                                                                backgroundColor,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            fontSize: 20,
+                                                        FittedBox(
+                                                          fit: BoxFit.fitWidth,
+                                                          child: Text(
+                                                            '$setsCount',
+                                                            style: kTextStyle
+                                                                .copyWith(
+                                                              color:
+                                                                  backgroundColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize: 20,
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ],
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
                                               ),
                                             ],
-                                              ),
-                                              decoration: BoxDecoration(
-                                                gradient: LinearGradient(
-                                                    colors: gradientList[
+                                          ),
+                                          decoration: BoxDecoration(
+                                            gradient: LinearGradient(
+                                                colors: gradientList[
                                                     4 - ((index - 4) % 5)],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight),
-                                                borderRadius:
+                                            borderRadius:
                                                 BorderRadius.circular(25),
-                                                boxShadow: [
-                                                  BoxShadow(
+                                            boxShadow: [
+                                              BoxShadow(
                                                       color: gradientList[4 -
                                                           ((index - 4) % 5)][1]
                                                       .withOpacity(0.22),

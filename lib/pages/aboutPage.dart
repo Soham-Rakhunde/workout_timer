@@ -293,7 +293,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 2.0.0',
+                        'Version 2.1.2',
                         style: kTextStyle.copyWith(
                           color: isDark.value ? Colors.white : Colors.black,
                         ),
@@ -422,7 +422,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '2.0.0',
+                            applicationVersion: '2.1.2',
                           );
                         }),
                         child: Container(

@@ -197,6 +197,7 @@ class _AdvancedPageState extends State<AdvancedPage>
         valueListenable: indexOfMenu,
         builder: (context, val, child) {
           if (!isAdvancedOpen && indexOfMenu.value == 5 && !isBackPressed) {
+            if (editGroups.isNotEmpty) groups = editGroups;
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
                 xOffset = 0;
@@ -476,7 +477,8 @@ class _AdvancedPageState extends State<AdvancedPage>
                                               groups[index].timeList.length,
                                           shrinkWrap: true,
                                           physics: BouncingScrollPhysics(),
-                                          key: ValueKey('${rebuildVal.value}'),
+                                          key: ValueKey(
+                                              '${groups[index].timeList.length}'),
                                           itemBuilder: (BuildContext context,
                                               int j, animation) {
                                             return Dismissible(
@@ -493,8 +495,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                               ),
                                               direction:
                                                   DismissDirection.horizontal,
-                                              key: ObjectKey(
-                                                  groups[index].timeList[j]),
+                                              key: ValueKey('1010'),
                                               onDismissed: (direction) {
                                                 groups[index]
                                                     .timeList[j]

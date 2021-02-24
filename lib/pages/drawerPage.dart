@@ -161,7 +161,7 @@ class _drawerPageState extends State<drawerPage> {
                                   ),
                                   SizedBox(width: screenWidth / 20),
                                   Text(
-                                    'Stats',
+                                    'Statistics',
                                     style: TextStyle(
                                       fontFamily: 'MontserratBold',
                                       color: Colors.teal[

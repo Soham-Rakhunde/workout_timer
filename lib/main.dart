@@ -24,6 +24,7 @@ bool isSettingsOpen = false;
 bool isAdvancedOpen = false;
 const perPixel = 0.0025641025641026;
 DisplayMode selected;
+List<SetClass> editGroups = [];
 
 void main() {
   Future.delayed(Duration(milliseconds: 1)).then(

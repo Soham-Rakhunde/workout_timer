@@ -47,9 +47,7 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
   Widget build(BuildContext context) {
     screenWidth = MediaQuery.of(context).size.width; //390
     widget.length = widget.length == 60 ? screenWidth / 6.5 : widget.length;
-    if (widget.length == 60) {
-      widget.breadth = widget.length;
-    }
+    widget.breadth = widget.length;
     return RawMaterialButton(
       onPressed: (() {
         HapticFeedback.lightImpact();

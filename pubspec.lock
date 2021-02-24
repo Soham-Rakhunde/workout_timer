@@ -323,7 +323,7 @@ packages:
       name: in_app_purchase
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.4+16"
+    version: "0.3.5+1"
   intl:
     dependency: transitive
     description:
