@@ -37,6 +37,9 @@ dependencies:
   flutter_inapp_purchase: ^3.0.1
   flutter_displaymode: ^0.1.1
   json_annotation: ^3.1.1
+  jiffy: ^3.0.1
+  sqflite: ^2.0.0+3
+  path_provider: ^1.6.22
   #  animations: ^1.1.2
 
   # The following adds the Cupertino Icons font to your application.

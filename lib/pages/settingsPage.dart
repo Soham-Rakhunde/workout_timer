@@ -118,7 +118,6 @@ class _SettingsPageState extends State<SettingsPage> {
         final DisplayMode current =
             modes.firstWhere((DisplayMode m) => m.selected, orElse: () => m);
         modes.forEach((element) {
-          print(element);
           deviceModeFocused.add(
             FocusedMenuItem(
               title: Padding(

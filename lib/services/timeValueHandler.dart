@@ -243,20 +243,26 @@ class SharedPref {
   }
 
   Future<int> readInt(String str) async {
-    //refresh rate
+    //deviceModeId,TotalWorkoutSessions,TotalDays
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getInt(str) == null) {
-      return 1;
+    if (str == 'deviceModeId') {
+      if (prefs.getInt(str) == null) {
+        return 1;
+      }
     } else {
       return prefs.getInt(str);
     }
   }
 
   Future<String> readString(String str) async {
-    //Voice
+    //Voice,LastWorkout,TotalWorkoutHours,ReleaseDateOfDatabase
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if (prefs.getString(str) == null) {
-      return 'amy';
+    if (str == 'Voice') {
+      if (prefs.getString(str) == null) {
+        return 'amy';
+      } else {
+        return prefs.getString(str);
+      }
     } else {
       return prefs.getString(str);
     }

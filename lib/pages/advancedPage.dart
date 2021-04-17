@@ -509,7 +509,6 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                 groups[index]
                                                     .timeList
                                                     .removeAt(j);
-                                                print('$index & $j');
                                                 Future.delayed(Duration(
                                                         microseconds: 1))
                                                     .then(
@@ -922,7 +921,6 @@ class _AdvancedPageState extends State<AdvancedPage>
                                 await createDialog(context);
                                 finaliseGroupsList();
                                 savedList = await prefs.read('Adv');
-                                print(savedList);
                                 SavedAdvanced _data = SavedAdvanced(
                                   name: stringFormatter(dialogController.text),
                                   groups: groups,

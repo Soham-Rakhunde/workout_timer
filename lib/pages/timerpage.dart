@@ -3,9 +3,11 @@ import 'dart:ui';
 
 import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
+import 'package:workout_timer/services/DatabaseService.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
@@ -42,6 +44,8 @@ class _TimerPageState extends State<TimerPage> {
   ValueNotifier<bool> resumeFlag = ValueNotifier<bool>(true);
 
   String voice;
+  String lastUsedDate, totalWorkoutHours;
+  int totalWorkouts, totalDays;
 
   bool isVoice;
 
@@ -75,6 +79,12 @@ class _TimerPageState extends State<TimerPage> {
   Future<bool> _getData() async {
     isVoice = await savedData.readBool('isVoice');
     voice = await savedData.readString('Voice');
+    lastUsedDate = await savedData.readString('LastWorkout');
+    totalWorkouts = await savedData.readInt('TotalWorkoutSessions');
+    totalDays = await savedData.readInt('TotalDays');
+    totalWorkoutHours = await savedData.readString('TotalWorkoutHours');
+    print(
+        '${lastUsedDate != null ? lastUsedDate : ' a'}  ${totalWorkouts != null ? totalWorkouts : ' b'} ${totalDays != null ? totalDays : ' c'} ${totalWorkoutHours != null ? totalWorkoutHours : ' d'}');
     if (isVoice) {
       audioPlayer = AudioCache(prefix: 'assets/audio/$voice/');
       audioPlayer.loadAll([
@@ -92,32 +102,74 @@ class _TimerPageState extends State<TimerPage> {
     return isVoice;
   }
 
+  void saveStats(int time) async {
+    Jiffy now = Jiffy()..startOf(Units.DAY);
+    if (totalWorkouts != null) {
+      totalWorkouts++;
+      savedData.saveInt('TotalWorkoutSessions', totalWorkouts);
+    } else {
+      savedData.saveInt('TotalWorkoutSessions', 1);
+    }
+    if (lastUsedDate != null) {
+      Jiffy lastTime = Jiffy(lastUsedDate);
+      if (!now.isSame(lastTime)) {
+        //see if not used today
+        if (totalDays != null) {
+          savedData.saveInt('TotalDays', totalDays + 1);
+        } else {
+          savedData.saveInt('TotalDays', 1);
+        }
+      }
+    } else {
+      if (totalDays == null) {
+        savedData.saveInt('TotalDays', 1);
+      }
+    }
+    savedData.saveString('LastWorkout', now.format());
+    Jiffy timeJiffy;
+    if (totalWorkoutHours != null) {
+      timeJiffy = Jiffy(totalWorkoutHours);
+    } else {
+      timeJiffy = Jiffy({
+        "year": 1,
+        "month": 1,
+        "day": 1,
+        "hour": 0,
+        "minute": 0,
+        "second": 0,
+        "millisecond": 0,
+      });
+    }
+    timeJiffy.add(seconds: time);
+    savedData.saveString('TotalWorkoutHours', timeJiffy.format());
+
+    //  db
+    await DbHelper.instance.insert({
+      DbHelper.cJiffy: time,
+      DbHelper.cDay: now.day,
+      DbHelper.cWeek: now.week,
+      DbHelper.cMonth: now.month,
+      DbHelper.cYear: now.year,
+    });
+  }
+
   void startTimer(int time) async {
-    print('as $time');
     while (timeInSec.value >= 0) {
-      print('a');
       while (!resumeFlag.value) {
-        print('b');
         await Future.delayed(Duration(milliseconds: 400));
       }
       if (i.value > s) {
-        print('broke');
         break;
       }
-      print('c');
       tickTime.value = ((time - timeInSec.value) / time) * 100;
       if (timeInSec.value != 0) progress.value += 100 / totalTime;
       if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice) {
-        print('d');
         audioPlayer.play('${timeInSec.value}-$voice.mp3');
       }
       await Future.delayed(Duration(seconds: 1));
-      print('e');
       timeInSec.value--;
     }
-    print('f');
     tickTime.value = ((time - timeInSec.value) / time) * 100;
-    print('ds');
   }
 
   void timerFunc() async{
@@ -141,17 +193,12 @@ class _TimerPageState extends State<TimerPage> {
     timeInSec.value = 1;
     if (isVoice) audioPlayer.play('1-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
-    print('1');
     if (timeInSec.value > 0) {
-      print('2');
         for (int index = 0; index < setList.length; index++) {
-          print('4');
         groupNum.value = index + 1;
         s = setList[index].sets;
         for (i.value = 1; i.value <= setList[index].sets; i.value++) {
-          print('5');
           for (int j = 0; j < setList[index].timeList.length; j++) {
-            print('6');
             if (isVoice)
               audioPlayer.play(
                   '${setList[index].timeList[j].isWork ? 'start' : 'rest'}-$voice.mp3');
@@ -160,9 +207,7 @@ class _TimerPageState extends State<TimerPage> {
             timeInSec.value = setList[index].timeList[j].sec;
             if (timeInSec.value > 0)
               await startTimer(setList[index].timeList[j].sec);
-            print(isRest);
             if (i.value != s && isRest) {
-              print('7');
               _titleName.value = breakT.name;
               timeInSec.value = breakT.sec;
               if (i.value != s + 1 && isVoice) {
@@ -172,7 +217,6 @@ class _TimerPageState extends State<TimerPage> {
             }
           }
         }
-        print('8');
       }
       //   i.value++;
       //   print('9');
@@ -188,6 +232,8 @@ class _TimerPageState extends State<TimerPage> {
     }
     // i.value = s + 1;
     // timeInSec.value = 0;
+    double timeElapsed = progress.value * totalTime / 100;
+    saveStats(timeElapsed.round());
     Navigator.pop(context);
   }
 
@@ -410,6 +456,9 @@ class _TimerPageState extends State<TimerPage> {
                                       audioPlayer.clearCache();
                                       isVoice = false;
                                     }
+                                    double timeElapsed =
+                                        progress.value * totalTime / 100;
+                                    saveStats(timeElapsed.round());
                                     Wakelock.disable();
                                     Navigator.pop(context);
                                   }),
@@ -539,6 +588,8 @@ class _TimerPageState extends State<TimerPage> {
             ),
             MaterialButton(
               onPressed: () {
+                double timeElapsed = progress.value * totalTime / 100;
+                saveStats(timeElapsed.round());
                 Wakelock.disable();
                 Navigator.pop(context, true);
               },
