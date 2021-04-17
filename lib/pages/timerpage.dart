@@ -83,8 +83,6 @@ class _TimerPageState extends State<TimerPage> {
     totalWorkouts = await savedData.readInt('TotalWorkoutSessions');
     totalDays = await savedData.readInt('TotalDays');
     totalWorkoutHours = await savedData.readString('TotalWorkoutHours');
-    print(
-        '${lastUsedDate != null ? lastUsedDate : ' a'}  ${totalWorkouts != null ? totalWorkouts : ' b'} ${totalDays != null ? totalDays : ' c'} ${totalWorkoutHours != null ? totalWorkoutHours : ' d'}');
     if (isVoice) {
       audioPlayer = AudioCache(prefix: 'assets/audio/$voice/');
       audioPlayer.loadAll([
@@ -218,9 +216,6 @@ class _TimerPageState extends State<TimerPage> {
           }
         }
       }
-      //   i.value++;
-      //   print('9');
-      // } while (i.value <= s);
       i.value--;
     }
     timeInSec.value = 0;

@@ -61,6 +61,7 @@ class DbHelper {
     if (today.isEmpty) {
       return await db.insert(_tableName, row);
     } else {
+      row[cJiffy] += today.first[cJiffy];
       return await db.update(_tableName, row,
           where: '$cDay = ? AND $cWeek = ? AND $cMonth = ? AND $cYear = ?',
           whereArgs: [row[cDay], row[cWeek], row[cMonth], row[cYear]]);
@@ -174,7 +175,6 @@ class DbHelper {
       GROUP BY $cMonth
       ORDER BY $cMonth ASC
     ''');
-    print('a');
     int foundIndex = 0;
     for (int month = 1; month <= 12; month++) {
       Iterable<Map<String, dynamic>> e = temp.where((element) {

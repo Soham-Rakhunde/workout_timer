@@ -153,11 +153,26 @@ class _drawerPageState extends State<drawerPage> {
                               child: Row(
                                 crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.stacked_line_chart_rounded,
-                                    size: 25,
-                                    color: Colors.teal[
-                                        indexOfMenu.value == 1 ? 200 : 500],
+                                  Stack(
+                                    clipBehavior: Clip.none,
+                                    children: [
+                                      Icon(
+                                        Icons.stacked_line_chart_rounded,
+                                        size: 25,
+                                        color: Colors.teal[
+                                            indexOfMenu.value == 1 ? 200 : 500],
+                                      ),
+                                      if (!openedAfterDbUpdate)
+                                        Positioned(
+                                          // draw a red marble
+                                          top: -5.0,
+                                          right: -5.0,
+                                          child: new Icon(
+                                              Icons.brightness_1_rounded,
+                                              size: 10.0,
+                                              color: Colors.redAccent),
+                                        )
+                                    ],
                                   ),
                                   SizedBox(width: screenWidth / 20),
                                   Text(

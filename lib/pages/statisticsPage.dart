@@ -22,8 +22,6 @@ class _StatisticsPageState extends State<StatisticsPage>
   double yOffset = 0;
   double scaleFactor = 1;
   bool isBackPressed = false;
-  AnimationController playGradientControl;
-  Animation edges;
   double positionOffset = 70;
 
   int totalWorkouts, totalDays;
@@ -56,30 +54,41 @@ class _StatisticsPageState extends State<StatisticsPage>
   Future<bool> _getData() async {
     shallGetData = isFirstTime ? true : shallGetData;
     if (shallGetData) {
-      print('getting it');
       shallGetData = false;
       isFirstTime = false;
       SharedPref sp = SharedPref();
+
       totalWorkouts = await sp.readInt('TotalWorkoutSessions');
+      if (totalWorkouts == null) totalWorkouts = 0;
+
       totalDays = await sp.readInt('TotalDays');
+      if (totalDays == null) totalDays = 0;
       releaseDate = await sp.readString('ReleaseDateOfDatabase');
       if (releaseDate != null) releaseJiffy = Jiffy(releaseDate);
 
       String totalHours = await sp.readString('TotalWorkoutHours');
       if (totalHours != null) {
         totalHoursJiffy = Jiffy(totalHours);
-      }
+      } else
+        totalHoursJiffy = Jiffy({
+          "year": 1,
+          "month": 1,
+          "day": 1,
+          "hour": 0,
+          "minute": 0,
+          "second": 0,
+          "millisecond": 0,
+        });
       String lastWorkoutJiffyString = await sp.readString('LastWorkout');
-      print(lastWorkoutJiffyString);
       if (lastWorkoutJiffyString != null) {
         lastWorkoutJiffy = Jiffy(lastWorkoutJiffyString);
-        print(lastWorkoutJiffy.format());
+      } else {
+        lastWorkoutJiffy = Jiffy();
       }
 
       curWeek = Jiffy()..startOf(Units.WEEK);
       curMonth = Jiffy()..startOf(Units.MONTH);
       curYear = Jiffy()..startOf(Units.YEAR);
-
       //db
       weekList = await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
       monthList =
@@ -90,47 +99,57 @@ class _StatisticsPageState extends State<StatisticsPage>
     return true;
   }
 
-  void prev() {
+  void prev() async {
     Jiffy release;
     if (toggleList[0]) {
       release = releaseJiffy..startOf(Units.WEEK);
       if (curWeek.isAfter(release)) {
         curWeek.subtract(weeks: 1);
+        weekList =
+            await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else if (toggleList[1]) {
       release = releaseJiffy..startOf(Units.MONTH);
-      if (curWeek.isAfter(release)) {
-        curWeek.subtract(months: 1);
+      if (curMonth.isAfter(release)) {
+        curMonth.subtract(months: 1);
+        monthList =
+            await DbHelper.instance.queryMonth(curMonth.month, curMonth.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else {
       release = releaseJiffy..startOf(Units.YEAR);
-      if (curWeek.isAfter(release)) {
-        curWeek.subtract(years: 1);
+      if (curYear.isAfter(release)) {
+        curYear.subtract(years: 1);
+        yearList = await DbHelper.instance.queryYear(curYear.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     }
   }
 
-  void nex() {
+  void nex() async {
     Jiffy realNow;
     if (toggleList[0]) {
       realNow = Jiffy()..startOf(Units.WEEK);
       if (curWeek.isBefore(realNow)) {
         curWeek.add(weeks: 1);
+        weekList =
+            await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else if (toggleList[1]) {
       realNow = Jiffy()..startOf(Units.MONTH);
-      if (curWeek.isBefore(realNow)) {
-        curWeek.add(months: 1);
+      if (curMonth.isBefore(realNow)) {
+        curMonth.add(months: 1);
+        monthList =
+            await DbHelper.instance.queryMonth(curMonth.month, curMonth.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else {
       realNow = Jiffy()..startOf(Units.YEAR);
-      if (curWeek.isBefore(realNow)) {
-        curWeek.add(years: 1);
+      if (curYear.isBefore(realNow)) {
+        curYear.add(years: 1);
+        yearList = await DbHelper.instance.queryYear(curYear.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     }
@@ -164,15 +183,6 @@ class _StatisticsPageState extends State<StatisticsPage>
       isStatsOpen = false;
       shallGetData = false;
     });
-    playGradientControl = AnimationController(
-      vsync: this,
-      duration: Duration(milliseconds: 450),
-      reverseDuration: Duration(milliseconds: 450),
-    );
-    edges = Tween<double>(
-      begin: 28.0,
-      end: 0.0,
-    ).animate(playGradientControl);
   }
 
   @override
@@ -187,7 +197,6 @@ class _StatisticsPageState extends State<StatisticsPage>
         isBackPressed = true;
         xOffset = adjusted(250);
         yOffset = adjusted(140);
-        playGradientControl.forward();
         scaleFactor = 0.7;
         positionOffset = 70;
         isDrawerOpen = true;
@@ -227,12 +236,12 @@ class _StatisticsPageState extends State<StatisticsPage>
               setState(() {
                 xOffset = 0;
                 positionOffset = 0;
-                playGradientControl.reverse();
                 yOffset = 0;
                 scaleFactor = 1;
                 isDrawerOpen = false;
                 isStatsOpen = true;
                 shallGetData = true;
+                openedAfterDbUpdate = true;
               });
             });
           } else if (indexOfMenu.value != 1)
@@ -269,7 +278,7 @@ class _StatisticsPageState extends State<StatisticsPage>
           }),
           decoration: BoxDecoration(
             color: backgroundC[0],
-            borderRadius: BorderRadius.circular(edges.value),
+            borderRadius: BorderRadius.circular(isStatsOpen ? 0 : 28),
           ),
           child: GestureDetector(
             onTap: (() {
@@ -277,7 +286,6 @@ class _StatisticsPageState extends State<StatisticsPage>
                 setState(() {
                   isBackPressed = false;
                   xOffset = 0;
-                  playGradientControl.reverse();
                   positionOffset = 0;
 
                   yOffset = 0;
@@ -293,7 +301,6 @@ class _StatisticsPageState extends State<StatisticsPage>
                 setState(() {
                   isBackPressed = false;
                   xOffset = 0;
-                  playGradientControl.reverse();
                   positionOffset = 0;
                   yOffset = 0;
                   scaleFactor = 1;
@@ -308,7 +315,7 @@ class _StatisticsPageState extends State<StatisticsPage>
               child: Stack(
                 children: [
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(edges.value),
+                    borderRadius: BorderRadius.circular(isStatsOpen ? 0 : 28),
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 450),
                       child: Container(
@@ -319,7 +326,8 @@ class _StatisticsPageState extends State<StatisticsPage>
                         height: double.infinity,
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(edges.value),
+                          borderRadius:
+                              BorderRadius.circular(isStatsOpen ? 0 : 28),
                         ),
                       ),
                     ),
@@ -328,7 +336,7 @@ class _StatisticsPageState extends State<StatisticsPage>
                     height: double.infinity,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(edges.value),
+                      borderRadius: BorderRadius.circular(isStatsOpen ? 0 : 28),
                     ),
                     child: FutureBuilder(
                         future: _getData(),
@@ -422,9 +430,7 @@ class _StatisticsPageState extends State<StatisticsPage>
                                                 padding:
                                                     const EdgeInsets.all(12.0),
                                                 child: Text(
-                                                  releaseDate != null
-                                                      ? 'Last Used'
-                                                      : 'Please Complete',
+                                                  'Last Used',
                                                   style: TextStyle(
                                                     color: textC[1],
                                                     letterSpacing: 2.0,
@@ -459,9 +465,9 @@ class _StatisticsPageState extends State<StatisticsPage>
                                                           const EdgeInsets.all(
                                                               25.0),
                                                       child: Text(
-                                                        releaseDate != null
-                                                            ? '${lastWorkoutJiffy.date} ${lastWorkoutJiffy.format('MMMM')} ${lastWorkoutJiffy.year}'
-                                                            : 'Atleast One Workout',
+                                                        lastWorkoutJiffy == null
+                                                            ? ''
+                                                            : '${lastWorkoutJiffy.date} ${lastWorkoutJiffy.format('MMMM')} ${lastWorkoutJiffy.year}',
                                                         style: TextStyle(
                                                           color: textC[1],
                                                           letterSpacing: 2.0,
@@ -549,89 +555,86 @@ class _StatisticsPageState extends State<StatisticsPage>
                                     ),
                                   if (releaseDate != null)
                                     GestureDetector(
-                                      onHorizontalDragUpdate: (details) {
-                                        int sensitivity = 8;
-                                        if (details.delta.dx > sensitivity) {
-                                          nex();
-                                        } else if (details.delta.dx <
-                                            -sensitivity) {
+                                      onHorizontalDragEnd: (details) {
+                                        if (details.primaryVelocity > 0) {
                                           prev();
+                                        } else if (details.primaryVelocity <
+                                            0) {
+                                          nex();
                                         }
                                       },
                                       child: ValueListenableBuilder(
                                         valueListenable: refreshBarGraph,
                                         builder: (context, val, child) {
-                                          return child;
-                                        },
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 20),
-                                          child: Container(
-                                            width: screenWidth * 0.9,
-                                            height: 400,
-                                            decoration: BoxDecoration(
-                                              color: backgroundC[1]
-                                                  .withOpacity(0.1),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30)),
-                                            ),
-                                            child: ClipRRect(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(30)),
-                                              child: BackdropFilter(
-                                                filter: ImageFilter.blur(
-                                                  sigmaX: 15,
-                                                  sigmaY: 15,
-                                                ),
-                                                child: Container(
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.all(
-                                                            Radius.circular(
-                                                                30)),
+                                          return Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 20, vertical: 20),
+                                            child: Container(
+                                              width: screenWidth * 0.9,
+                                              height: 375,
+                                              decoration: BoxDecoration(
+                                                color: backgroundC[1]
+                                                    .withOpacity(0.1),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30)),
+                                              ),
+                                              child: ClipRRect(
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(30)),
+                                                child: BackdropFilter(
+                                                  filter: ImageFilter.blur(
+                                                    sigmaX: 15,
+                                                    sigmaY: 15,
                                                   ),
-                                                  child: toggleList[0]
-                                                      ? BarChartSample1(
-                                                          barCount: 7,
-                                                          title:
-                                                              'Week ${curWeek.week}',
-                                                          subtitle:
-                                                              'Total Time ${weekList.last.first}',
-                                                          barList: weekList
-                                                              .sublist(0, 7),
-                                                        )
-                                                      : toggleList[1]
-                                                          ? BarChartSample1(
-                                                              barCount: monthList
-                                                                      .length -
-                                                                  1,
-                                                              title:
-                                                                  '${curMonth.format('MMMM')}',
-                                                              subtitle:
-                                                                  'Total Time ${monthList.last.first}',
-                                                              barList: monthList
-                                                                  .sublist(
-                                                                      0,
-                                                                      monthList
-                                                                              .length -
-                                                                          1),
-                                                            )
-                                                          : BarChartSample1(
-                                                              barCount: 12,
-                                                              title:
-                                                                  'Year ${curYear.year}',
-                                                              subtitle:
-                                                                  'Total Time ${yearList.last.first}',
-                                                              barList: yearList
-                                                                  .sublist(
-                                                                      0, 12),
-                                                            ),
+                                                  child: Container(
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.all(
+                                                              Radius.circular(
+                                                                  30)),
+                                                    ),
+                                                    child: toggleList[0]
+                                                        ? BarChartSample1(
+                                                            barCount: 7,
+                                                            title:
+                                                                'Week ${curWeek.week}',
+                                                            subtitle:
+                                                                'Total Time ${weekList.last.first}',
+                                                            barList: weekList
+                                                                .sublist(0, 7),
+                                                          )
+                                                        : toggleList[1]
+                                                            ? BarChartSample1(
+                                                                barCount: monthList
+                                                                        .length -
+                                                                    1,
+                                                                title:
+                                                                    '${curMonth.format('MMMM')}',
+                                                                subtitle:
+                                                                    'Total Time ${monthList.last.first}',
+                                                                barList: monthList
+                                                                    .sublist(
+                                                                        0,
+                                                                        monthList.length -
+                                                                            1),
+                                                              )
+                                                            : BarChartSample1(
+                                                                barCount: 12,
+                                                                title:
+                                                                    'Year ${curYear.year}',
+                                                                subtitle:
+                                                                    'Total Time ${yearList.last.first}',
+                                                                barList: yearList
+                                                                    .sublist(
+                                                                        0, 12),
+                                                              ),
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
                                       ),
                                     ),
                                   if (releaseDate != null)

@@ -240,55 +240,67 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                       builder: (context, value, child) {
                                         return Text(
                                           _titleName.value,
-                                          style: TextStyle(
-                                            color: textColor,
-                                            letterSpacing: 2.0,
-                                            fontSize: 30,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        );
-                                      },
-                                    ),
+                                  style: TextStyle(
+                                    color: textColor,
+                                    letterSpacing: 2.0,
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
                                   ),
-                                  NeuButton(
-                                    ico: Icon(
-                                      Icons.menu_rounded,
-                              size: 30,
-                              color: textColor,
+                                );
+                              },
                             ),
-                                    onPress: (() {
-                                      setState(() {
-                                        FocusScope.of(context).unfocus();
-                                isBackPressed = true;
-                                xOffset = 250;
-                                yOffset = 140;
-                                scaleFactor = 0.7;
-                                isDrawerOpen = true;
-                                isHomeOpen = false;
-                                SystemChrome.setSystemUIOverlayStyle(
-                                    SystemUiOverlayStyle(
-                                  statusBarColor: Colors.transparent,
-                                  // isHomeOpen
-                                              //     ? backgroundColor
-                                              //     : drawerColor,
-                                              statusBarIconBrightness: isHomeOpen
-                                                  ? Brightness.dark
-                                                  : Brightness.light,
-                                              systemNavigationBarColor: isHomeOpen
-                                                  ? backgroundColor
-                                                  : drawerColor,
-                                              systemNavigationBarIconBrightness:
-                                              isHomeOpen
-                                                  ? Brightness.dark
-                                                  : Brightness.light,
-                                              systemNavigationBarDividerColor:
-                                              isHomeOpen
-                                                  ? backgroundColor
-                                                  : drawerColor,
-                                            ));
-                                      });
-                                    }),
-                                  ),
+                          ),
+                          Stack(
+                            children: [
+                              NeuButton(
+                                ico: Icon(
+                                  Icons.menu_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
+                                onPress: (() {
+                                  setState(() {
+                                    FocusScope.of(context).unfocus();
+                                    isBackPressed = true;
+                                    xOffset = 250;
+                                    yOffset = 140;
+                                    scaleFactor = 0.7;
+                                    isDrawerOpen = true;
+                                    isHomeOpen = false;
+                                    SystemChrome.setSystemUIOverlayStyle(
+                                        SystemUiOverlayStyle(
+                                      statusBarColor: Colors.transparent,
+                                      // isHomeOpen
+                                      //     ? backgroundColor
+                                      //     : drawerColor,
+                                      statusBarIconBrightness: isHomeOpen
+                                          ? Brightness.dark
+                                          : Brightness.light,
+                                      systemNavigationBarColor: isHomeOpen
+                                          ? backgroundColor
+                                          : drawerColor,
+                                      systemNavigationBarIconBrightness:
+                                          isHomeOpen
+                                              ? Brightness.dark
+                                              : Brightness.light,
+                                      systemNavigationBarDividerColor:
+                                          isHomeOpen
+                                              ? backgroundColor
+                                              : drawerColor,
+                                    ));
+                                  });
+                                }),
+                              ),
+                              if (!openedAfterDbUpdate)
+                                Positioned(
+                                  // draw a red marble
+                                  top: 0.0,
+                                  right: 15.0,
+                                  child: new Icon(Icons.brightness_1_rounded,
+                                      size: 15.0, color: Colors.redAccent),
+                                )
+                            ],
+                          ),
                                 ],
                               ),
                             ),

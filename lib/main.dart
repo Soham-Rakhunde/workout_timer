@@ -14,6 +14,7 @@ import 'package:workout_timer/services/scaleFactor.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
 ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
+bool openedAfterDbUpdate = false;
 bool isContrast = false;
 bool isDrawerOpen = false;
 bool isHomeOpen = true;
@@ -105,6 +106,8 @@ class _mainPageState extends State<mainPage> {
 
   Future<bool> _getData() async {
     isDark.value = await savedData.readBool('isDark');
+    String temp = await savedData.readString('ReleaseDateOfDatabase');
+    openedAfterDbUpdate = temp != null;
     isContrast = await savedData.readBool('isContrast');
     backgroundColor = backgroundC[isDark.value ? 1 : 0];
     shadowColor = shadowC[isDark.value ? 1 : 0];

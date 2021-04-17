@@ -138,12 +138,18 @@ class _savedPageState extends State<savedPage> {
                                       Center(
                                           child: Text(
                                         'No Data Saved',
-                                        style: TextStyle(fontSize: 25),
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          color: textColor,
+                                        ),
                                       )),
                                       Center(
                                           child: Text(
-                                        'Save data from homescreen',
-                                        style: TextStyle(fontSize: 20),
+                                            'Save data from homescreen',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: textColor,
+                                        ),
                                       )),
                                     ],
                                   ),
@@ -443,13 +449,19 @@ class _savedPageState extends State<savedPage> {
                                       ),
                                       Center(
                                           child: Text(
-                                        'No Data Saved',
-                                        style: TextStyle(fontSize: 25),
+                                            'No Data Saved',
+                                        style: TextStyle(
+                                          fontSize: 25,
+                                          color: textColor,
+                                        ),
                                       )),
                                       Center(
                                           child: Text(
-                                            'Save data from Advanced Mode',
-                                        style: TextStyle(fontSize: 20),
+                                        'Save data from Advanced Mode',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          color: textColor,
+                                        ),
                                       )),
                                     ],
                                   ),
