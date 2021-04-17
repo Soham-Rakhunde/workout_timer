@@ -240,7 +240,7 @@ class DbHelper {
       "year": 1,
       "month": 1,
       "day": 1,
-      "hour": j.hour,
+      "hour": 0,
       "minute": j.minute,
       "second": j.seconds,
       "millisecond": j.milliseconds,
