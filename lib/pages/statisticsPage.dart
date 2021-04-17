@@ -70,11 +70,9 @@ class _StatisticsPageState extends State<StatisticsPage>
         totalHoursJiffy = Jiffy(totalHours);
       }
       String lastWorkoutJiffyString = await sp.readString('LastWorkout');
-      print('f');
       print(lastWorkoutJiffyString);
       if (lastWorkoutJiffyString != null) {
         lastWorkoutJiffy = Jiffy(lastWorkoutJiffyString);
-        print('g');
         print(lastWorkoutJiffy.format());
       }
 
