@@ -162,8 +162,8 @@ class _StatisticsPageState extends State<StatisticsPage>
       "day": 1,
       "hour": totalHoursJiffy.hour,
       "minute": totalHoursJiffy.minute,
-      "second": totalHoursJiffy.seconds,
-      "millisecond": totalHoursJiffy.milliseconds,
+      "second": totalHoursJiffy.second,
+      "millisecond": totalHoursJiffy.millisecond,
     });
     return totalHoursJiffy.diff(zeroDate, Units.DAY);
   }

@@ -94,8 +94,7 @@ class _mainPageState extends State<mainPage> {
       /// noAPI - No API support. Only Marshmallow and above.
       /// noActivity - Activity is not available. Probably app is in background
     }
-    selected =
-        modesList.firstWhere((DisplayMode m) => m.selected, orElse: () => null);
+    selected = await FlutterDisplayMode.active;
     return true;
   }
 
@@ -118,7 +117,7 @@ class _mainPageState extends State<mainPage> {
       refreshId = await savedData.readInt('deviceModeId');
       modesList.forEach((element) async {
         if (element.id == refreshId) {
-          await FlutterDisplayMode.setMode(element);
+          await FlutterDisplayMode.setPreferredMode(element);
           if (mounted) {
             setState(() {});
           }

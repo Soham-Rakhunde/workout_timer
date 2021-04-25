@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:jiffy/jiffy.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -229,8 +228,8 @@ class DbHelper {
       "day": 1,
       "hour": j.hour,
       "minute": j.minute,
-      "second": j.seconds,
-      "millisecond": j.milliseconds,
+      "second": j.second,
+      "millisecond": j.millisecond,
     });
     return j.diff(zeroDate, Units.DAY);
   }
@@ -242,8 +241,8 @@ class DbHelper {
       "day": 1,
       "hour": 0,
       "minute": j.minute,
-      "second": j.seconds,
-      "millisecond": j.milliseconds,
+      "second": j.second,
+      "millisecond": j.millisecond,
     });
     return j.diff(zeroDate, Units.HOUR);
   }

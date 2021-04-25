@@ -36,7 +36,7 @@ class _SettingsPageState extends State<SettingsPage> {
   List<DisplayMode> modes = <DisplayMode>[];
 
   Future<DisplayMode> getCurrentMode() async {
-    return await FlutterDisplayMode.current;
+    return await FlutterDisplayMode.active;
   }
 
   @override
@@ -113,10 +113,11 @@ class _SettingsPageState extends State<SettingsPage> {
     deviceModeFocused = [];
     await Future.delayed(Duration(microseconds: 10)).then((_) async {
       try {
-        DisplayMode m = await FlutterDisplayMode.current;
+        DisplayMode m = await FlutterDisplayMode.active;
         modes = await FlutterDisplayMode.supported;
-        final DisplayMode current =
-            modes.firstWhere((DisplayMode m) => m.selected, orElse: () => m);
+        print('modes $modes of $m');
+        final DisplayMode current = await FlutterDisplayMode.active;
+        modes = modes.sublist(1);
         modes.forEach((element) {
           deviceModeFocused.add(
             FocusedMenuItem(
@@ -132,7 +133,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               backgroundColor: Colors.transparent,
               onPressed: () async {
-                await FlutterDisplayMode.setMode(element);
+                await FlutterDisplayMode.setPreferredMode(element);
                 await savedData.saveInt('deviceModeId', element.id);
                 Scaffold.of(context).showSnackBar(new SnackBar(
                     content: new Text(
