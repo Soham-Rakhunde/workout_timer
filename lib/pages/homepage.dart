@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:workout_timer/constants.dart';
@@ -28,7 +29,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   double yOffset = 0;
   double scaleFactor = 1;
   bool isBackPressed = false;
-  List<String> savedList = List<String>();
+  List<String> savedList = [];
   SharedPref savedData = SharedPref();
 
   // RateMyApp rateMyApp = RateMyApp(
@@ -206,28 +207,28 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 });
               }
             }),
-                    onHorizontalDragEnd: ((_) {
-                      if (!isHomeOpen && indexOfMenu.value == 0) {
-                        setState(() {
-                          xOffset = 0;
-                          yOffset = 0;
-                          scaleFactor = 1;
-                          isDrawerOpen = false;
-                          isHomeOpen = true;
-                        });
-                      }
-                    }),
-                    child: AnimatedOpacity(
-                      duration: Duration(milliseconds: 200),
-                      opacity: _opacity,
-                      child: AbsorbPointer(
-                        absorbing: !isHomeOpen,
-                        child: Column(
-                          // mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 6,
+            onHorizontalDragEnd: ((_) {
+              if (!isHomeOpen && indexOfMenu.value == 0) {
+                setState(() {
+                  xOffset = 0;
+                  yOffset = 0;
+                  scaleFactor = 1;
+                  isDrawerOpen = false;
+                  isHomeOpen = true;
+                });
+              }
+            }),
+            child: AnimatedOpacity(
+              duration: Duration(milliseconds: 200),
+              opacity: _opacity,
+              child: AbsorbPointer(
+                absorbing: !isHomeOpen,
+                child: Column(
+                  // mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      flex: 6,
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
