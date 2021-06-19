@@ -22,24 +22,24 @@ class AdvancedPage extends StatefulWidget {
 
 class _AdvancedPageState extends State<AdvancedPage>
     with SingleTickerProviderStateMixin {
-  double screenWidth;
+  double? screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
   double logoAnim = 0;
   bool isBackPressed = false;
-  AnimationController playGradientControl;
-  Animation<Color> colAnim1, colAnim2;
+  late AnimationController playGradientControl;
+  Animation<Color?>? colAnim1, colAnim2;
   TextEditingController dialogController = TextEditingController();
-  List<SetClass> groups = [];
+  List<SetClass>? groups = [];
   int totalTimeCount = 0;
 
   var scrollController;
   ValueNotifier<bool> rebuildVal = ValueNotifier<bool>(false);
 
   SharedPref prefs = SharedPref();
-  List<SavedAdvanced> savedListObjs;
-  List<String> savedList;
+  List<SavedAdvanced>? savedListObjs;
+  List<String>? savedList;
   double scrolloffset = 0;
 
   // Future<List<SavedAdvanced>> _getAdvData() async {
@@ -55,9 +55,9 @@ class _AdvancedPageState extends State<AdvancedPage>
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     scrollController = ScrollController();
-    groups.add(
+    groups!.add(
       SetClass(
-          grpName: 'Group ${groups.length + 1}',
+          grpName: 'Group ${groups!.length + 1}',
           timeList: [
             TimeClass(
               name: 'Work',
@@ -83,8 +83,8 @@ class _AdvancedPageState extends State<AdvancedPage>
       end: turqoiseGradient[1],
     ).animate(playGradientControl);
     setState(() {
-      groups.first.listenerMaker();
-      groups.first.timeList.forEach((element) {
+      groups!.first.listenerMaker();
+      groups!.first.timeList!.forEach((element) {
         element.initListenerMaker();
       });
 
@@ -109,7 +109,7 @@ class _AdvancedPageState extends State<AdvancedPage>
 
   void finaliseGroupsList() {
     totalTimeCount = 0;
-    groups.forEach((groupEle) {
+    groups!.forEach((groupEle) {
       groupEle.sets = int.parse(groupEle.textController.value.text);
       groupEle.grpName = groupEle.nameController.value.text;
       if (groupEle.textController.value.text == '') {
@@ -119,7 +119,7 @@ class _AdvancedPageState extends State<AdvancedPage>
         groupEle.grpName = 'Work';
       }
       int timelistTally = 0;
-      groupEle.timeList.forEach((timeEle) {
+      groupEle.timeList!.forEach((timeEle) {
         if (timeEle.controllers['name'] == '') {
           timeEle.controllers['name'].value.text = 'Work';
         }
@@ -134,9 +134,9 @@ class _AdvancedPageState extends State<AdvancedPage>
           minutes: int.parse(timeEle.controllers['min'].value.text),
           seconds: int.parse(timeEle.controllers['sec'].value.text),
         ).inSeconds;
-        timelistTally += timeEle.sec;
+        timelistTally += timeEle.sec!;
       });
-      totalTimeCount += timelistTally * groupEle.sets;
+      totalTimeCount += timelistTally * groupEle.sets!;
     });
   }
 
@@ -144,10 +144,10 @@ class _AdvancedPageState extends State<AdvancedPage>
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
     dialogController.dispose();
-    groups.forEach((element) {
+    groups!.forEach((element) {
       element.nameController.dispose();
       element.textController.dispose();
-      element.timeList.forEach((ele) {
+      element.timeList!.forEach((ele) {
         ele.controllers.forEach((key, value) {
           ele.controllers[key].dispose();
         });
@@ -182,7 +182,7 @@ class _AdvancedPageState extends State<AdvancedPage>
       return false;
   }
 
-  double adjusted(double val) => val * screenWidth * perPixel;
+  double adjusted(double val) => val * screenWidth! * perPixel;
 
   @override
   Widget build(BuildContext context) {
@@ -190,14 +190,14 @@ class _AdvancedPageState extends State<AdvancedPage>
 
     return ValueListenableBuilder(
       valueListenable: isDark,
-      builder: (context, val, child) {
-        return child;
+      builder: (context, dynamic val, child) {
+        return child!;
       },
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
-        builder: (context, val, child) {
+        builder: (context, dynamic val, child) {
           if (!isAdvancedOpen && indexOfMenu.value == 5 && !isBackPressed) {
-            if (editGroups.isNotEmpty) groups = editGroups;
+            if (editGroups!.isNotEmpty) groups = editGroups;
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
                 xOffset = 0;
@@ -208,7 +208,7 @@ class _AdvancedPageState extends State<AdvancedPage>
               });
             });
           } else if (indexOfMenu.value != 5) isBackPressed = false;
-          return child;
+          return child!;
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: drawerAnimDur),
@@ -343,8 +343,8 @@ class _AdvancedPageState extends State<AdvancedPage>
                         // },
                         child: AnimatedList(
                           controller: scrollController,
-                          initialItemCount: groups.length,
-                          key: ValueKey('0${groups.length}'),
+                          initialItemCount: groups!.length,
+                          key: ValueKey('0${groups!.length}'),
                           physics: BouncingScrollPhysics(),
                           itemBuilder:
                               (BuildContext context, int index, animation) {
@@ -368,13 +368,13 @@ class _AdvancedPageState extends State<AdvancedPage>
                                 ]),
                                 // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
                               ),
-                              direction: groups.length == 1
+                              direction: groups!.length == 1
                                   ? DismissDirection.none
                                   : DismissDirection.horizontal,
                               key: ValueKey('$index name'),
                               onDismissed: (direction) async {
                                 setState(() {
-                                  groups.removeAt(index);
+                                  groups!.removeAt(index);
                                 });
                               },
                               child: AnimatedContainer(
@@ -383,7 +383,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                     vertical: 15, horizontal: 20),
                                 padding: EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 15),
-                                height: groups[index].height,
+                                height: groups![index].height,
                                 width: screenWidth,
                                 decoration: BoxDecoration(
                                   color: backgroundColor,
@@ -417,7 +417,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                           child: TextField(
                                             keyboardType: TextInputType.name,
                                             controller:
-                                                groups[index].nameController,
+                                                groups![index].nameController,
                                             style: kTextStyle.copyWith(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 25,
@@ -448,15 +448,15 @@ class _AdvancedPageState extends State<AdvancedPage>
                                               size: 20,
                                             ),
                                             onPress: (() {
-                                              SetClass temp = groups[index];
-                                              temp.timeList.add(new TimeClass(
+                                              SetClass temp = groups![index];
+                                              temp.timeList!.add(new TimeClass(
                                                 name: 'Work',
                                                 isWork: true,
                                                 sec: 30,
                                               ));
                                               setState(() {
-                                                groups[index] = temp;
-                                                groups[index].height += 68;
+                                                groups![index] = temp;
+                                                groups![index].height += 68;
                                               });
 
                                               rebuildVal.value =
@@ -474,11 +474,11 @@ class _AdvancedPageState extends State<AdvancedPage>
                                     Expanded(
                                       child: AnimatedList(
                                           initialItemCount:
-                                              groups[index].timeList.length,
+                                              groups![index].timeList!.length,
                                           shrinkWrap: true,
                                           physics: BouncingScrollPhysics(),
                                           key: ValueKey(
-                                              '${groups[index].timeList.length}'),
+                                              '${groups![index].timeList!.length}'),
                                           itemBuilder: (BuildContext context,
                                               int j, animation) {
                                             return Dismissible(
@@ -497,23 +497,23 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                   DismissDirection.horizontal,
                                               key: ValueKey('1010'),
                                               onDismissed: (direction) {
-                                                groups[index]
-                                                    .timeList[j]
+                                                groups![index]
+                                                    .timeList![j]
                                                     .controllers
                                                     .forEach((key, value) {
-                                                  groups[index]
-                                                      .timeList[j]
+                                                  groups![index]
+                                                      .timeList![j]
                                                       .controllers[key]
                                                       .dispose();
                                                 });
-                                                groups[index]
-                                                    .timeList
+                                                groups![index]
+                                                    .timeList!
                                                     .removeAt(j);
                                                 Future.delayed(Duration(
                                                         microseconds: 1))
                                                     .then(
                                                         (value) => setState(() {
-                                                              groups[index]
+                                                              groups![index]
                                                                   .height -= 68;
                                                             }));
                                               },
@@ -522,7 +522,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                      lerpDouble(0, 100, 0.25),
+                                                      lerpDouble(0, 100, 0.25)!,
                                                     ),
                                                   ),
                                                   colors: [
@@ -531,7 +531,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                   ],
                                                   depression: 10,
                                                 ),
-                                                width: screenWidth - 40,
+                                                width: screenWidth! - 40,
                                                 margin: EdgeInsets.symmetric(
                                                     vertical: 5, horizontal: 0),
                                                 padding: EdgeInsets.symmetric(
@@ -553,9 +553,9 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                           (val) {
                                                         setState(() {
                                                           val
-                                                              ? groups[index]
+                                                              ? groups![index]
                                                                   .height += 68
-                                                              : groups[index]
+                                                              : groups![index]
                                                                   .height -= 68;
                                                         });
                                                       },
@@ -570,9 +570,9 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                               keyboardType:
                                                                   TextInputType
                                                                       .name,
-                                                              controller: groups[
+                                                              controller: groups![
                                                                           index]
-                                                                      .timeList[j]
+                                                                      .timeList![j]
                                                                       .controllers[
                                                                   'name'],
                                                               style: kTextStyle
@@ -582,7 +582,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                         .bold,
                                                                 fontSize: 20,
                                                                 color: isDark
-                                                                        .value
+                                                                        .value!
                                                                     ? Colors
                                                                         .white
                                                                     : Colors
@@ -603,11 +603,10 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                               keyboardType:
                                                                   TextInputType
                                                                       .number,
-                                                              controller: groups[
-                                                                          index]
-                                                                      .timeList[j]
-                                                                      .controllers[
-                                                                  'min'],
+                                                              controller: groups![
+                                                                      index]
+                                                                  .timeList![j]
+                                                                  .controllers['min'],
                                                               style: kTextStyle
                                                                   .copyWith(
                                                                 fontWeight:
@@ -615,7 +614,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                         .bold,
                                                                 fontSize: 20,
                                                                 color: isDark
-                                                                        .value
+                                                                        .value!
                                                                     ? Colors
                                                                         .white
                                                                     : Colors
@@ -647,11 +646,10 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                               keyboardType:
                                                                   TextInputType
                                                                       .number,
-                                                              controller: groups[
-                                                                          index]
-                                                                      .timeList[j]
-                                                                      .controllers[
-                                                                  'sec'],
+                                                              controller: groups![
+                                                                      index]
+                                                                  .timeList![j]
+                                                                  .controllers['sec'],
                                                               style: kTextStyle
                                                                   .copyWith(
                                                                 fontWeight:
@@ -659,7 +657,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                         .bold,
                                                                 fontSize: 20,
                                                                 color: isDark
-                                                                        .value
+                                                                        .value!
                                                                     ? Colors
                                                                         .white
                                                                     : Colors
@@ -704,8 +702,8 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                 onTap:
                                                                     (() async {
                                                                   setState(() {
-                                                                    groups[index]
-                                                                        .timeList[
+                                                                    groups![index]
+                                                                        .timeList![
                                                                             j]
                                                                         .isWork = true;
                                                                   });
@@ -720,10 +718,10 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                   height: 45,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: groups[index]
-                                                                            .timeList[
+                                                                    color: groups![index]
+                                                                            .timeList![
                                                                                 j]
-                                                                            .isWork
+                                                                            .isWork!
                                                                         ? textColor.withOpacity(
                                                                             0.5)
                                                                         : Colors
@@ -743,7 +741,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                       'Work',
                                                                       style:
                                                                           TextStyle(
-                                                                        color: groups[index].timeList[j].isWork
+                                                                            color: groups![index].timeList![j].isWork!
                                                                             ? backgroundColor
                                                                             : textColor,
                                                                         letterSpacing:
@@ -769,8 +767,8 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                 onTap:
                                                                     (() async {
                                                                   setState(() {
-                                                                    groups[index]
-                                                                        .timeList[
+                                                                    groups![index]
+                                                                        .timeList![
                                                                             j]
                                                                         .isWork = false;
                                                                   });
@@ -785,10 +783,10 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                   height: 45,
                                                                   decoration:
                                                                       BoxDecoration(
-                                                                    color: !groups[index]
-                                                                            .timeList[
+                                                                    color: !groups![index]
+                                                                            .timeList![
                                                                                 j]
-                                                                            .isWork
+                                                                            .isWork!
                                                                         ? textColor.withOpacity(
                                                                             0.5)
                                                                         : Colors
@@ -808,7 +806,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                                                       'Rest',
                                                                       style:
                                                                           TextStyle(
-                                                                        color: !groups[index].timeList[j].isWork
+                                                                            color: !groups![index].timeList![j].isWork!
                                                                             ? backgroundColor
                                                                             : textColor,
                                                                         letterSpacing:
@@ -862,7 +860,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                             color: textColor,
                                           ),
                                           onPress: (() {
-                                            groups[index].addRemove(false);
+                                            groups![index].addRemove(false);
                                           }),
                                         ),
                                         Container(
@@ -871,11 +869,11 @@ class _AdvancedPageState extends State<AdvancedPage>
                                             keyboardType: TextInputType.number,
                                             isStringName: false,
                                             control:
-                                                groups[index].textController,
+                                                groups![index].textController,
                                             func: (val) {
                                               setState(() {
-                                                groups[index].retain = val;
-                                                groups[index]
+                                                groups![index].retain = val;
+                                                groups![index]
                                                     .textController
                                                     .text = val;
                                               });
@@ -891,7 +889,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                                             color: textColor,
                                           ),
                                           onPress: (() {
-                                            groups[index].addRemove(true);
+                                            groups![index].addRemove(true);
                                           }),
                                         ),
                                       ],
@@ -927,24 +925,24 @@ class _AdvancedPageState extends State<AdvancedPage>
                                   totalTime: totalTimeCount,
                                 );
                                 print('Encoded ${jsonEncode(_data.toJson())}');
-                                savedList.add(jsonEncode(_data.toJson()));
-                                await prefs.save('Adv', savedList);
+                                savedList!.add(jsonEncode(_data.toJson()));
+                                await prefs.save('Adv', savedList!);
                               }),
                             ),
                             AnimatedBuilder(
                               animation: playGradientControl,
-                              builder: (BuildContext context, Widget child) {
+                              builder: (BuildContext context, Widget? child) {
                                 return NeuButton(
                                   ico: GradientIcon(
                                     icon: Icons.play_arrow_rounded,
                                     size: 55,
                                     gradient: RadialGradient(colors: <Color>[
-                                      colAnim1.value,
-                                      colAnim2.value,
+                                      colAnim1!.value!,
+                                      colAnim2!.value!,
                                     ], focal: Alignment.centerLeft),
                                   ),
-                                  length: screenWidth / 4.6,
-                                  breadth: screenWidth / 4.6,
+                                  length: screenWidth! / 4.6,
+                                  breadth: screenWidth! / 4.6,
                                   radii: 50,
                                   onPress: (() async {
                                     FocusScopeNode currentFocus =
@@ -995,9 +993,9 @@ class _AdvancedPageState extends State<AdvancedPage>
                               ),
                               onPress: (() {
                                 setState(() {
-                                  groups.add(
+                                  groups!.add(
                                     SetClass(
-                                        grpName: 'Group ${groups.length + 1}',
+                                        grpName: 'Group ${groups!.length + 1}',
                                         timeList: [
                                           TimeClass(
                                             name: 'Work',
@@ -1037,7 +1035,7 @@ class _AdvancedPageState extends State<AdvancedPage>
     );
   }
 
-  Future<String> createDialog(BuildContext context) {
+  Future<String?> createDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -1063,16 +1061,16 @@ class _AdvancedPageState extends State<AdvancedPage>
           ),
           content: AnimatedBuilder(
               animation: playGradientControl,
-              builder: (BuildContext context, Widget child) {
+              builder: (BuildContext context, Widget? child) {
                 return Container(
                   height: 150,
                   alignment: Alignment.center,
                   padding: EdgeInsets.all(15),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: <Color>[
-                        colAnim1.value,
-                        colAnim2.value,
+                      colors: [
+                        colAnim1!.value!,
+                        colAnim2!.value!,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
@@ -1095,7 +1093,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                     style: kTextStyle.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 40,
-                      color: isDark.value ? Colors.white : Colors.black,
+                      color: isDark.value! ? Colors.white : Colors.black,
                     ),
                     textAlign: TextAlign.center,
                     decoration: kInputDecor,
@@ -1115,7 +1113,7 @@ class _AdvancedPageState extends State<AdvancedPage>
                   'Save',
                   style: kTextStyle.copyWith(
                     fontSize: 25,
-                    color: isDark.value ? Colors.white : Colors.black,
+                    color: isDark.value! ? Colors.white : Colors.black,
                     fontFamily: 'MontserratBold',
                   ),
                 ),

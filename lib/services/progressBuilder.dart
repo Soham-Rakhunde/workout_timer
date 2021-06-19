@@ -8,18 +8,20 @@ import '../main.dart';
 import 'innerShadow.dart';
 
 class buildStack extends StatefulWidget {
-  ValueNotifier<int> i;
-  ValueNotifier<double> tickTime ;
-  ValueNotifier<int> timeInSec;
-  buildStack({this.tickTime,this.i,this.timeInSec});
+  ValueNotifier<int>? i;
+  ValueNotifier<double>? tickTime;
+
+  ValueNotifier<int?>? timeInSec;
+
+  buildStack({this.tickTime, this.i, this.timeInSec});
 
   @override
   _buildStackState createState() => _buildStackState();
 }
 
 class _buildStackState extends State<buildStack> {
-  double diameter;
-  double pieWidth;
+  double? diameter;
+  double? pieWidth;
 
   @override
   void initState() {
@@ -28,9 +30,9 @@ class _buildStackState extends State<buildStack> {
 
   @override
   void dispose() {
-    widget.i.dispose();
-    widget.tickTime.dispose();
-    widget.timeInSec.dispose();
+    widget.i!.dispose();
+    widget.tickTime!.dispose();
+    widget.timeInSec!.dispose();
     // TODO: implement dispose
     super.dispose();
   }
@@ -41,12 +43,12 @@ class _buildStackState extends State<buildStack> {
     pieWidth = MediaQuery.of(context).size.width / 6.67;
     Widget customWidgetReturn(double val) => Text('');
     return ValueListenableBuilder(
-        valueListenable: widget.tickTime,
-        builder: (context, value, child) {
+        valueListenable: widget.tickTime!,
+        builder: (context, dynamic value, child) {
           return TweenAnimationBuilder(
               tween: Tween<double>(begin: 1, end: 0),
               duration: Duration(seconds: 5),
-              builder: (BuildContext context, double value, Widget _) {
+              builder: (BuildContext context, double value, Widget? _) {
                 return Stack(
                   alignment: AlignmentDirectional.center,
                   children: [
@@ -56,7 +58,7 @@ class _buildStackState extends State<buildStack> {
                       decoration: BoxDecoration(
                         color: backgroundColor,
                         borderRadius: BorderRadius.circular(
-                          lerpDouble(0, diameter, 0.5),
+                          lerpDouble(0, diameter, 0.5)!,
                         ),
                         boxShadow: [
                           BoxShadow(
@@ -76,21 +78,26 @@ class _buildStackState extends State<buildStack> {
                       decoration: ConcaveDecoration(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(
-                            lerpDouble(0, diameter, 0.25),
+                            lerpDouble(0, diameter, 0.25)!,
                           ),
                         ),
                         colors: [shadowColor, lightShadowColor],
                         depression: 20 * (1 - value),
                       ),
                     ),
-                    widget.tickTime.value <= 0 ? Container() : SleekCircularSlider(
-                      innerWidget: (customWidgetReturn),
-                      min: 0,
-                      max: 25,
-                      initialValue: widget.tickTime.value<0 ?
-                      0 : (widget.tickTime.value>22 ? 25 : widget.tickTime.value),
-                      appearance: CircularSliderAppearance(
-                        size: lerpDouble(0, diameter, 0.865),
+                    widget.tickTime!.value <= 0
+                        ? Container()
+                        : SleekCircularSlider(
+                            innerWidget: (customWidgetReturn),
+                            min: 0,
+                            max: 25,
+                            initialValue: widget.tickTime!.value < 0
+                                ? 0
+                                : (widget.tickTime!.value > 22
+                                    ? 25
+                                    : widget.tickTime!.value),
+                            appearance: CircularSliderAppearance(
+                              size: lerpDouble(0, diameter, 0.865)!,
                               angleRange: 90,
                               startAngle: 0,
                               animationEnabled: true,
@@ -110,18 +117,19 @@ class _buildStackState extends State<buildStack> {
                         ),
                       ),
                     ),
-                    widget.tickTime.value <=25 ? Container() :
-                    SleekCircularSlider(
-                      innerWidget: (customWidgetReturn),
+                    widget.tickTime!.value <= 25
+                        ? Container()
+                        : SleekCircularSlider(
+                            innerWidget: (customWidgetReturn),
                             min: 26,
                             max: 50,
-                            initialValue: widget.tickTime.value < 26
+                            initialValue: widget.tickTime!.value < 26
                                 ? 26
-                                : (widget.tickTime.value > 47
+                                : (widget.tickTime!.value > 47
                                     ? 50
-                                    : widget.tickTime.value),
+                                    : widget.tickTime!.value),
                             appearance: CircularSliderAppearance(
-                              size: lerpDouble(0, diameter, 0.865),
+                              size: lerpDouble(0, diameter, 0.865)!,
                               angleRange: 90,
                               startAngle: 90,
                               customWidths: CustomSliderWidths(
@@ -143,20 +151,21 @@ class _buildStackState extends State<buildStack> {
                               animDurationMultiplier: 0.9,
                             ),
                     ),
-                    widget.tickTime.value <=50 ? Container() :
-                    SleekCircularSlider(
-                      innerWidget: (customWidgetReturn),
+                    widget.tickTime!.value <= 50
+                        ? Container()
+                        : SleekCircularSlider(
+                            innerWidget: (customWidgetReturn),
                             min: 51,
                             max: 75,
-                            initialValue: widget.tickTime.value < 51
+                            initialValue: widget.tickTime!.value < 51
                                 ? 51
-                                : (widget.tickTime.value > 72
+                                : (widget.tickTime!.value > 72
                                     ? 75
-                                    : widget.tickTime.value),
+                                    : widget.tickTime!.value),
                             appearance: CircularSliderAppearance(
                               animationEnabled: true,
                               animDurationMultiplier: 0.9,
-                              size: lerpDouble(0, diameter, 0.865),
+                              size: lerpDouble(0, diameter, 0.865)!,
                               angleRange: 90,
                               startAngle: 180,
                               customWidths: CustomSliderWidths(
@@ -174,20 +183,21 @@ class _buildStackState extends State<buildStack> {
                         ),
                       ),
                     ),
-                    widget.tickTime.value <=75 ? Container() :
-                    SleekCircularSlider(
-                      innerWidget: (customWidgetReturn),
+                    widget.tickTime!.value <= 75
+                        ? Container()
+                        : SleekCircularSlider(
+                            innerWidget: (customWidgetReturn),
                             min: 76,
                             max: 100,
-                            initialValue: widget.tickTime.value < 76
+                            initialValue: widget.tickTime!.value < 76
                                 ? 76
-                                : (widget.tickTime.value > 97
+                                : (widget.tickTime!.value > 97
                                     ? 100
-                                    : widget.tickTime.value),
+                                    : widget.tickTime!.value),
                             appearance: CircularSliderAppearance(
                               animationEnabled: true,
                               animDurationMultiplier: 0.9,
-                              size: lerpDouble(0, diameter, 0.865),
+                              size: lerpDouble(0, diameter, 0.865)!,
                               angleRange: 90,
                               startAngle: 270,
                               customWidths: CustomSliderWidths(
@@ -206,8 +216,8 @@ class _buildStackState extends State<buildStack> {
                       ),
                     ),
                     ValueListenableBuilder(
-                      valueListenable: widget.timeInSec,
-                      builder: (context, value, child) {
+                      valueListenable: widget.timeInSec!,
+                      builder: (context, dynamic value, child) {
                         return AnimatedSwitcher(
                           duration: Duration(milliseconds: 250),
                           reverseDuration: Duration(milliseconds: 0),
@@ -223,10 +233,11 @@ class _buildStackState extends State<buildStack> {
                             );
                           },
                           child: Text(
-                            '${widget.timeInSec.value}',
-                            key: ValueKey<String>('${widget.timeInSec.value}'),
+                            '${widget.timeInSec!.value}',
+                            key: ValueKey<String>('${widget.timeInSec!.value}'),
                             style: kTextStyle.copyWith(
-                              color: isDark.value ? Colors.white : Colors.black,
+                              color:
+                                  isDark.value! ? Colors.white : Colors.black,
                               fontWeight: FontWeight.bold,
                               fontSize: 50,
                             ),

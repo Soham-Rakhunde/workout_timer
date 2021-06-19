@@ -18,19 +18,19 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  double screenWidth;
+  late double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
   SharedPref savedData = SharedPref();
-  ValueNotifier<bool> isVoice = ValueNotifier<bool>(true);
+  ValueNotifier<bool?> isVoice = ValueNotifier<bool?>(true);
   ValueNotifier<String> selection = ValueNotifier<String>('Voice');
-  ValueNotifier<String> Voice = ValueNotifier<String>('');
-  AudioCache audioPlayer;
+  ValueNotifier<String?> Voice = ValueNotifier<String?>('');
+  late AudioCache audioPlayer;
   double positionOffset = 70;
   bool isBackPressed = false;
   List<FocusedMenuItem> deviceModeFocused = <FocusedMenuItem>[];
-  Future _refreshFunc;
+  Future? _refreshFunc;
   bool isRefresh = false;
 
   List<DisplayMode> modes = <DisplayMode>[];
@@ -94,10 +94,10 @@ class _SettingsPageState extends State<SettingsPage> {
 
   double adjusted(double val) => val * screenWidth * perPixel;
 
-  Future<bool> _getData() async {
+  Future<bool?> _getData() async {
     isVoice.value = await savedData.readBool('isVoice');
     Voice.value = await savedData.readString('Voice');
-    if (isVoice.value) {
+    if (isVoice.value!) {
       if (Voice.value == 'beep') {
         selection.value = 'beeps';
       } else {
@@ -177,12 +177,12 @@ class _SettingsPageState extends State<SettingsPage> {
     screenWidth = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
       valueListenable: isDark,
-      builder: (context, val, child) {
-        return child;
+      builder: (context, dynamic val, child) {
+        return child!;
       },
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
-        builder: (context, val, child) {
+        builder: (context, dynamic val, child) {
           if (!isSettingsOpen && indexOfMenu.value == 4 && !isBackPressed) {
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
@@ -196,7 +196,7 @@ class _SettingsPageState extends State<SettingsPage> {
             });
           } else if (indexOfMenu.value != 4)
             isBackPressed = false;
-          return child;
+          return child!;
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: drawerAnimDur),
@@ -227,7 +227,7 @@ class _SettingsPageState extends State<SettingsPage> {
             }
           }),
           decoration: BoxDecoration(
-            color: isDark.value ? Colors.black : backgroundColor,
+            color: isDark.value! ? Colors.black : backgroundColor,
             borderRadius: BorderRadius.circular(isDrawerOpen ? 28 : 0),
           ),
           child: GestureDetector(
@@ -273,8 +273,10 @@ class _SettingsPageState extends State<SettingsPage> {
                           curve: Curves.easeInOutBack,
                           left: 10 - positionOffset,
                           bottom: -70 - positionOffset,
-                          child: ColoredEllipse(250,
-                              [Colors.purpleAccent[200], Colors.purple[700]])),
+                          child: ColoredEllipse(250, [
+                            Colors.purpleAccent[200]!,
+                            Colors.purple[700]!
+                          ])),
                       AnimatedPositioned(
                         duration: Duration(milliseconds: 1000),
                         curve: Curves.easeInOutBack,
@@ -290,8 +292,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           curve: Curves.easeInOutBack,
                           left: screenWidth / 2 - 90 - positionOffset,
                           bottom: 200 - positionOffset,
-                          child: ColoredEllipse(
-                              150, [Colors.pinkAccent[100], Colors.pink[800]])),
+                          child: ColoredEllipse(150,
+                              [Colors.pinkAccent[100]!, Colors.pink[800]!])),
                       AnimatedPositioned(
                           duration: Duration(milliseconds: 1000),
                           curve: Curves.easeInOutBack,
@@ -326,7 +328,9 @@ class _SettingsPageState extends State<SettingsPage> {
                         left: -20 - positionOffset,
                         top: 350,
                         child: ColoredEllipse(
-                            140, [Colors.orangeAccent, Colors.deepOrange]),
+                            140,
+                            [Colors.orangeAccent, Colors.deepOrange]
+                                as List<Color>),
                       ),
                       Column(
                           // mainAxisAlignment:MainAxisAlignment.spaceBetween,
@@ -451,7 +455,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                                 bottom: 10),
                                             child: ValueListenableBuilder(
                                                 valueListenable: selection,
-                                                builder: (context, val, _) {
+                                                builder:
+                                                    (context, dynamic val, _) {
                                                   return FutureBuilder(
                                                       future: _getData(),
                                                       builder: (BuildContext
@@ -553,7 +558,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                                           value: e.toLowerCase(),
                                                                                           groupValue: Voice.value,
                                                                                           selected: Voice.value == e.toLowerCase(),
-                                                                                          onChanged: (val) async {
+                                                                                  onChanged: (dynamic val) async {
                                                                                             await audioPlayer.load('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
                                                                                             Voice.value = e.toLowerCase();
                                                                                             await audioPlayer.play('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
@@ -584,7 +589,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                     height: 70,
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                      color: isVoice.value &&
+                                                                          color: isVoice.value! &&
                                                                               Voice.value !=
                                                                                   'beep'
                                                                           ? textColor.withOpacity(
@@ -608,7 +613,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                         'Voice',
                                                                         style:
                                                                             TextStyle(
-                                                                          color: isVoice.value && Voice.value != 'beep'
+                                                                              color: isVoice.value! && Voice.value != 'beep'
                                                                               ? backgroundColor
                                                                               : textColor,
                                                                           letterSpacing:
@@ -669,7 +674,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                     height: 70,
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                      color: isVoice.value &&
+                                                                          color: isVoice.value! &&
                                                                               Voice.value ==
                                                                                   'beep'
                                                                           ? textColor.withOpacity(
@@ -693,7 +698,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                         'Beeps',
                                                                         style:
                                                                             TextStyle(
-                                                                          color: isVoice.value && Voice.value == 'beep'
+                                                                              color: isVoice.value! && Voice.value == 'beep'
                                                                               ? backgroundColor
                                                                               : textColor,
                                                                           letterSpacing:
@@ -743,7 +748,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                     height: 70,
                                                                     decoration:
                                                                         BoxDecoration(
-                                                                      color: isVoice.value
+                                                                          color: isVoice.value!
                                                                           ? Colors
                                                                               .transparent
                                                                           : textColor
@@ -765,7 +770,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                         'Off',
                                                                         style:
                                                                             TextStyle(
-                                                                          color: isVoice.value
+                                                                              color: isVoice.value!
                                                                               ? textColor
                                                                               : backgroundColor,
                                                                           letterSpacing:
@@ -874,23 +879,24 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         isDark.value = false;
                                                         backgroundColor =
                                                             backgroundC[
-                                                                isDark.value
+                                                            isDark.value!
                                                                     ? 1
                                                                     : 0];
                                                         shadowColor = shadowC[
-                                                            isDark.value
+                                                        isDark.value!
                                                                 ? 1
                                                                 : 0];
                                                         lightShadowColor =
                                                             lightShadowC[
-                                                                isDark.value
+                                                            isDark.value!
                                                                     ? 1
                                                                     : 0];
-                                                        textColor = isContrast
+                                                        textColor = isContrast!
                                                             ? Colors.black
-                                                            : textC[isDark.value
-                                                                ? 1
-                                                                : 0];
+                                                            : textC[
+                                                                isDark.value!
+                                                                    ? 1
+                                                                    : 0];
                                                       });
                                                     }),
                                                     child: AnimatedContainer(
@@ -907,7 +913,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                           15,
                                                       height: 70,
                                                       decoration: BoxDecoration(
-                                                        color: !isDark.value
+                                                        color: !isDark.value!
                                                             ? textColor
                                                                 .withOpacity(
                                                                     0.5)
@@ -926,7 +932,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         child: Text(
                                                           'Light',
                                                           style: TextStyle(
-                                                            color: !isDark.value
+                                                            color: !isDark
+                                                                    .value!
                                                                 ? backgroundColor
                                                                 : textColor,
                                                             letterSpacing: 2.0,
@@ -955,20 +962,20 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         isDark.value = true;
                                                         backgroundColor =
                                                             backgroundC[
-                                                                isDark.value
+                                                            isDark.value!
                                                                     ? 1
                                                                     : 0];
                                                         shadowColor = shadowC[
-                                                            isDark.value
+                                                        isDark.value!
                                                                 ? 1
                                                                 : 0];
                                                         lightShadowColor =
                                                             lightShadowC[
-                                                                isDark.value
+                                                            isDark.value!
                                                                     ? 1
                                                                     : 0];
                                                         textColor = textC[
-                                                            isDark.value
+                                                        isDark.value!
                                                                 ? 1
                                                                 : 0];
                                                       });
@@ -987,7 +994,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                           15,
                                                       height: 70,
                                                       decoration: BoxDecoration(
-                                                        color: isDark.value
+                                                        color: isDark.value!
                                                             ? textColor
                                                                 .withOpacity(
                                                                     0.5)
@@ -1006,7 +1013,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         child: Text(
                                                           'Dark',
                                                           style: TextStyle(
-                                                            color: isDark.value
+                                                            color: isDark.value!
                                                                 ? backgroundColor
                                                                 : textColor,
                                                             letterSpacing: 2.0,
@@ -1047,7 +1054,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   scale: anim,
                                   child: child,
                                 ),
-                                child: isDark.value
+                                child: isDark.value!
                                     ? Container()
                                     : ClipRRect(
                                         borderRadius: BorderRadius.all(
@@ -1157,7 +1164,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                               height: 70,
                                                               decoration:
                                                                   BoxDecoration(
-                                                                color: !isContrast
+                                                                    color: !isContrast!
                                                                     ? textColor
                                                                         .withOpacity(
                                                                             0.5)
@@ -1179,7 +1186,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                   'Off',
                                                                   style:
                                                                       TextStyle(
-                                                                    color: !isContrast
+                                                                        color: !isContrast!
                                                                         ? backgroundColor
                                                                         : textColor,
                                                                     letterSpacing:
@@ -1234,7 +1241,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                               height: 70,
                                                               decoration:
                                                                   BoxDecoration(
-                                                                color: isContrast
+                                                                    color: isContrast!
                                                                     ? textColor
                                                                         .withOpacity(
                                                                             0.5)
@@ -1256,7 +1263,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                   'On',
                                                                   style:
                                                                       TextStyle(
-                                                                    color: isContrast
+                                                                        color: isContrast!
                                                                         ? backgroundColor
                                                                         : textColor,
                                                                     letterSpacing:
@@ -1322,7 +1329,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                                       .width -
                                                   30 * 2,
                                               menuItemExtent: 55,
-                                              menuItems: snapshot.data,
+                                              menuItems: snapshot.data
+                                                  as List<FocusedMenuItem>,
                                               blurBackgroundColor:
                                                   backgroundColor,
                                               menuOffset: 20,

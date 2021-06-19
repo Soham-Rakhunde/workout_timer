@@ -13,8 +13,8 @@ class ColoredEllipse extends StatelessWidget {
       height: width,
       decoration: BoxDecoration(
         gradient: RadialGradient(
-            colors: colors,
-            center: Alignment.lerp(Alignment.topLeft, Alignment.center, 0.7),
+            colors: colors as List<Color>,
+            center: Alignment.lerp(Alignment.topLeft, Alignment.center, 0.7)!,
             stops: [0.15, 1]),
         borderRadius: BorderRadius.all(Radius.circular(width / 2)),
       ),

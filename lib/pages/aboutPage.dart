@@ -17,7 +17,7 @@ class AboutPage extends StatefulWidget {
 }
 
 class _AboutPageState extends State<AboutPage> {
-  double screenWidth;
+  late double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
@@ -86,12 +86,12 @@ class _AboutPageState extends State<AboutPage> {
         .width;
     return ValueListenableBuilder(
       valueListenable: isDark,
-      builder: (context, val, child) {
-        return child;
+      builder: (context, dynamic val, child) {
+        return child!;
       },
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
-        builder: (context, val, child) {
+        builder: (context, dynamic val, child) {
           if (!isAboutOpen && indexOfMenu.value == 3 && !isBackPressed) {
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
@@ -104,7 +104,7 @@ class _AboutPageState extends State<AboutPage> {
             });
           } else if (indexOfMenu.value != 3)
             isBackPressed = false;
-          return child;
+          return child!;
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: drawerAnimDur),
@@ -264,7 +264,7 @@ class _AboutPageState extends State<AboutPage> {
                         child: ClipOval(
                           child: Image.asset(
                             'assets/logoblender.png',
-                            color: isDark.value
+                            color: isDark.value!
                                 ? backgroundC[0].withAlpha(243)
                                 : Colors.transparent,
                             colorBlendMode: BlendMode.difference,
@@ -277,7 +277,7 @@ class _AboutPageState extends State<AboutPage> {
                       child: Text(
                         'Developed by',
                         style: kTextStyle.copyWith(
-                          color: isDark.value ? Colors.white : Colors.black,
+                          color: isDark.value! ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -286,7 +286,7 @@ class _AboutPageState extends State<AboutPage> {
                       child: Text(
                         'Soham Rakhunde',
                         style: kTextStyle.copyWith(
-                          color: isDark.value ? Colors.white : Colors.black,
+                          color: isDark.value! ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -295,7 +295,7 @@ class _AboutPageState extends State<AboutPage> {
                       child: Text(
                         'Version 3.0.0',
                         style: kTextStyle.copyWith(
-                          color: isDark.value ? Colors.white : Colors.black,
+                          color: isDark.value! ? Colors.white : Colors.black,
                         ),
                       ),
                     ),
@@ -474,7 +474,7 @@ class _AboutPageState extends State<AboutPage> {
   }
 
   _onShare(BuildContext context) async {
-    final RenderBox box = context.findRenderObject();
+    final RenderBox box = context.findRenderObject() as RenderBox;
     await Share.share(
         'Hey wanna try out High Intensity Interval Training (HIIT) for the Workout. Checkout Workout Timer : https://play.google.com/store/apps/details?id=com.rakhunde.workout_timer',
         sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);

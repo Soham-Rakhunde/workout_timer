@@ -15,7 +15,7 @@ class drawerPage extends StatefulWidget {
 }
 
 class _drawerPageState extends State<drawerPage> {
-  double screenWidth;
+  late double screenWidth;
 
   double adjusted(double val) => val * screenWidth * perPixel;
 
@@ -27,12 +27,12 @@ class _drawerPageState extends State<drawerPage> {
         padding: const EdgeInsets.fromLTRB(20, 25, 0, 5),
         child: ValueListenableBuilder(
           valueListenable: isDark,
-          builder: (context, val, child) {
-            return child;
+          builder: (context, dynamic val, child) {
+            return child!;
           },
           child: ValueListenableBuilder(
             valueListenable: indexOfMenu,
-            builder: (context, val, child) {
+            builder: (context, dynamic val, child) {
               return Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -390,7 +390,7 @@ class _drawerPageState extends State<drawerPage> {
     );
   }
 
-  Future<String> createDialog (BuildContext context){
+  Future<String?> createDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) {

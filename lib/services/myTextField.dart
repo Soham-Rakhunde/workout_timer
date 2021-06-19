@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import '../constants.dart';
 
 class myTextField extends StatelessWidget {
-  int temp;
-  String controllerName = ' ';
-  TextEditingController control;
-  Function func;
-  bool isStringName = true;
+  late int temp;
+  String? controllerName = ' ';
+  TextEditingController? control;
+  Function? func;
+  bool? isStringName = true;
   TextInputType keyboardType;
 
   myTextField(
@@ -16,12 +16,12 @@ class myTextField extends StatelessWidget {
       this.func,
       this.isStringName,
       this.control,
-      @required this.keyboardType});
+      required this.keyboardType});
 
   @override
   Widget build(BuildContext context) {
     return TextField(
-      controller: isStringName ? controller[controllerName] : control,
+      controller: isStringName! ? controller[controllerName] : control,
       style: kTextStyle.copyWith(
         fontWeight: FontWeight.bold,
         fontSize: 25,
@@ -38,7 +38,7 @@ class myTextField extends StatelessWidget {
         if (controllerName != 'sets' && (temp < 0 || temp > 60)) {
           val = retain[controllerName];
         }
-        func(val);
+        func!(val);
       }),
       keyboardType: keyboardType,
       decoration: kInputDecor,

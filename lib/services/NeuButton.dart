@@ -5,28 +5,37 @@ import 'package:flutter/services.dart';
 import 'package:workout_timer/constants.dart';
 
 class NeuButton extends StatefulWidget {
-  final ico ;
-  AnimatedIcon animatedIco;
-  bool flag= false;
-  bool animated =false;
-  double length,breadth, radii;
-  Function onPress;
-  NeuButton({this.ico,this.flag= false, this.radii=32, this.onPress, this.length=60,  this.breadth =60, this.animated = false,this.animatedIco});
+  final ico;
+
+  AnimatedIcon? animatedIco;
+  bool flag = false;
+  bool animated = false;
+  double length, breadth, radii;
+  Function? onPress;
+
+  NeuButton(
+      {this.ico,
+      this.flag = false,
+      this.radii = 32,
+      this.onPress,
+      this.length = 60,
+      this.breadth = 60,
+      this.animated = false,
+      this.animatedIco});
 
   @override
   _NeuButtonState createState() => _NeuButtonState();
 }
 
 class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMixin {
-  AnimationController playPauseController;
-  double offsetFactor=1;
-  double screenWidth;
+  late AnimationController playPauseController;
+  double offsetFactor = 1;
+  late double screenWidth;
 
   @override
   void initState() {
     super.initState();
-    if(widget.animated)
-    {
+    if (widget.animated) {
       playPauseController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: 500),
@@ -64,7 +73,7 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
             });
           });
         });
-        widget.onPress();
+        widget.onPress!();
       }),
       child: Stack(
         children: <Widget>[

@@ -13,9 +13,9 @@ import 'package:workout_timer/pages/timerpage.dart';
 import 'package:workout_timer/services/scaleFactor.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
-ValueNotifier<bool> isDark = ValueNotifier<bool>(false);
+ValueNotifier<bool?> isDark = ValueNotifier<bool?>(false);
 bool openedAfterDbUpdate = false;
-bool isContrast = false;
+bool? isContrast = false;
 bool isDrawerOpen = false;
 bool isHomeOpen = true;
 bool isAboutOpen = false;
@@ -24,8 +24,8 @@ bool isDonateOpen = false;
 bool isSettingsOpen = false;
 bool isAdvancedOpen = false;
 const perPixel = 0.0025641025641026;
-DisplayMode selected;
-List<SetClass> editGroups = [];
+DisplayMode? selected;
+List<SetClass>? editGroups = [];
 
 void main() {
   Future.delayed(Duration(milliseconds: 1)).then(
@@ -67,11 +67,11 @@ class mainPage extends StatefulWidget {
 class _mainPageState extends State<mainPage> {
   SharedPref savedData = SharedPref();
 
-  DisplayMode selected;
+  DisplayMode? selected;
 
   List<DisplayMode> modesList = <DisplayMode>[];
 
-  int refreshId = 1;
+  int? refreshId = 1;
 
   Future<bool> fetchModes() async {
     try {
@@ -103,15 +103,15 @@ class _mainPageState extends State<mainPage> {
     super.initState();
   }
 
-  Future<bool> _getData() async {
+  Future<bool?> _getData() async {
     isDark.value = await savedData.readBool('isDark');
-    String temp = await savedData.readString('ReleaseDateOfDatabase');
+    String? temp = await savedData.readString('ReleaseDateOfDatabase');
     openedAfterDbUpdate = temp != null;
     isContrast = await savedData.readBool('isContrast');
-    backgroundColor = backgroundC[isDark.value ? 1 : 0];
-    shadowColor = shadowC[isDark.value ? 1 : 0];
-    lightShadowColor = lightShadowC[isDark.value ? 1 : 0];
-    textColor = isContrast ? Colors.black : textC[isDark.value ? 1 : 0];
+    backgroundColor = backgroundC[isDark.value! ? 1 : 0];
+    shadowColor = shadowC[isDark.value! ? 1 : 0];
+    lightShadowColor = lightShadowC[isDark.value! ? 1 : 0];
+    textColor = isContrast! ? Colors.black : textC[isDark.value! ? 1 : 0];
     await fetchModes();
     if (modesList.length > 1) {
       refreshId = await savedData.readInt('deviceModeId');
@@ -127,7 +127,7 @@ class _mainPageState extends State<mainPage> {
     return isDark.value;
   }
 
-  double screenWidth;
+  late double screenWidth;
 
   double adjusted(double val) => val * screenWidth * perPixel;
 
@@ -215,7 +215,7 @@ class _mainPageState extends State<mainPage> {
                         },
                         child: ValueListenableBuilder(
                           valueListenable: isDark,
-                          builder: (context, val, child) {
+                          builder: (context, dynamic val, child) {
                             return Container(
                                 height: MediaQuery.of(context).size.height * .6,
                                 width: MediaQuery.of(context).size.width * .6,
@@ -226,7 +226,7 @@ class _mainPageState extends State<mainPage> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(17),
                                   child: Image.asset(
-                                    'assets/progressImg${isDark.value ? 1 : 0}.${isDark.value ? 'jpg' : 'png'}',
+                                    'assets/progressImg${isDark.value! ? 1 : 0}.${isDark.value! ? 'jpg' : 'png'}',
                                     alignment: Alignment.centerLeft,
                                   ),
                                 ));
@@ -239,7 +239,7 @@ class _mainPageState extends State<mainPage> {
                       top: 140 + SizeConfig.screenHeight * 0.05,
                       child: ValueListenableBuilder(
                         valueListenable: isDark,
-                        builder: (context, val, child) {
+                        builder: (context, dynamic val, child) {
                           return Container(
                             height: MediaQuery.of(context).size.height * .6,
                             width: SizeConfig.sw * 20,

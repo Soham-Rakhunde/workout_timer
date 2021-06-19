@@ -6,12 +6,12 @@ part 'timeValueHandler.g.dart';
 
 @JsonSerializable(explicitToJson: true)
 class SetClass {
-  List<TimeClass> timeList;
-  int sets;
+  List<TimeClass>? timeList;
+  int? sets;
 
   @JsonKey(ignore: true)
   double height = 300;
-  String grpName = 'Group';
+  String? grpName = 'Group';
 
   @JsonKey(ignore: true)
   TextEditingController nameController = TextEditingController(text: 'Group');
@@ -71,7 +71,7 @@ class SetClass {
       grpName = 'Group';
       nameController.text = 'Group';
     } else {
-      nameController.text = grpName;
+      nameController.text = grpName!;
     }
 
     textController.addListener(() {
@@ -95,9 +95,9 @@ class SetClass {
 
 @JsonSerializable(explicitToJson: true)
 class TimeClass {
-  int sec = 30;
-  bool isWork = true;
-  String name = 'Work';
+  int? sec = 30;
+  bool? isWork = true;
+  String? name = 'Work';
 
   @JsonKey(ignore: true)
   Map controllers = {
@@ -163,11 +163,11 @@ class TimeClass {
 
 @JsonSerializable(explicitToJson: true)
 class SavedAdvanced {
-  String name;
-  List<SetClass> groups;
-  int totalTime = 0;
+  String? name;
+  List<SetClass>? groups;
+  int? totalTime = 0;
 
-  SavedAdvanced({this.name, this.groups, @required this.totalTime});
+  SavedAdvanced({this.name, this.groups, required this.totalTime});
 
   factory SavedAdvanced.fromJson(Map<String, dynamic> json) =>
       _$SavedAdvancedFromJson(json);
@@ -203,23 +203,23 @@ class SavedAdvanced {
 }
 
 class SavedWorkout {
-  String name;
-  int pMin;
-  int pSec;
-  int bMin;
-  int bSec;
-  int setsCount;
+  String? name;
+  int? pMin;
+  int? pSec;
+  int? bMin;
+  int? bSec;
+  int? setsCount;
 
   SavedWorkout(
       {this.name, this.bMin, this.bSec, this.pMin, this.pSec, this.setsCount});
 
   Map toMap() => {
-    'name': name,
-    'pMin': pMin,
-    'pSec': pSec,
-    'bMin': bMin,
-    'bSec': bSec,
-    'setsCount': setsCount,
+        'name': name,
+        'pMin': pMin,
+        'pSec': pSec,
+        'bMin': bMin,
+        'bSec': bSec,
+        'setsCount': setsCount,
   };
 
   SavedWorkout.fromMap(Map map)
@@ -232,7 +232,7 @@ class SavedWorkout {
 }
 
 class SharedPref {
-  Future<List<String>> read(String str) async {
+  Future<List<String>?> read(String str) async {
     //List , Adv
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getStringList(str) == null) {
@@ -242,7 +242,7 @@ class SharedPref {
     }
   }
 
-  Future<int> readInt(String str) async {
+  Future<int?> readInt(String str) async {
     //deviceModeId,TotalWorkoutSessions,TotalDays
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (str == 'deviceModeId') {
@@ -254,7 +254,7 @@ class SharedPref {
     }
   }
 
-  Future<String> readString(String str) async {
+  Future<String?> readString(String str) async {
     //Voice,LastWorkout,TotalWorkoutHours,ReleaseDateOfDatabase
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (str == 'Voice') {
@@ -268,7 +268,7 @@ class SharedPref {
     }
   }
 
-  Future<bool> readBool(String str) async {
+  Future<bool?> readBool(String str) async {
     //isVoice
     SharedPreferences prefs = await SharedPreferences.getInstance();
     if (prefs.getBool(str) == null) {
@@ -289,7 +289,7 @@ class SharedPref {
 
   save(String str, List value) async {
     final prefs = await SharedPreferences.getInstance();
-    prefs.setStringList(str, value);
+    prefs.setStringList(str, value as List<String>);
     // prefs.setString(key, json.encode(value));
   }
 

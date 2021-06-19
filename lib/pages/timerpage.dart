@@ -15,17 +15,17 @@ import 'package:workout_timer/services/timeValueHandler.dart';
 class TimerPage extends StatefulWidget {
   TimerPage({this.args, this.isRest, this.breakTime, this.totalTime});
 
-  List<SetClass> args = [];
-  bool isRest;
-  TimeClass breakTime;
-  int totalTime;
+  List<SetClass>? args = [];
+  bool? isRest;
+  TimeClass? breakTime;
+  int? totalTime;
 
   @override
   _TimerPageState createState() => _TimerPageState();
 }
 
 class _TimerPageState extends State<TimerPage> {
-  AudioCache audioPlayer;
+  late AudioCache audioPlayer;
 
   ValueNotifier<String> _titleName = ValueNotifier<String>('Start');
 
@@ -39,23 +39,23 @@ class _TimerPageState extends State<TimerPage> {
 
   ValueNotifier<int> groupNum = ValueNotifier<int>(1);
 
-  int s, totalTime;
+  int? s, totalTime;
 
   ValueNotifier<bool> resumeFlag = ValueNotifier<bool>(true);
 
-  String voice;
-  String lastUsedDate, totalWorkoutHours;
-  int totalWorkouts, totalDays;
+  String? voice;
+  String? lastUsedDate, totalWorkoutHours;
+  int? totalWorkouts, totalDays;
 
-  bool isVoice;
+  bool? isVoice;
 
   SharedPref savedData = SharedPref();
 
-  int flexFactor;
+  late int flexFactor;
 
-  List<SetClass> setList = [];
-  bool isRest;
-  TimeClass breakT;
+  List<SetClass>? setList = [];
+  bool? isRest;
+  TimeClass? breakT;
 
   bool firstInstance = true;
 
@@ -76,14 +76,14 @@ class _TimerPageState extends State<TimerPage> {
     resumeFlag.dispose();
   }
 
-  Future<bool> _getData() async {
+  Future<bool?> _getData() async {
     isVoice = await savedData.readBool('isVoice');
     voice = await savedData.readString('Voice');
     lastUsedDate = await savedData.readString('LastWorkout');
     totalWorkouts = await savedData.readInt('TotalWorkoutSessions');
     totalDays = await savedData.readInt('TotalDays');
     totalWorkoutHours = await savedData.readString('TotalWorkoutHours');
-    if (isVoice) {
+    if (isVoice!) {
       audioPlayer = AudioCache(prefix: 'assets/audio/$voice/');
       audioPlayer.loadAll([
         'greet-$voice.mp3',
@@ -103,8 +103,8 @@ class _TimerPageState extends State<TimerPage> {
   void saveStats(int time) async {
     Jiffy now = Jiffy()..startOf(Units.DAY);
     if (totalWorkouts != null) {
-      totalWorkouts++;
-      savedData.saveInt('TotalWorkoutSessions', totalWorkouts);
+      totalWorkouts = totalWorkouts! + 1;
+      savedData.saveInt('TotalWorkoutSessions', totalWorkouts!);
     } else {
       savedData.saveInt('TotalWorkoutSessions', 1);
     }
@@ -113,7 +113,7 @@ class _TimerPageState extends State<TimerPage> {
       if (!now.isSame(lastTime)) {
         //see if not used today
         if (totalDays != null) {
-          savedData.saveInt('TotalDays', totalDays + 1);
+          savedData.saveInt('TotalDays', totalDays! + 1);
         } else {
           savedData.saveInt('TotalDays', 1);
         }
@@ -151,67 +151,67 @@ class _TimerPageState extends State<TimerPage> {
     });
   }
 
-  void startTimer(int time) async {
+  Future<void> startTimer(int? time) async {
     while (timeInSec.value >= 0) {
       while (!resumeFlag.value) {
         await Future.delayed(Duration(milliseconds: 400));
       }
-      if (i.value > s) {
+      if (i.value > s!) {
         break;
       }
-      tickTime.value = ((time - timeInSec.value) / time) * 100;
-      if (timeInSec.value != 0) progress.value += 100 / totalTime;
-      if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice) {
+      tickTime.value = ((time! - timeInSec.value) / time) * 100;
+      if (timeInSec.value != 0) progress.value += 100 / totalTime!;
+      if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice!) {
         audioPlayer.play('${timeInSec.value}-$voice.mp3');
       }
       await Future.delayed(Duration(seconds: 1));
       timeInSec.value--;
     }
-    tickTime.value = ((time - timeInSec.value) / time) * 100;
+    tickTime.value = ((time! - timeInSec.value) / time) * 100;
   }
 
   void timerFunc() async{
     tickTime.value = 100;
     timeInSec.value = 5;
-    if (isVoice) audioPlayer.play('5-$voice.mp3');
+    if (isVoice!) audioPlayer.play('5-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
     timeInSec.value = 4;
     tickTime.value = 0;
-    if (isVoice) audioPlayer.play('4-$voice.mp3');
+    if (isVoice!) audioPlayer.play('4-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 100;
     timeInSec.value = 3;
-    if (isVoice) audioPlayer.play('3-$voice.mp3');
+    if (isVoice!) audioPlayer.play('3-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 0;
     timeInSec.value = 2;
-    if (isVoice) audioPlayer.play('2-$voice.mp3');
+    if (isVoice!) audioPlayer.play('2-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 100;
     timeInSec.value = 1;
-    if (isVoice) audioPlayer.play('1-$voice.mp3');
+    if (isVoice!) audioPlayer.play('1-$voice.mp3');
     await Future.delayed(Duration(seconds: 1));
     if (timeInSec.value > 0) {
-        for (int index = 0; index < setList.length; index++) {
+      for (int index = 0; index < setList!.length; index++) {
         groupNum.value = index + 1;
-        s = setList[index].sets;
-        for (i.value = 1; i.value <= setList[index].sets; i.value++) {
-          for (int j = 0; j < setList[index].timeList.length; j++) {
-            if (isVoice)
+        s = setList![index].sets;
+        for (i.value = 1; i.value <= setList![index].sets!; i.value++) {
+          for (int j = 0; j < setList![index].timeList!.length; j++) {
+            if (isVoice!)
               audioPlayer.play(
-                  '${setList[index].timeList[j].isWork ? 'start' : 'rest'}-$voice.mp3');
+                  '${setList![index].timeList![j].isWork! ? 'start' : 'rest'}-$voice.mp3');
             _titleName.value =
-                '${setList[index].grpName}${isRest ? '' : '-'}${setList[index].timeList[j].name}';
-            timeInSec.value = setList[index].timeList[j].sec;
+                '${setList![index].grpName}${isRest! ? '' : '-'}${setList![index].timeList![j].name}';
+            timeInSec.value = setList![index].timeList![j].sec!;
             if (timeInSec.value > 0)
-              await startTimer(setList[index].timeList[j].sec);
-            if (i.value != s && isRest) {
-              _titleName.value = breakT.name;
-              timeInSec.value = breakT.sec;
-              if (i.value != s + 1 && isVoice) {
+              await startTimer(setList![index].timeList![j].sec);
+            if (i.value != s && isRest!) {
+              _titleName.value = breakT!.name!;
+              timeInSec.value = breakT!.sec!;
+              if (i.value != s! + 1 && isVoice!) {
                 audioPlayer.play('rest-$voice.mp3');
               }
-              if (timeInSec.value > 0) await startTimer(breakT.sec);
+              if (timeInSec.value > 0) await startTimer(breakT!.sec);
             }
           }
         }
@@ -219,7 +219,7 @@ class _TimerPageState extends State<TimerPage> {
       i.value--;
     }
     timeInSec.value = 0;
-    if (isVoice) {
+    if (isVoice!) {
       AudioCache finishPlayer = AudioCache(prefix: 'assets/audio/$voice/');
       finishPlayer.play('finish-$voice.mp3');
       audioPlayer.clearCache();
@@ -227,7 +227,7 @@ class _TimerPageState extends State<TimerPage> {
     }
     // i.value = s + 1;
     // timeInSec.value = 0;
-    double timeElapsed = progress.value * totalTime / 100;
+    double timeElapsed = progress.value * totalTime! / 100;
     saveStats(timeElapsed.round());
     Navigator.pop(context);
   }
@@ -237,15 +237,16 @@ class _TimerPageState extends State<TimerPage> {
     flexFactor = (MediaQuery.of(context).size.width - 50) ~/ 10;
     if (firstInstance) {
       setList = widget.args;
-      s = setList.first.sets;
+      s = setList!.first.sets;
       isRest = widget.isRest;
       breakT = widget.breakTime;
-      totalTime = isRest
-          ? (setList.first.timeList.first.sec * s + breakT.sec * (s - 1))
+      totalTime = isRest!
+          ? (setList!.first.timeList!.first.sec! * s! + breakT!.sec! * (s! - 1))
           : widget.totalTime;
     }
     return WillPopScope(
-      onWillPop: () async => createAlertDialog(context),
+      onWillPop: (() async => createAlertDialog(context) as FutureOr<bool>)
+          as Future<bool> Function()?,
       child: FutureBuilder(
           future: _getData(),
           builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -262,7 +263,7 @@ class _TimerPageState extends State<TimerPage> {
                 body: TweenAnimationBuilder(
                   tween: Tween<double>(begin: 1, end: 0),
                   duration: Duration(seconds: 1),
-                  builder: (BuildContext context, double value, Widget _) {
+                  builder: (BuildContext context, double value, Widget? _) {
                     return Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -271,7 +272,7 @@ class _TimerPageState extends State<TimerPage> {
                         ),
                         Expanded(
                           flex: 3 * flexFactor,
-                          child: ValueListenableBuilder<String>(
+                          child: ValueListenableBuilder<String?>(
                             valueListenable: _titleName,
                             builder: (context, value, child) {
                               return Text(
@@ -341,7 +342,7 @@ class _TimerPageState extends State<TimerPage> {
                                           'Set',
                                           style: kTextStyle.copyWith(
                                             letterSpacing: 0.5,
-                                            color: isDark.value
+                                            color: isDark.value!
                                                 ? Colors.white
                                                 : Colors.black,
                                           ),
@@ -351,13 +352,14 @@ class _TimerPageState extends State<TimerPage> {
                                         fit: BoxFit.fitWidth,
                                         child: ValueListenableBuilder(
                                           valueListenable: i,
-                                          builder: (context, value, child) {
+                                          builder:
+                                              (context, dynamic value, child) {
                                             return Text(
                                               '${i.value}/$s',
                                               style: kTextStyle.copyWith(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 40,
-                                                color: isDark.value
+                                                color: isDark.value!
                                                     ? Colors.white
                                                     : Colors.black,
                                               ),
@@ -399,7 +401,7 @@ class _TimerPageState extends State<TimerPage> {
                                           'Progress',
                                           style: kTextStyle.copyWith(
                                             letterSpacing: 0.5,
-                                            color: isDark.value
+                                            color: isDark.value!
                                                 ? Colors.white
                                                 : Colors.black,
                                           ),
@@ -409,7 +411,8 @@ class _TimerPageState extends State<TimerPage> {
                                         fit: BoxFit.fitWidth,
                                         child: ValueListenableBuilder(
                                           valueListenable: progress,
-                                          builder: (context, value, child) {
+                                          builder:
+                                              (context, dynamic value, child) {
                                             return Text(
                                               progress.value >= 99.5
                                                   ? '100'
@@ -417,7 +420,7 @@ class _TimerPageState extends State<TimerPage> {
                                               style: kTextStyle.copyWith(
                                                 fontWeight: FontWeight.bold,
                                                 fontSize: 40,
-                                                color: isDark.value
+                                                color: isDark.value!
                                                     ? Colors.white
                                                     : Colors.black,
                                               ),
@@ -444,7 +447,7 @@ class _TimerPageState extends State<TimerPage> {
                                 tag: 'leftButton',
                                 child: NeuButton(
                                   onPress: (() {
-                                    if (isVoice) {
+                                    if (isVoice!) {
                                       AudioCache finishPlayer = AudioCache(
                                           prefix: 'assets/audio/$voice/');
                                       finishPlayer.play('finish-$voice.mp3');
@@ -452,7 +455,7 @@ class _TimerPageState extends State<TimerPage> {
                                       isVoice = false;
                                     }
                                     double timeElapsed =
-                                        progress.value * totalTime / 100;
+                                        progress.value * totalTime! / 100;
                                     saveStats(timeElapsed.round());
                                     Wakelock.disable();
                                     Navigator.pop(context);
@@ -465,9 +468,9 @@ class _TimerPageState extends State<TimerPage> {
                                 ),
                               ),
                               Spacer(
-                                flex: isRest ? 4 : 1,
+                                flex: isRest! ? 4 : 1,
                               ),
-                              isRest
+                              isRest!
                                   ? Spacer(
                                       flex: 2,
                                     )
@@ -497,10 +500,10 @@ class _TimerPageState extends State<TimerPage> {
                                               return FittedBox(
                                                 fit: BoxFit.scaleDown,
                                                 child: Text(
-                                                  'Group $snapshot of ${setList.length}',
+                                                  'Group $snapshot of ${setList!.length}',
                                                   style: kTextStyle.copyWith(
                                                     letterSpacing: 0.1,
-                                                    color: isDark.value
+                                                    color: isDark.value!
                                                         ? Colors.white
                                                         : Colors.black,
                                                   ),
@@ -510,11 +513,11 @@ class _TimerPageState extends State<TimerPage> {
                                       ),
                                     ),
                               Spacer(
-                                flex: isRest ? 4 : 1,
+                                flex: isRest! ? 4 : 1,
                               ),
                               ValueListenableBuilder(
                                 valueListenable: resumeFlag,
-                                builder: (context, value, child) {
+                                builder: (context, dynamic value, child) {
                                   return Hero(
                                     tag: 'rightButton',
                                     child: Center(
@@ -549,7 +552,7 @@ class _TimerPageState extends State<TimerPage> {
     );
   }
 
-  Future<bool> createAlertDialog(BuildContext context) {
+  Future<bool?> createAlertDialog(BuildContext context) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -576,14 +579,14 @@ class _TimerPageState extends State<TimerPage> {
                 'No',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
-                  color: isDark.value ? Colors.white : Colors.black,
+                  color: isDark.value! ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),
             ),
             MaterialButton(
               onPressed: () {
-                double timeElapsed = progress.value * totalTime / 100;
+                double timeElapsed = progress.value * totalTime! / 100;
                 saveStats(timeElapsed.round());
                 Wakelock.disable();
                 Navigator.pop(context, true);
@@ -592,7 +595,7 @@ class _TimerPageState extends State<TimerPage> {
                 'Yes',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
-                  color: isDark.value ? Colors.white : Colors.black,
+                  color: isDark.value! ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),

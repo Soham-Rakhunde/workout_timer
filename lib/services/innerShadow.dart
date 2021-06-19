@@ -1,22 +1,22 @@
 import 'dart:ui' as ui;
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 
 class ConcaveDecoration extends Decoration {
   final ShapeBorder shape;
   final double depression;
-  final List<Color> colors;
+  final List<Color>? colors;
 
   ConcaveDecoration({
-    @required this.shape,
-    @required this.depression,
+    required this.shape,
+    required this.depression,
     this.colors,
   })  : assert(shape != null),
         assert(depression >= 0),
         assert(colors == null || colors.length == 2);
 
   @override
-  BoxPainter createBoxPainter([onChanged]) =>
+  BoxPainter createBoxPainter([ui.VoidCallback? onChanged]) =>
       _ConcaveDecorationPainter(shape, depression, colors);
 
   @override
@@ -26,7 +26,7 @@ class ConcaveDecoration extends Decoration {
 class _ConcaveDecorationPainter extends BoxPainter {
   ShapeBorder shape;
   double depression;
-  List<Color> colors;
+  List<Color>? colors;
 
   _ConcaveDecorationPainter(this.shape, this.depression, this.colors) {
     colors ??= [Colors.black87, Colors.white];
@@ -35,7 +35,7 @@ class _ConcaveDecorationPainter extends BoxPainter {
   @override
   void paint(
       ui.Canvas canvas, ui.Offset offset, ImageConfiguration configuration) {
-    final rect = offset & configuration.size;
+    final rect = offset & configuration.size!;
     final shapePath = shape.getOuterPath(rect);
 
     final delta = 16 / rect.longestSide;
@@ -55,10 +55,10 @@ class _ConcaveDecorationPainter extends BoxPainter {
         : Size(rect.width / 2, rect.height);
     for (final alignment in [Alignment.topLeft, Alignment.bottomRight]) {
       final shaderRect =
-      alignment.inscribe(Size.square(rect.longestSide), rect);
+          alignment.inscribe(Size.square(rect.longestSide), rect);
       paint
         ..shader = ui.Gradient.linear(
-            shaderRect.topLeft, shaderRect.bottomRight, colors, stops);
+            shaderRect.topLeft, shaderRect.bottomRight, colors!, stops);
 
       canvas.save();
       canvas.clipRect(alignment.inscribe(clipSize, rect));

@@ -1,5 +1,6 @@
-import 'dart:async';
+ import 'dart:async';
 import 'dart:io';
+
 import 'package:jiffy/jiffy.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
@@ -18,16 +19,16 @@ class DbHelper {
   static final cMonth = 'month';
   static final cYear = 'year';
 
-  static Database _database;
+  static Database? _database;
 
   DbHelper._privateConstructor();
 
   static final DbHelper instance = DbHelper._privateConstructor();
 
   Future<Database> get database async {
-    if (_database != null) return _database;
+    if (_database != null) return _database!;
     _database = await _initDatabase();
-    return _database;
+    return _database!;
   }
 
   _initDatabase() async {
@@ -51,8 +52,13 @@ class DbHelper {
       )''');
   }
 
+  Future close() async {
+    final db = await instance.database;
+    db.close();
+  }
+
   Future<int> insert(Map<String, dynamic> row) async {
-    Database db = await instance.database;
+    Database db = await (instance.database as FutureOr<Database>);
     List today;
     today = await db.query(_tableName,
         where: '$cDay = ? AND $cWeek = ? AND $cMonth = ? AND $cYear = ?',
@@ -68,7 +74,7 @@ class DbHelper {
   }
 
   Future<List<List>> queryWeek(int curWeek, int curYear) async {
-    Database db = await instance.database;
+    Database db = await (instance.database as FutureOr<Database>);
     List<List> result = [];
     List<Map<String, dynamic>> temp;
     Jiffy j, weekName;
@@ -106,7 +112,7 @@ class DbHelper {
   }
 
   Future<List<List>> queryMonth(int curMonth, int curYear) async {
-    Database db = await instance.database;
+    Database db = await (instance.database as FutureOr<Database>);
     List<List> result = [];
     List<Map<String, dynamic>> temp, total;
     Jiffy j;
@@ -163,7 +169,7 @@ class DbHelper {
   }
 
   Future<List<List>> queryYear(int curYear) async {
-    Database db = await instance.database;
+    Database db = await (instance.database as FutureOr<Database>);
     List<List> result = [];
     List<Map<String, dynamic>> temp, total;
     Jiffy j, monthName;
@@ -231,7 +237,7 @@ class DbHelper {
       "second": j.second,
       "millisecond": j.millisecond,
     });
-    return j.diff(zeroDate, Units.DAY);
+    return j.diff(zeroDate, Units.DAY) as int;
   }
 
   int getHour(Jiffy j) {
@@ -244,6 +250,6 @@ class DbHelper {
       "second": j.second,
       "millisecond": j.millisecond,
     });
-    return j.diff(zeroDate, Units.HOUR);
+    return j.diff(zeroDate, Units.HOUR) as int;
   }
 }

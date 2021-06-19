@@ -16,19 +16,19 @@ class savedPage extends StatefulWidget {
 
 class _savedPageState extends State<savedPage> {
   SharedPref _data = SharedPref();
-  List<SavedWorkout> savedListObjs;
-  List<SavedAdvanced> savedAdvListObjs;
+  List<SavedWorkout>? savedListObjs;
+  List<SavedAdvanced>? savedAdvListObjs;
   ValueNotifier<bool> isSimpleOpen = ValueNotifier<bool>(true);
-  List<String> savedList;
+  List<String>? savedList;
 
-  Future<List<SavedWorkout>> _getData() async {
+  Future<List<SavedWorkout>?> _getData() async {
     savedList = await _data.read('List');
-    savedListObjs = savedList
+    savedListObjs = savedList!
         .map((item) => SavedWorkout.fromMap(jsonDecode(item)))
         .toList();
     print('savedListObjs $savedList');
     savedList = await _data.read('Adv');
-    savedAdvListObjs = savedList
+    savedAdvListObjs = savedList!
         .map((item) => SavedAdvanced.fromJson(jsonDecode(item)))
         .toList();
     print('AdvListObjs $savedList');
@@ -112,16 +112,16 @@ class _savedPageState extends State<savedPage> {
           Expanded(
             child: ValueListenableBuilder(
                 valueListenable: isSimpleOpen,
-                builder: (context, isSimple, _) {
+                builder: (context, dynamic isSimple, _) {
                   return FutureBuilder(
                     future: _getData(),
                     builder: (BuildContext context,
-                        AsyncSnapshot<List<dynamic>> snapshot) {
+                        AsyncSnapshot<List<dynamic>?> snapshot) {
                       if (isSimple) {
                         if (snapshot.data == null) {
                           return Center(child: Text('Loading'));
                         } else {
-                          return snapshot.data.length == 0
+                          return snapshot.data!.length == 0
                               ? Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -155,7 +155,7 @@ class _savedPageState extends State<savedPage> {
                                   ),
                                 )
                               : ListView.builder(
-                                  itemCount: snapshot.data.length,
+                            itemCount: snapshot.data!.length,
                                   physics: BouncingScrollPhysics(),
                                   itemBuilder:
                                       (BuildContext context, int index) {
@@ -184,24 +184,24 @@ class _savedPageState extends State<savedPage> {
                                       direction: DismissDirection.horizontal,
                                       key: UniqueKey(),
                                       onDismissed: (direction) async {
-                                        savedListObjs.removeAt(index);
+                                        savedListObjs!.removeAt(index);
                                         savedList = [];
-                                        savedList = savedListObjs
+                                        savedList = savedListObjs!
                                             .map((item) =>
                                                 (jsonEncode(item.toMap())))
                                             .toList();
-                                        await _data.save('List', savedList);
+                                        await _data.save('List', savedList!);
                                       },
                                       child: GestureDetector(
                                         onTap: (() async {
                                           final periodTime = TimeClass(
-                                            name: snapshot.data[index].name,
+                                            name: snapshot.data![index].name,
                                             isWork: true,
                                             sec: Duration(
                                               minutes:
-                                                  snapshot.data[index].pMin,
+                                                  snapshot.data![index].pMin,
                                               seconds:
-                                                  snapshot.data[index].pSec,
+                                                  snapshot.data![index].pSec,
                                             ).inSeconds,
                                           );
                                           final breakTime = TimeClass(
@@ -209,9 +209,9 @@ class _savedPageState extends State<savedPage> {
                                             isWork: false,
                                             sec: Duration(
                                               minutes:
-                                                  snapshot.data[index].bMin,
+                                                  snapshot.data![index].bMin,
                                               seconds:
-                                                  snapshot.data[index].bSec,
+                                                  snapshot.data![index].bSec,
                                             ).inSeconds,
                                           );
                                           final set1 = SetClass(
@@ -220,7 +220,7 @@ class _savedPageState extends State<savedPage> {
                                               periodTime,
                                             ],
                                             sets:
-                                                snapshot.data[index].setsCount,
+                                                snapshot.data![index].setsCount,
                                           );
                                           final page = TimerPage(
                                             isRest: true,
@@ -274,10 +274,11 @@ class _savedPageState extends State<savedPage> {
                                                 child: FittedBox(
                                                   fit: BoxFit.fitWidth,
                                                   child: Text(
-                                                    snapshot.data[index].name ==
+                                                    snapshot.data![index]
+                                                                .name ==
                                                             ''
                                                         ? 'Name'
-                                                        : '${snapshot.data[index].name}',
+                                                        : '${snapshot.data![index].name}',
                                                     style: kTextStyle.copyWith(
                                                       color: backgroundColor,
                                                       fontWeight:
@@ -314,7 +315,7 @@ class _savedPageState extends State<savedPage> {
                                                       FittedBox(
                                                         fit: BoxFit.fitWidth,
                                                         child: Text(
-                                                          '${snapshot.data[index].pMin}:${snapshot.data[index].pSec}',
+                                                          '${snapshot.data![index].pMin}:${snapshot.data![index].pSec}',
                                                           style: kTextStyle
                                                               .copyWith(
                                                             color:
@@ -349,7 +350,7 @@ class _savedPageState extends State<savedPage> {
                                                       FittedBox(
                                                         fit: BoxFit.fitWidth,
                                                         child: Text(
-                                                          '${snapshot.data[index].bMin}:${snapshot.data[index].bSec}',
+                                                          '${snapshot.data![index].bMin}:${snapshot.data![index].bSec}',
                                                           style: kTextStyle
                                                               .copyWith(
                                                             color:
@@ -384,7 +385,7 @@ class _savedPageState extends State<savedPage> {
                                                       FittedBox(
                                                         fit: BoxFit.fitWidth,
                                                         child: Text(
-                                                          '${snapshot.data[index].setsCount}',
+                                                          '${snapshot.data![index].setsCount}',
                                                           style: kTextStyle
                                                               .copyWith(
                                                             color:
@@ -433,7 +434,7 @@ class _savedPageState extends State<savedPage> {
                         if (savedAdvListObjs == null) {
                           return Center(child: Text('Loading'));
                         } else {
-                          return savedAdvListObjs.length == 0
+                          return savedAdvListObjs!.length == 0
                               ? Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -467,15 +468,15 @@ class _savedPageState extends State<savedPage> {
                                   ),
                                 )
                               : ListView.builder(
-                                  itemCount: savedAdvListObjs.length,
+                            itemCount: savedAdvListObjs!.length,
                                   physics: BouncingScrollPhysics(),
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     int setsCount = 0;
-                                    savedAdvListObjs[index]
-                                        .groups
+                                    savedAdvListObjs![index]
+                                        .groups!
                                         .forEach((element) {
-                                      setsCount += element.sets;
+                                      setsCount += element.sets!;
                                     });
                                     return Dismissible(
                                       background: Container(
@@ -502,22 +503,22 @@ class _savedPageState extends State<savedPage> {
                                       direction: DismissDirection.horizontal,
                                       key: UniqueKey(),
                                       onDismissed: (direction) async {
-                                        savedAdvListObjs.removeAt(index);
+                                        savedAdvListObjs!.removeAt(index);
                                         savedList = [];
-                                        savedList = savedAdvListObjs
+                                        savedList = savedAdvListObjs!
                                             .map((item) =>
                                                 (jsonEncode(item.toJson())))
                                             .toList();
-                                        await _data.save('Adv', savedList);
+                                        await _data.save('Adv', savedList!);
                                       },
                                       child: GestureDetector(
                                             onTap: (() async {
                                           final page = TimerPage(
                                             isRest: false,
                                             args:
-                                                savedAdvListObjs[index].groups,
+                                                savedAdvListObjs![index].groups,
                                             breakTime: TimeClass(sec: 0),
-                                            totalTime: savedAdvListObjs[index]
+                                            totalTime: savedAdvListObjs![index]
                                                 .totalTime,
                                           );
                                           // await Future.delayed(Duration(microseconds: 1));
@@ -574,11 +575,11 @@ class _savedPageState extends State<savedPage> {
                                                     child: FittedBox(
                                                       fit: BoxFit.fitWidth,
                                                       child: Text(
-                                                        savedAdvListObjs[index]
+                                                        savedAdvListObjs![index]
                                                                     .name ==
                                                                 ''
                                                             ? 'Name'
-                                                            : '${savedAdvListObjs[index].name}',
+                                                            : '${savedAdvListObjs![index].name}',
                                                         style:
                                                             kTextStyle.copyWith(
                                                           color:
@@ -602,7 +603,7 @@ class _savedPageState extends State<savedPage> {
                                                       ),
                                                       onPressed: () {
                                                         editGroups =
-                                                            savedAdvListObjs[
+                                                            savedAdvListObjs![
                                                                     index]
                                                                 .groups;
                                                         indexOfMenu.value = 5;
@@ -644,9 +645,9 @@ class _savedPageState extends State<savedPage> {
                                                         FittedBox(
                                                           fit: BoxFit.fitWidth,
                                                           child: Text(
-                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inMinutes}:'
-                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60 < 10 ? '0' : ''}'
-                                                            '${Duration(seconds: savedAdvListObjs[index].totalTime).inSeconds % 60}',
+                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inMinutes}:'
+                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60 < 10 ? '0' : ''}'
+                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60}',
                                                             style: kTextStyle
                                                                 .copyWith(
                                                               color:
@@ -682,7 +683,7 @@ class _savedPageState extends State<savedPage> {
                                                         FittedBox(
                                                           fit: BoxFit.fitWidth,
                                                           child: Text(
-                                                            '${savedAdvListObjs[index].groups.length}',
+                                                            '${savedAdvListObjs![index].groups!.length}',
                                                             style: kTextStyle
                                                                 .copyWith(
                                                               color:

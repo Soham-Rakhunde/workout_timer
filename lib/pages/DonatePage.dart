@@ -21,25 +21,25 @@ class DonatePage extends StatefulWidget {
 
 class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
   static const _productIds = {'80_spoon'};
-  double screenWidth;
+  late double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
   bool isBackPressed = false;
   double xCard = 0, yCard = 0, zCard = 0;
-  AnimationController xcontroller;
-  Animation<double> xanimation;
+  late AnimationController xcontroller;
+  late Animation<double> xanimation;
   double positionOffset = 70;
 
   final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'soham.s.rakhunde.com',
       queryParameters: {'subject': 'Bug_Report'});
-  AnimationController ycontroller;
-  Animation<double> yanimation;
+  late AnimationController ycontroller;
+  late Animation<double> yanimation;
 
   InAppPurchaseConnection _connection = InAppPurchaseConnection.instance;
-  StreamSubscription<List<PurchaseDetails>> _subscription;
+  late StreamSubscription<List<PurchaseDetails>> _subscription;
   List<ProductDetails> _products = [];
 
   // static const String iapId = '80_spoon';
@@ -59,7 +59,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
       _subscription.cancel();
     }, onError: (error) {
       // handle error here.
-    });
+    }) as StreamSubscription<List<PurchaseDetails>>;
     initStoreInfo();
 
     // initPlatformState();
@@ -152,12 +152,12 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
     screenWidth = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
       valueListenable: isDark,
-      builder: (context, val, child) {
-        return child;
+      builder: (context, dynamic val, child) {
+        return child!;
       },
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
-        builder: (context, val, child) {
+        builder: (context, dynamic val, child) {
           if (!isDonateOpen && indexOfMenu.value == 2 && !isBackPressed) {
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
@@ -171,7 +171,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
             });
           } else if (indexOfMenu.value != 2)
             isBackPressed = false;
-          return child;
+          return child!;
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: drawerAnimDur),
@@ -202,7 +202,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
             }
           }),
           decoration: BoxDecoration(
-            color: isDark.value ? Colors.black : backgroundColor,
+            color: isDark.value! ? Colors.black : backgroundColor,
             borderRadius: BorderRadius.circular(isDrawerOpen ? 28 : 0),
           ),
           child: GestureDetector(
@@ -236,7 +236,7 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                 height: double.infinity,
                 width: double.infinity,
                 decoration: BoxDecoration(
-                  color: isDark.value ? Colors.black : backgroundColor,
+                  color: isDark.value! ? Colors.black : backgroundColor,
                   borderRadius: BorderRadius.circular(isDonateOpen ? 0 : 28),
                 ),
                 child: ClipRRect(
@@ -249,8 +249,10 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                           curve: Curves.easeInOutBack,
                           left: 10 - positionOffset,
                           bottom: -70 - positionOffset,
-                          child: ColoredEllipse(250,
-                              [Colors.purpleAccent[200], Colors.purple[700]])),
+                          child: ColoredEllipse(250, [
+                            Colors.purpleAccent[200]!,
+                            Colors.purple[700]!
+                          ])),
                       AnimatedPositioned(
                         duration: Duration(milliseconds: 1000),
                         curve: Curves.easeInOutBack,
@@ -266,8 +268,8 @@ class _DonatePageState extends State<DonatePage> with TickerProviderStateMixin {
                           curve: Curves.easeInOutBack,
                           left: screenWidth / 2 - 90 - positionOffset,
                           bottom: 200 - positionOffset,
-                          child: ColoredEllipse(
-                              150, [Colors.pinkAccent[100], Colors.pink[800]])),
+                          child: ColoredEllipse(150,
+                              [Colors.pinkAccent[100]!, Colors.pink[800]!])),
                       AnimatedPositioned(
                           duration: Duration(milliseconds: 1000),
                           curve: Curves.easeInOutBack,

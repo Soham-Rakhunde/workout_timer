@@ -17,18 +17,18 @@ class StatisticsPage extends StatefulWidget {
 
 class _StatisticsPageState extends State<StatisticsPage>
     with SingleTickerProviderStateMixin {
-  double screenWidth;
+  late double screenWidth;
   double xOffset = 0;
   double yOffset = 0;
   double scaleFactor = 1;
   bool isBackPressed = false;
   double positionOffset = 70;
 
-  int totalWorkouts, totalDays;
-  String releaseDate;
-  Jiffy releaseJiffy;
-  Jiffy totalHoursJiffy, lastWorkoutJiffy, curWeek, curMonth, curYear;
-  List<List> weekList, monthList, yearList;
+  int? totalWorkouts, totalDays;
+  String? releaseDate;
+  Jiffy? releaseJiffy;
+  Jiffy? totalHoursJiffy, lastWorkoutJiffy, curWeek, curMonth, curYear;
+  List<List>? weekList, monthList, yearList;
   ValueNotifier<bool> refreshBarGraph = ValueNotifier<bool>(true);
   bool shallGetData = true;
   bool isFirstTime = true;
@@ -66,7 +66,7 @@ class _StatisticsPageState extends State<StatisticsPage>
       releaseDate = await sp.readString('ReleaseDateOfDatabase');
       if (releaseDate != null) releaseJiffy = Jiffy(releaseDate);
 
-      String totalHours = await sp.readString('TotalWorkoutHours');
+      String? totalHours = await sp.readString('TotalWorkoutHours');
       if (totalHours != null) {
         totalHoursJiffy = Jiffy(totalHours);
       } else
@@ -79,7 +79,7 @@ class _StatisticsPageState extends State<StatisticsPage>
           "second": 0,
           "millisecond": 0,
         });
-      String lastWorkoutJiffyString = await sp.readString('LastWorkout');
+      String? lastWorkoutJiffyString = await sp.readString('LastWorkout');
       if (lastWorkoutJiffyString != null) {
         lastWorkoutJiffy = Jiffy(lastWorkoutJiffyString);
       } else {
@@ -89,39 +89,44 @@ class _StatisticsPageState extends State<StatisticsPage>
       curWeek = Jiffy()..startOf(Units.WEEK);
       curMonth = Jiffy()..startOf(Units.MONTH);
       curYear = Jiffy()..startOf(Units.YEAR);
+
       //db
-      weekList = await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
+      weekList =
+          await DbHelper.instance.queryWeek(curWeek!.week, curWeek!.year);
+
       monthList =
-          await DbHelper.instance.queryMonth(curMonth.month, curMonth.year);
-      yearList = await DbHelper.instance.queryYear(curYear.year);
+          await DbHelper.instance.queryMonth(curMonth!.month, curMonth!.year);
+
+      yearList = await DbHelper.instance.queryYear(curYear!.year);
+
       refreshBarGraph.value = !refreshBarGraph.value;
     }
     return true;
   }
 
   void prev() async {
-    Jiffy release;
+    Jiffy? release;
     if (toggleList[0]) {
-      release = releaseJiffy..startOf(Units.WEEK);
-      if (curWeek.isAfter(release)) {
-        curWeek.subtract(weeks: 1);
+      release = releaseJiffy!..startOf(Units.WEEK);
+      if (curWeek!.isAfter(release)) {
+        curWeek!.subtract(weeks: 1);
         weekList =
-            await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
+            await DbHelper.instance.queryWeek(curWeek!.week, curWeek!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else if (toggleList[1]) {
-      release = releaseJiffy..startOf(Units.MONTH);
-      if (curMonth.isAfter(release)) {
-        curMonth.subtract(months: 1);
+      release = releaseJiffy!..startOf(Units.MONTH);
+      if (curMonth!.isAfter(release)) {
+        curMonth!.subtract(months: 1);
         monthList =
-            await DbHelper.instance.queryMonth(curMonth.month, curMonth.year);
+            await DbHelper.instance.queryMonth(curMonth!.month, curMonth!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else {
-      release = releaseJiffy..startOf(Units.YEAR);
-      if (curYear.isAfter(release)) {
-        curYear.subtract(years: 1);
-        yearList = await DbHelper.instance.queryYear(curYear.year);
+      release = releaseJiffy!..startOf(Units.YEAR);
+      if (curYear!.isAfter(release)) {
+        curYear!.subtract(years: 1);
+        yearList = await DbHelper.instance.queryYear(curYear!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     }
@@ -131,25 +136,25 @@ class _StatisticsPageState extends State<StatisticsPage>
     Jiffy realNow;
     if (toggleList[0]) {
       realNow = Jiffy()..startOf(Units.WEEK);
-      if (curWeek.isBefore(realNow)) {
-        curWeek.add(weeks: 1);
+      if (curWeek!.isBefore(realNow)) {
+        curWeek!.add(weeks: 1);
         weekList =
-            await DbHelper.instance.queryWeek(curWeek.week, curWeek.year);
+            await DbHelper.instance.queryWeek(curWeek!.week, curWeek!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else if (toggleList[1]) {
       realNow = Jiffy()..startOf(Units.MONTH);
-      if (curMonth.isBefore(realNow)) {
-        curMonth.add(months: 1);
+      if (curMonth!.isBefore(realNow)) {
+        curMonth!.add(months: 1);
         monthList =
-            await DbHelper.instance.queryMonth(curMonth.month, curMonth.year);
+            await DbHelper.instance.queryMonth(curMonth!.month, curMonth!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     } else {
       realNow = Jiffy()..startOf(Units.YEAR);
-      if (curYear.isBefore(realNow)) {
-        curYear.add(years: 1);
-        yearList = await DbHelper.instance.queryYear(curYear.year);
+      if (curYear!.isBefore(realNow)) {
+        curYear!.add(years: 1);
+        yearList = await DbHelper.instance.queryYear(curYear!.year);
         refreshBarGraph.value = !refreshBarGraph.value;
       }
     }
@@ -160,12 +165,12 @@ class _StatisticsPageState extends State<StatisticsPage>
       "year": 1,
       "month": 1,
       "day": 1,
-      "hour": totalHoursJiffy.hour,
-      "minute": totalHoursJiffy.minute,
-      "second": totalHoursJiffy.second,
-      "millisecond": totalHoursJiffy.millisecond,
+      "hour": totalHoursJiffy!.hour,
+      "minute": totalHoursJiffy!.minute,
+      "second": totalHoursJiffy!.second,
+      "millisecond": totalHoursJiffy!.millisecond,
     });
-    return totalHoursJiffy.diff(zeroDate, Units.DAY);
+    return totalHoursJiffy!.diff(zeroDate, Units.DAY) as int;
   }
 
   @override
@@ -225,12 +230,12 @@ class _StatisticsPageState extends State<StatisticsPage>
     screenWidth = MediaQuery.of(context).size.width;
     return ValueListenableBuilder(
       valueListenable: isDark,
-      builder: (context, val, child) {
-        return child;
+      builder: (context, dynamic val, child) {
+        return child!;
       },
       child: ValueListenableBuilder(
         valueListenable: indexOfMenu,
-        builder: (context, val, child) {
+        builder: (context, dynamic val, child) {
           if (!isStatsOpen && indexOfMenu.value == 1 && !isBackPressed) {
             Future.delayed(Duration(microseconds: 1)).then((value) {
               setState(() {
@@ -246,7 +251,7 @@ class _StatisticsPageState extends State<StatisticsPage>
             });
           } else if (indexOfMenu.value != 1)
             isBackPressed = false;
-          return child;
+          return child!;
         },
         child: AnimatedContainer(
           duration: Duration(milliseconds: drawerAnimDur),
@@ -467,7 +472,7 @@ class _StatisticsPageState extends State<StatisticsPage>
                                                       child: Text(
                                                         lastWorkoutJiffy == null
                                                             ? ''
-                                                            : '${lastWorkoutJiffy.date} ${lastWorkoutJiffy.format('MMMM')} ${lastWorkoutJiffy.year}',
+                                                            : '${lastWorkoutJiffy!.date} ${lastWorkoutJiffy!.format('MMMM')} ${lastWorkoutJiffy!.year}',
                                                         style: TextStyle(
                                                           color: textC[1],
                                                           letterSpacing: 2.0,
@@ -556,16 +561,16 @@ class _StatisticsPageState extends State<StatisticsPage>
                                   if (releaseDate != null)
                                     GestureDetector(
                                       onHorizontalDragEnd: (details) {
-                                        if (details.primaryVelocity > 0) {
+                                        if (details.primaryVelocity! > 0) {
                                           prev();
-                                        } else if (details.primaryVelocity <
+                                        } else if (details.primaryVelocity! <
                                             0) {
                                           nex();
                                         }
                                       },
                                       child: ValueListenableBuilder(
                                         valueListenable: refreshBarGraph,
-                                        builder: (context, val, child) {
+                                        builder: (context, dynamic val, child) {
                                           return Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 20, vertical: 20),
@@ -596,38 +601,40 @@ class _StatisticsPageState extends State<StatisticsPage>
                                                     ),
                                                     child: toggleList[0]
                                                         ? BarChartSample1(
-                                                            barCount: 7,
+                                                      barCount: 7,
                                                             title:
-                                                                'Week ${curWeek.week}',
+                                                                'Week ${curWeek!.week}',
                                                             subtitle:
-                                                                'Total Time ${weekList.last.first}',
-                                                            barList: weekList
+                                                                'Total Time ${weekList!.last.first}',
+                                                            barList: weekList!
                                                                 .sublist(0, 7),
                                                           )
                                                         : toggleList[1]
                                                             ? BarChartSample1(
-                                                                barCount: monthList
+                                                      barCount: monthList!
                                                                         .length -
                                                                     1,
                                                                 title:
-                                                                    '${curMonth.format('MMMM')}',
+                                                                    '${curMonth!.format('MMMM')}',
                                                                 subtitle:
-                                                                    'Total Time ${monthList.last.first}',
-                                                                barList: monthList
+                                                                    'Total Time ${monthList!.last.first}',
+                                                                barList: monthList!
                                                                     .sublist(
                                                                         0,
-                                                                        monthList.length -
+                                                                        monthList!.length -
                                                                             1),
                                                               )
                                                             : BarChartSample1(
-                                                                barCount: 12,
+                                                      barCount: 12,
                                                                 title:
-                                                                    'Year ${curYear.year}',
+                                                                    'Year ${curYear!.year}',
                                                                 subtitle:
-                                                                    'Total Time ${yearList.last.first}',
-                                                                barList: yearList
-                                                                    .sublist(
-                                                                        0, 12),
+                                                                    'Total Time ${yearList!.last.first}',
+                                                                barList:
+                                                                    yearList!
+                                                                        .sublist(
+                                                                            0,
+                                                                            12),
                                                               ),
                                                   ),
                                                 ),
@@ -696,7 +703,7 @@ class _StatisticsPageState extends State<StatisticsPage>
                                                             const EdgeInsets
                                                                 .all(15.0),
                                                         child: Text(
-                                                          '${getDay()} Days\n${totalHoursJiffy.hour} Hours\n${totalHoursJiffy.minute} Minute',
+                                                          '${getDay()} Days\n${totalHoursJiffy!.hour} Hours\n${totalHoursJiffy!.minute} Minute',
                                                           style: TextStyle(
                                                             color: textC[1],
                                                             letterSpacing: 2.0,
