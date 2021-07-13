@@ -28,14 +28,14 @@ packages:
       name: async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.5.0"
-  audioplayers:
-    dependency: "direct main"
+    version: "2.6.1"
+  audio_session:
+    dependency: transitive
     description:
-      name: audioplayers
+      name: audio_session
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.18.3"
+    version: "0.1.5"
   back_button_interceptor:
     dependency: "direct main"
     description:
@@ -331,6 +331,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.1"
+  just_audio:
+    dependency: "direct main"
+    description:
+      name: just_audio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.8.0"
+  just_audio_platform_interface:
+    dependency: transitive
+    description:
+      name: just_audio_platform_interface
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.1.0"
+  just_audio_web:
+    dependency: transitive
+    description:
+      name: just_audio_web
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.3.2"
   logging:
     dependency: transitive
     description:
@@ -457,6 +478,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.0"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.27.1"
   share:
     dependency: "direct main"
     description:

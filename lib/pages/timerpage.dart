@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:ui';
 
-import 'package:audioplayers/audio_cache.dart';
+// import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
 import 'package:jiffy/jiffy.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
@@ -11,6 +12,10 @@ import 'package:workout_timer/services/DatabaseService.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/progressBuilder.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
+
+// void audioIsolate(AudioPlayer audioPlayer, String path){
+//
+// }
 
 class TimerPage extends StatefulWidget {
   TimerPage({this.args, this.isRest, this.breakTime, this.totalTime});
@@ -25,7 +30,8 @@ class TimerPage extends StatefulWidget {
 }
 
 class _TimerPageState extends State<TimerPage> {
-  late AudioCache audioPlayer;
+  // late AudioCache audioPlayer;
+  late AudioPlayer audioPlayer;
 
   ValueNotifier<String> _titleName = ValueNotifier<String>('Start');
 
@@ -63,6 +69,7 @@ class _TimerPageState extends State<TimerPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    audioPlayer = AudioPlayer();
     firstInstance = true;
     _getData();
     Wakelock.enable();
@@ -71,6 +78,7 @@ class _TimerPageState extends State<TimerPage> {
   @override
   void dispose() {
     super.dispose();
+    audioPlayer.dispose();
     tickTime.dispose();
     progress.dispose();
     resumeFlag.dispose();
@@ -83,20 +91,20 @@ class _TimerPageState extends State<TimerPage> {
     totalWorkouts = await savedData.readInt('TotalWorkoutSessions');
     totalDays = await savedData.readInt('TotalDays');
     totalWorkoutHours = await savedData.readString('TotalWorkoutHours');
-    if (isVoice!) {
-      audioPlayer = AudioCache(prefix: 'assets/audio/$voice/');
-      audioPlayer.loadAll([
-        'greet-$voice.mp3',
-        'start-$voice.mp3',
-        'rest-$voice.mp3',
-        'finish-$voice.mp3',
-        '1-$voice.mp3',
-        '2-$voice.mp3',
-        '3-$voice.mp3',
-        '4-$voice.mp3',
-        '5-$voice.mp3',
-      ]);
-    }
+    // if (isVoice!) {
+    //   audioPlayer = AudioCache(prefix: 'assets/audio/$voice/');
+    //   audioPlayer.loadAll([
+    //     'greet-$voice.mp3',
+    //     'start-$voice.mp3',
+    //     'rest-$voice.mp3',
+    //     'finish-$voice.mp3',
+    //     '1-$voice.mp3',
+    //     '2-$voice.mp3',
+    //     '3-$voice.mp3',
+    //     '4-$voice.mp3',
+    //     '5-$voice.mp3',
+    //   ]);
+    // }
     return isVoice;
   }
 
@@ -162,7 +170,10 @@ class _TimerPageState extends State<TimerPage> {
       tickTime.value = ((time! - timeInSec.value) / time) * 100;
       if (timeInSec.value != 0) progress.value += 100 / totalTime!;
       if (timeInSec.value <= 5 && timeInSec.value > 0 && isVoice!) {
-        audioPlayer.play('${timeInSec.value}-$voice.mp3');
+        await audioPlayer
+            .setAsset('assets/audio/$voice/${timeInSec.value}-$voice.mp3');
+        audioPlayer.play();
+        // audioPlayer.play('${timeInSec.value}-$voice.mp3');
       }
       await Future.delayed(Duration(seconds: 1));
       timeInSec.value--;
@@ -173,23 +184,39 @@ class _TimerPageState extends State<TimerPage> {
   void timerFunc() async{
     tickTime.value = 100;
     timeInSec.value = 5;
-    if (isVoice!) audioPlayer.play('5-$voice.mp3');
+    if (isVoice!) {
+      await audioPlayer.setAsset('assets/audio/$voice/5-$voice.mp3');
+      audioPlayer.play();
+      // audioPlayer.play('5-$voice.mp3');
+    }
     await Future.delayed(Duration(seconds: 1));
     timeInSec.value = 4;
     tickTime.value = 0;
-    if (isVoice!) audioPlayer.play('4-$voice.mp3');
+    if (isVoice!) {
+      await audioPlayer.setAsset('assets/audio/$voice/4-$voice.mp3');
+      audioPlayer.play();
+    }
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 100;
     timeInSec.value = 3;
-    if (isVoice!) audioPlayer.play('3-$voice.mp3');
+    if (isVoice!) {
+      await audioPlayer.setAsset('assets/audio/$voice/3-$voice.mp3');
+      audioPlayer.play();
+    }
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 0;
     timeInSec.value = 2;
-    if (isVoice!) audioPlayer.play('2-$voice.mp3');
+    if (isVoice!) {
+      await audioPlayer.setAsset('assets/audio/$voice/2-$voice.mp3');
+      audioPlayer.play();
+    }
     await Future.delayed(Duration(seconds: 1));
     tickTime.value = 100;
     timeInSec.value = 1;
-    if (isVoice!) audioPlayer.play('1-$voice.mp3');
+    if (isVoice!) {
+      await audioPlayer.setAsset('assets/audio/$voice/1-$voice.mp3');
+      audioPlayer.play();
+    }
     await Future.delayed(Duration(seconds: 1));
     if (timeInSec.value > 0) {
       for (int index = 0; index < setList!.length; index++) {
@@ -197,9 +224,14 @@ class _TimerPageState extends State<TimerPage> {
         s = setList![index].sets;
         for (i.value = 1; i.value <= setList![index].sets!; i.value++) {
           for (int j = 0; j < setList![index].timeList!.length; j++) {
-            if (isVoice!)
-              audioPlayer.play(
-                  '${setList![index].timeList![j].isWork! ? 'start' : 'rest'}-$voice.mp3');
+            if (isVoice!) {
+              await audioPlayer.setAsset(
+                  'assets/audio/$voice/${setList![index].timeList![j].isWork! ? 'start' : 'rest'}-$voice.mp3');
+              audioPlayer.play();
+            }
+            // if (isVoice!){
+            //   audioPlayer.play(
+            //       '${setList![index].timeList![j].isWork! ? 'start' : 'rest'}-$voice.mp3');
             _titleName.value =
                 '${setList![index].grpName}${isRest! ? '' : '-'}${setList![index].timeList![j].name}';
             timeInSec.value = setList![index].timeList![j].sec!;
@@ -209,7 +241,10 @@ class _TimerPageState extends State<TimerPage> {
               _titleName.value = breakT!.name!;
               timeInSec.value = breakT!.sec!;
               if (i.value != s! + 1 && isVoice!) {
-                audioPlayer.play('rest-$voice.mp3');
+                await audioPlayer
+                    .setAsset('assets/audio/$voice/rest-$voice.mp3');
+                audioPlayer.play();
+                // audioPlayer.play('rest-$voice.mp3');
               }
               if (timeInSec.value > 0) await startTimer(breakT!.sec);
             }
@@ -220,9 +255,11 @@ class _TimerPageState extends State<TimerPage> {
     }
     timeInSec.value = 0;
     if (isVoice!) {
-      AudioCache finishPlayer = AudioCache(prefix: 'assets/audio/$voice/');
-      finishPlayer.play('finish-$voice.mp3');
-      audioPlayer.clearCache();
+      await audioPlayer.setAsset('assets/audio/$voice/finish-$voice.mp3');
+      audioPlayer.play();
+      // AudioCache finishPlayer = AudioCache(prefix: 'assets/audio/$voice/');
+      // finishPlayer.play('finish-$voice.mp3');
+      // audioPlayer.clearCache();
       isVoice = false;
     }
     // i.value = s + 1;
@@ -446,12 +483,15 @@ class _TimerPageState extends State<TimerPage> {
                               Hero(
                                 tag: 'leftButton',
                                 child: NeuButton(
-                                  onPress: (() {
+                                  onPress: (() async {
                                     if (isVoice!) {
-                                      AudioCache finishPlayer = AudioCache(
-                                          prefix: 'assets/audio/$voice/');
-                                      finishPlayer.play('finish-$voice.mp3');
-                                      audioPlayer.clearCache();
+                                      await audioPlayer.setAsset(
+                                          'assets/audio/$voice/finish-$voice.mp3');
+                                      audioPlayer.play();
+                                      // AudioCache finishPlayer = AudioCache(
+                                      //     prefix: 'assets/audio/$voice/');
+                                      // finishPlayer.play('finish-$voice.mp3');
+                                      // audioPlayer.clearCache();
                                       isVoice = false;
                                     }
                                     double timeElapsed =

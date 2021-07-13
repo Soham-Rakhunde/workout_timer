@@ -1,12 +1,13 @@
 import 'dart:ui';
 
-import 'package:audioplayers/audio_cache.dart';
+// import 'package:audioplayers/audio_cache.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_displaymode/flutter_displaymode.dart';
 import 'package:focused_menu/focused_menu.dart';
 import 'package:focused_menu/modals.dart';
+import 'package:just_audio/just_audio.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/services/colorEllipse.dart';
@@ -26,7 +27,9 @@ class _SettingsPageState extends State<SettingsPage> {
   ValueNotifier<bool?> isVoice = ValueNotifier<bool?>(true);
   ValueNotifier<String> selection = ValueNotifier<String>('Voice');
   ValueNotifier<String?> Voice = ValueNotifier<String?>('');
-  late AudioCache audioPlayer;
+
+  // late AudioCache audioPlayer;
+  late AudioPlayer audioPlayer;
   double positionOffset = 70;
   bool isBackPressed = false;
   List<FocusedMenuItem> deviceModeFocused = <FocusedMenuItem>[];
@@ -44,7 +47,8 @@ class _SettingsPageState extends State<SettingsPage> {
     // TODO: implement initState
     super.initState();
     _refreshFunc = _getRefresh();
-    audioPlayer = AudioCache(prefix: 'assets/audio/');
+    // audioPlayer = AudioCache(prefix: 'assets/audio/');
+    audioPlayer = AudioPlayer();
     BackButtonInterceptor.add(myInterceptor);
     setState(() {
       xOffset = 250;
@@ -59,6 +63,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void dispose() {
     BackButtonInterceptor.remove(myInterceptor);
+    audioPlayer.dispose();
     isVoice.dispose();
     Voice.dispose();
     selection.dispose();
@@ -559,11 +564,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                                           groupValue: Voice.value,
                                                                                           selected: Voice.value == e.toLowerCase(),
                                                                                   onChanged: (dynamic val) async {
-                                                                                            await audioPlayer.load('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
+                                                                                            await audioPlayer.setAsset('assets/audio/${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
+                                                                                            audioPlayer.play();
+                                                                                            // await audioPlayer.load('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
+                                                                                            // await audioPlayer.play('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
+                                                                                            // audioPlayer.clearCache();
                                                                                             Voice.value = e.toLowerCase();
-                                                                                            await audioPlayer.play('${e.toLowerCase()}/greet-${e.toLowerCase()}.mp3');
                                                                                             await savedData.saveString('Voice', e.toLowerCase());
-                                                                                            audioPlayer.clearCache();
                                                                                             Navigator.of(context).pop();
                                                                                           },
                                                                                         ))
@@ -639,9 +646,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                     GestureDetector(
                                                                   onTap:
                                                                       (() async {
-                                                                    await audioPlayer
-                                                                        .load(
-                                                                            'beep/1-beep.mp3');
+                                                                        await audioPlayer
+                                                                        .setAsset(
+                                                                            'assets/audio/beep/1-beep.mp3');
+                                                                    audioPlayer
+                                                                        .play();
+                                                                    // await audioPlayer.load('beep/1-beep.mp3');
+                                                                    // await audioPlayer.play('beep/1-beep.mp3');
                                                                     await savedData
                                                                         .saveBool(
                                                                             'isVoice',
@@ -656,9 +667,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                                                     selection
                                                                             .value =
                                                                         'beeps';
-                                                                    await audioPlayer
-                                                                        .play(
-                                                                            'beep/1-beep.mp3');
                                                                   }),
                                                                   child:
                                                                       AnimatedContainer(

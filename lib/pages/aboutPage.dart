@@ -1,9 +1,12 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
+// import 'package:just_audio/just_audio.dart';
 import 'package:share/share.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:workout_timer/main.dart';
@@ -24,6 +27,8 @@ class _AboutPageState extends State<AboutPage> {
   double logoAnim = 0;
   bool isBackPressed = false;
 
+  // late AudioPlayer player;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -41,6 +46,7 @@ class _AboutPageState extends State<AboutPage> {
 
   @override
   void dispose() {
+    // player.dispose();
     BackButtonInterceptor.remove(myInterceptor);
     super.dispose();
   }
@@ -58,16 +64,12 @@ class _AboutPageState extends State<AboutPage> {
           statusBarColor: Colors.transparent,
           statusBarIconBrightness:
               isAboutOpen ? Brightness.dark : Brightness.light,
-              systemNavigationBarColor: isAboutOpen
-                  ? backgroundColor
-                  : drawerColor,
-              systemNavigationBarIconBrightness: isAboutOpen
-                  ? Brightness.dark
-                  : Brightness.light,
-              systemNavigationBarDividerColor: isAboutOpen
-                  ? backgroundColor
-                  : drawerColor,
-            ));
+          systemNavigationBarColor: isAboutOpen ? backgroundColor : drawerColor,
+          systemNavigationBarIconBrightness:
+              isAboutOpen ? Brightness.dark : Brightness.light,
+          systemNavigationBarDividerColor:
+              isAboutOpen ? backgroundColor : drawerColor,
+        ));
       });
       return true;
     }
@@ -293,7 +295,7 @@ class _AboutPageState extends State<AboutPage> {
                     Padding(
                       padding: const EdgeInsets.only(top: 20, bottom: 50),
                       child: Text(
-                        'Version 3.0.0',
+                        'Version 3.2.0',
                         style: kTextStyle.copyWith(
                           color: isDark.value! ? Colors.white : Colors.black,
                         ),
@@ -336,6 +338,7 @@ class _AboutPageState extends State<AboutPage> {
                           ),
                           GestureDetector(
                             onTap: (() async {
+                              sleep(Duration(seconds: 2));
                               if (await canLaunch(
                                   'https://www.linkedin.com/in/soham-rakhunde/')) {
                                 await launch(
@@ -422,7 +425,7 @@ class _AboutPageState extends State<AboutPage> {
                           showLicensePage(
                             context: context,
                             applicationName: 'Workout Timer',
-                            applicationVersion: '3.0.0',
+                            applicationVersion: '3.2.0',
                           );
                         }),
                         child: Container(
