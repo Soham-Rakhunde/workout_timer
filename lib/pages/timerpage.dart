@@ -1,13 +1,13 @@
 import 'dart:async';
 import 'dart:ui';
 
-// import 'package:audioplayers/audio_cache.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:jiffy/jiffy.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:wakelock/wakelock.dart';
 import 'package:workout_timer/constants.dart';
-import 'package:workout_timer/main.dart';
+import 'package:workout_timer/providers.dart';
 import 'package:workout_timer/services/DatabaseService.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/progressBuilder.dart';
@@ -281,318 +281,344 @@ class _TimerPageState extends State<TimerPage> {
           ? (setList!.first.timeList!.first.sec! * s! + breakT!.sec! * (s! - 1))
           : widget.totalTime;
     }
-    return WillPopScope(
-      onWillPop: (() async => createAlertDialog(context) as FutureOr<bool>)
-          as Future<bool> Function()?,
-      child: FutureBuilder(
-          future: _getData(),
-          builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-            if (snapshot.data == null) {
-              return Center(child: Text('Loading'));
-            } else {
-              if (firstInstance) {
-                timerFunc();
-                firstInstance = false;
-              }
-              return Scaffold(
-                resizeToAvoidBottomInset: false,
-                backgroundColor: backgroundColor,
-                body: TweenAnimationBuilder(
-                  tween: Tween<double>(begin: 1, end: 0),
-                  duration: Duration(seconds: 1),
-                  builder: (BuildContext context, double value, Widget? _) {
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Spacer(
-                          flex: 3 * flexFactor,
-                        ),
-                        Expanded(
-                          flex: 3 * flexFactor,
-                          child: ValueListenableBuilder<String?>(
-                            valueListenable: _titleName,
-                            builder: (context, value, child) {
-                              return Text(
-                                _titleName.value,
-                                style: TextStyle(
-                                  color: textColor,
-                                  letterSpacing: 2.0,
-                                  fontSize: 40,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        Spacer(
-                          flex: 2 * flexFactor,
-                        ),
-                        Expanded(
-                          flex: 20 * flexFactor,
-                          child: Container(
-                            // width: MediaQuery.of(context).size.width - 50,
-                            height: MediaQuery.of(context).size.width - 50,
-                            child: buildStack(
-                              tickTime: tickTime,
-                              timeInSec: timeInSec,
-                              i: i,
+    return Consumer(builder: (context, ref, child) {
+      bool isDark = ref.read(isDarkProvider);
+      Color backgroundColor = ref.watch(backgroundProvider);
+      Color shadowColor = ref.watch(shadowProvider);
+      Color lightShadowColor = ref.watch(lightShadowProvider);
+      Color textColor = ref.watch(textProvider);
+      return WillPopScope(
+        onWillPop: (() async =>
+            createAlertDialog(context, isDark, backgroundColor, textColor)
+                as FutureOr<bool>) as Future<bool> Function()?,
+        child: FutureBuilder(
+            future: _getData(),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.data == null) {
+                return Center(child: Text('Loading'));
+              } else {
+                if (firstInstance) {
+                  timerFunc();
+                  firstInstance = false;
+                }
+                return Consumer(builder: (context, ref, child) {
+                  Color backgroundColor = ref.watch(backgroundProvider);
+                  Color shadowColor = ref.watch(shadowProvider);
+                  Color lightShadowColor = ref.watch(lightShadowProvider);
+                  Color textColor = ref.watch(textProvider);
+                  return Scaffold(
+                    resizeToAvoidBottomInset: false,
+                    backgroundColor: backgroundColor,
+                    body: TweenAnimationBuilder(
+                      tween: Tween<double>(begin: 1, end: 0),
+                      duration: Duration(seconds: 1),
+                      builder: (BuildContext context, double value, Widget? _) {
+                        return Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Spacer(
+                              flex: 3 * flexFactor,
                             ),
-                          ),
-                        ),
-                        Spacer(
-                          flex: 3 * flexFactor,
-                        ),
-                        Expanded(
-                          flex: 7 * flexFactor,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Container(
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      40,
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 25, right: 25, bottom: 20),
-                                  decoration: BoxDecoration(
-                                    color: backgroundColor,
-                                    borderRadius: BorderRadius.circular(32),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: shadowColor,
-                                          offset: Offset(
-                                              8 - value * 8, 6 - value * 6),
-                                          blurRadius: 12),
-                                      BoxShadow(
-                                          color: lightShadowColor,
-                                          offset: Offset(
-                                              -8 + value * 8, -6 + value * 6),
-                                          blurRadius: 12),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.fitWidth,
-                                        child: Text(
-                                          'Set',
-                                          style: kTextStyle.copyWith(
-                                            letterSpacing: 0.5,
-                                            color: isDark.value!
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      FittedBox(
-                                        fit: BoxFit.fitWidth,
-                                        child: ValueListenableBuilder(
-                                          valueListenable: i,
-                                          builder:
-                                              (context, dynamic value, child) {
-                                            return Text(
-                                              '${i.value}/$s',
-                                              style: kTextStyle.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 40,
-                                                color: isDark.value!
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                              Container(
-                                  width: MediaQuery.of(context).size.width / 2 -
-                                      40,
-                                  padding: EdgeInsets.only(
-                                      top: 20, left: 25, right: 25, bottom: 20),
-                                  decoration: BoxDecoration(
-                                    color: backgroundColor,
-                                    borderRadius: BorderRadius.circular(32),
-                                    boxShadow: [
-                                      BoxShadow(
-                                          color: shadowColor,
-                                          offset: Offset(8, 6),
-                                          blurRadius: 12),
-                                      BoxShadow(
-                                          color: lightShadowColor,
-                                          offset: Offset(-8, -6),
-                                          blurRadius: 12),
-                                    ],
-                                  ),
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    mainAxisSize: MainAxisSize.max,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      FittedBox(
-                                        fit: BoxFit.fitWidth,
-                                        child: Text(
-                                          'Progress',
-                                          style: kTextStyle.copyWith(
-                                            letterSpacing: 0.5,
-                                            color: isDark.value!
-                                                ? Colors.white
-                                                : Colors.black,
-                                          ),
-                                        ),
-                                      ),
-                                      FittedBox(
-                                        fit: BoxFit.fitWidth,
-                                        child: ValueListenableBuilder(
-                                          valueListenable: progress,
-                                          builder:
-                                              (context, dynamic value, child) {
-                                            return Text(
-                                              progress.value >= 99.5
-                                                  ? '100'
-                                                  : '${progress.value.toStringAsFixed(0)}%',
-                                              style: kTextStyle.copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 40,
-                                                color: isDark.value!
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ],
-                                  )),
-                            ],
-                          ),
-                        ),
-                        Spacer(
-                          flex: 3 * flexFactor,
-                        ),
-                        Expanded(
-                          flex: 4 * flexFactor,
-                          child: Row(
-                            children: [
-                              Spacer(
-                                flex: 1,
-                              ),
-                              Hero(
-                                tag: 'leftButton',
-                                child: NeuButton(
-                                  onPress: (() async {
-                                    if (isVoice!) {
-                                      await audioPlayer.setAsset(
-                                          'assets/audio/$voice/finish-$voice.mp3');
-                                      audioPlayer.play();
-                                      // AudioCache finishPlayer = AudioCache(
-                                      //     prefix: 'assets/audio/$voice/');
-                                      // finishPlayer.play('finish-$voice.mp3');
-                                      // audioPlayer.clearCache();
-                                      isVoice = false;
-                                    }
-                                    double timeElapsed =
-                                        progress.value * totalTime! / 100;
-                                    saveStats(timeElapsed.round());
-                                    Wakelock.disable();
-                                    Navigator.pop(context);
-                                  }),
-                                  ico: Icon(
-                                    Icons.stop_rounded,
-                                    size: 30,
-                                    color: textColor,
-                                  ),
-                                ),
-                              ),
-                              Spacer(
-                                flex: isRest! ? 4 : 1,
-                              ),
-                              isRest!
-                                  ? Spacer(
-                                      flex: 2,
-                                    )
-                                  : Expanded(
-                                      flex: 15,
-                                      child: Container(
-                                        height: 60,
-                                        decoration: BoxDecoration(
-                                          color: backgroundColor,
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          // boxShadow: [
-                                          //   BoxShadow(
-                                          //       color: shadowColor,
-                                          //       offset: Offset(8, 6),
-                                          //       blurRadius: 12),
-                                          //   BoxShadow(
-                                          //       color: lightShadowColor,
-                                          //       offset: Offset(-8, -6),
-                                          //       blurRadius: 12),
-                                          // ],
-                                        ),
-                                        child: ValueListenableBuilder<int>(
-                                            valueListenable: groupNum,
-                                            builder:
-                                                (context, snapshot, widget) {
-                                              return FittedBox(
-                                                fit: BoxFit.scaleDown,
-                                                child: Text(
-                                                  'Group $snapshot of ${setList!.length}',
-                                                  style: kTextStyle.copyWith(
-                                                    letterSpacing: 0.1,
-                                                    color: isDark.value!
-                                                        ? Colors.white
-                                                        : Colors.black,
-                                                  ),
-                                                ),
-                                              );
-                                            }),
-                                      ),
-                                    ),
-                              Spacer(
-                                flex: isRest! ? 4 : 1,
-                              ),
-                              ValueListenableBuilder(
-                                valueListenable: resumeFlag,
-                                builder: (context, dynamic value, child) {
-                                  return Hero(
-                                    tag: 'rightButton',
-                                    child: Center(
-                                      child: NeuButton(
-                                        flag: resumeFlag.value,
-                                        animated: true,
-                                        ico: AnimatedIcons.pause_play,
-                                        onPress: (() {
-                                          resumeFlag.value = !resumeFlag.value;
-                                        }),
-                                      ),
+                            Expanded(
+                              flex: 3 * flexFactor,
+                              child: ValueListenableBuilder<String?>(
+                                valueListenable: _titleName,
+                                builder: (context, value, child) {
+                                  return Text(
+                                    _titleName.value,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      letterSpacing: 2.0,
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   );
                                 },
                               ),
-                              Spacer(
-                                flex: 1,
+                            ),
+                            Spacer(
+                              flex: 2 * flexFactor,
+                            ),
+                            Expanded(
+                              flex: 20 * flexFactor,
+                              child: Container(
+                                // width: MediaQuery.of(context).size.width - 50,
+                                height: MediaQuery.of(context).size.width - 50,
+                                child: buildStack(
+                                  tickTime: tickTime,
+                                  timeInSec: timeInSec,
+                                  i: i,
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                        Spacer(
-                          flex: 1 * flexFactor,
-                        ),
-                      ],
-                    );
-                  },
-                ),
-              );
-            }
-          }),
-    );
+                            ),
+                            Spacer(
+                              flex: 3 * flexFactor,
+                            ),
+                            Expanded(
+                              flex: 7 * flexFactor,
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Container(
+                                      width: MediaQuery.of(context).size.width /
+                                              2 -
+                                          40,
+                                      padding: EdgeInsets.only(
+                                          top: 20,
+                                          left: 25,
+                                          right: 25,
+                                          bottom: 20),
+                                      decoration: BoxDecoration(
+                                        color: backgroundColor,
+                                        borderRadius: BorderRadius.circular(32),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: shadowColor,
+                                              offset: Offset(
+                                                  8 - value * 8, 6 - value * 6),
+                                              blurRadius: 12),
+                                          BoxShadow(
+                                              color: lightShadowColor,
+                                              offset: Offset(-8 + value * 8,
+                                                  -6 + value * 6),
+                                              blurRadius: 12),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.fitWidth,
+                                            child: Text(
+                                              'Set',
+                                              style: kTextStyle.copyWith(
+                                                letterSpacing: 0.5,
+                                                color: isDark
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                          FittedBox(
+                                            fit: BoxFit.fitWidth,
+                                            child: ValueListenableBuilder(
+                                              valueListenable: i,
+                                              builder: (context, dynamic value,
+                                                  child) {
+                                                return Text(
+                                                  '${i.value}/$s',
+                                                  style: kTextStyle.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 40,
+                                                    color: isDark
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                  Container(
+                                      width: MediaQuery.of(context).size.width /
+                                              2 -
+                                          40,
+                                      padding: EdgeInsets.only(
+                                          top: 20,
+                                          left: 25,
+                                          right: 25,
+                                          bottom: 20),
+                                      decoration: BoxDecoration(
+                                        color: backgroundColor,
+                                        borderRadius: BorderRadius.circular(32),
+                                        boxShadow: [
+                                          BoxShadow(
+                                              color: shadowColor,
+                                              offset: Offset(8, 6),
+                                              blurRadius: 12),
+                                          BoxShadow(
+                                              color: lightShadowColor,
+                                              offset: Offset(-8, -6),
+                                              blurRadius: 12),
+                                        ],
+                                      ),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        mainAxisSize: MainAxisSize.max,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          FittedBox(
+                                            fit: BoxFit.fitWidth,
+                                            child: Text(
+                                              'Progress',
+                                              style: kTextStyle.copyWith(
+                                                letterSpacing: 0.5,
+                                                color: isDark!
+                                                    ? Colors.white
+                                                    : Colors.black,
+                                              ),
+                                            ),
+                                          ),
+                                          FittedBox(
+                                            fit: BoxFit.fitWidth,
+                                            child: ValueListenableBuilder(
+                                              valueListenable: progress,
+                                              builder: (context, dynamic value,
+                                                  child) {
+                                                return Text(
+                                                  progress.value >= 99.5
+                                                      ? '100'
+                                                      : '${progress.value.toStringAsFixed(0)}%',
+                                                  style: kTextStyle.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 40,
+                                                    color: isDark
+                                                        ? Colors.white
+                                                        : Colors.black,
+                                                  ),
+                                                );
+                                              },
+                                            ),
+                                          ),
+                                        ],
+                                      )),
+                                ],
+                              ),
+                            ),
+                            Spacer(
+                              flex: 3 * flexFactor,
+                            ),
+                            Expanded(
+                              flex: 4 * flexFactor,
+                              child: Row(
+                                children: [
+                                  Spacer(
+                                    flex: 1,
+                                  ),
+                                  Hero(
+                                    tag: 'leftButton',
+                                    child: NeuButton(
+                                      onPress: (() async {
+                                        if (isVoice!) {
+                                          await audioPlayer.setAsset(
+                                              'assets/audio/$voice/finish-$voice.mp3');
+                                          audioPlayer.play();
+                                          // AudioCache finishPlayer = AudioCache(
+                                          //     prefix: 'assets/audio/$voice/');
+                                          // finishPlayer.play('finish-$voice.mp3');
+                                          // audioPlayer.clearCache();
+                                          isVoice = false;
+                                        }
+                                        double timeElapsed =
+                                            progress.value * totalTime! / 100;
+                                        saveStats(timeElapsed.round());
+                                        Wakelock.disable();
+                                        Navigator.pop(context);
+                                      }),
+                                      ico: Icon(
+                                        Icons.stop_rounded,
+                                        size: 30,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                  ),
+                                  Spacer(
+                                    flex: isRest! ? 4 : 1,
+                                  ),
+                                  isRest!
+                                      ? Spacer(
+                                          flex: 2,
+                                        )
+                                      : Expanded(
+                                          flex: 15,
+                                          child: Container(
+                                            height: 60,
+                                            decoration: BoxDecoration(
+                                              color: backgroundColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
+                                              // boxShadow: [
+                                              //   BoxShadow(
+                                              //       color: shadowColor,
+                                              //       offset: Offset(8, 6),
+                                              //       blurRadius: 12),
+                                              //   BoxShadow(
+                                              //       color: lightShadowColor,
+                                              //       offset: Offset(-8, -6),
+                                              //       blurRadius: 12),
+                                              // ],
+                                            ),
+                                            child: ValueListenableBuilder<int>(
+                                                valueListenable: groupNum,
+                                                builder: (context, snapshot,
+                                                    widget) {
+                                                  return FittedBox(
+                                                    fit: BoxFit.scaleDown,
+                                                    child: Text(
+                                                      'Group $snapshot of ${setList!.length}',
+                                                      style:
+                                                          kTextStyle.copyWith(
+                                                        letterSpacing: 0.1,
+                                                        color: isDark!
+                                                            ? Colors.white
+                                                            : Colors.black,
+                                                      ),
+                                                    ),
+                                                  );
+                                                }),
+                                          ),
+                                        ),
+                                  Spacer(
+                                    flex: isRest! ? 4 : 1,
+                                  ),
+                                  ValueListenableBuilder(
+                                    valueListenable: resumeFlag,
+                                    builder: (context, dynamic value, child) {
+                                      return Hero(
+                                        tag: 'rightButton',
+                                        child: Center(
+                                          child: NeuButton(
+                                            flag: resumeFlag.value,
+                                            animated: true,
+                                            ico: AnimatedIcons.pause_play,
+                                            onPress: (() {
+                                              resumeFlag.value =
+                                                  !resumeFlag.value;
+                                            }),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                  Spacer(
+                                    flex: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Spacer(
+                              flex: 1 * flexFactor,
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  );
+                });
+              }
+            }),
+      );
+    });
   }
 
-  Future<bool?> createAlertDialog(BuildContext context) {
+  Future<bool?> createAlertDialog(BuildContext context, bool isDark,
+      Color backgroundColor, Color textColor) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -619,7 +645,7 @@ class _TimerPageState extends State<TimerPage> {
                 'No',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
-                  color: isDark.value! ? Colors.white : Colors.black,
+                  color: isDark ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),
@@ -635,7 +661,7 @@ class _TimerPageState extends State<TimerPage> {
                 'Yes',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
-                  color: isDark.value! ? Colors.white : Colors.black,
+                  color: isDark! ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),

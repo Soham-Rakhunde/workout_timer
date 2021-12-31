@@ -3,10 +3,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/pages/savedAccesspage.dart';
 import 'package:workout_timer/pages/timerpage.dart';
+import 'package:workout_timer/providers.dart';
 import 'package:workout_timer/services/GenericFunctions.dart';
 import 'package:workout_timer/services/NeuButton.dart';
 import 'package:workout_timer/services/animIcon/gradientIcon.dart';
@@ -67,11 +69,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: isHomeOpen ? Brightness.dark : Brightness.light,
-      systemNavigationBarColor: isHomeOpen ? backgroundColor : drawerColor,
+      systemNavigationBarColor: isHomeOpen ? backgroundC[0] : drawerColor,
       systemNavigationBarIconBrightness:
           isHomeOpen ? Brightness.dark : Brightness.light,
       systemNavigationBarDividerColor:
-          isHomeOpen ? backgroundColor : drawerColor,
+          isHomeOpen ? backgroundC[0] : drawerColor,
     ));
   }
 
@@ -131,528 +133,418 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     _opacity = 1;
     screenWidth = MediaQuery.of(context).size.width;
-    return ValueListenableBuilder(
-      valueListenable: isDark,
-      builder: (context, dynamic val, child) {
-        return child!;
-      },
-      child: ValueListenableBuilder(
-        valueListenable: indexOfMenu,
-        builder: (context, dynamic val, child) {
-          if (!isHomeOpen && indexOfMenu.value == 0 && !isBackPressed) {
-            Future.delayed(Duration(microseconds: 1)).then((value) {
-              setState(() {
-                xOffset = 0;
-                playGradientControl.reverse();
-                yOffset = 0;
-                scaleFactor = 1;
-                isDrawerOpen = false;
-                isHomeOpen = true;
+    return Consumer(
+      builder: (context, ref, child) {
+        bool isDark = ref.read(isDarkProvider);
+        Color backgroundColor = ref.watch(backgroundProvider);
+        Color shadowColor = ref.watch(shadowProvider);
+        Color lightShadowColor = ref.watch(lightShadowProvider);
+        Color textColor = ref.watch(textProvider);
+        return ValueListenableBuilder(
+          valueListenable: indexOfMenu,
+          builder: (context, dynamic val, child) {
+            if (!isHomeOpen && indexOfMenu.value == 0 && !isBackPressed) {
+              Future.delayed(Duration(microseconds: 1)).then((value) {
+                setState(() {
+                  xOffset = 0;
+                  playGradientControl.reverse();
+                  yOffset = 0;
+                  scaleFactor = 1;
+                  isDrawerOpen = false;
+                  isHomeOpen = true;
+                });
               });
-            });
-          } else if (indexOfMenu.value != 0) isBackPressed = false;
-          return child!;
-        },
-        child: AnimatedContainer(
-          padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
-          duration: Duration(milliseconds: drawerAnimDur),
-          curve: Curves.easeInOutQuart,
-          transform: Matrix4.translationValues(xOffset, yOffset, 100)
-            ..scale(scaleFactor),
-          height: MediaQuery
-              .of(context)
-              .size
-              .height,
-          width: double.infinity,
-          onEnd: (() {
-            if (isHomeOpen && indexOfMenu.value == 0) {
-              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-                statusBarColor: Colors.transparent,
-                // isHomeOpen
-                //     ? backgroundColor
-                //     : drawerColor,
-                statusBarIconBrightness:
-                    isHomeOpen ? Brightness.dark : Brightness.light,
-                systemNavigationBarColor:
-                    isHomeOpen ? backgroundColor : drawerColor,
-                systemNavigationBarIconBrightness:
-                    isHomeOpen ? Brightness.dark : Brightness.light,
-                systemNavigationBarDividerColor:
-                    isHomeOpen ? backgroundColor : drawerColor,
-              ));
-            }
-          }),
-          decoration: BoxDecoration(
-            color: backgroundColor,
-            borderRadius: BorderRadius.circular(isHomeOpen ? 0 : 28),
-          ),
-          child: GestureDetector(
-            onTap: (() {
-              if (!isHomeOpen && indexOfMenu.value == 0) {
-                setState(() {
-                  xOffset = 0;
-                  yOffset = 0;
-                  scaleFactor = 1;
-                  isDrawerOpen = false;
-                  isHomeOpen = true;
-                });
+            } else if (indexOfMenu.value != 0) isBackPressed = false;
+            return child!;
+          },
+          child: AnimatedContainer(
+            padding: EdgeInsets.fromLTRB(8, 8, 8, 8),
+            duration: Duration(milliseconds: drawerAnimDur),
+            curve: Curves.easeInOutQuart,
+            transform: Matrix4.translationValues(xOffset, yOffset, 100)
+              ..scale(scaleFactor),
+            height: MediaQuery.of(context).size.height,
+            width: double.infinity,
+            onEnd: (() {
+              if (isHomeOpen && indexOfMenu.value == 0) {
+                SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  // isHomeOpen
+                  //     ? backgroundColor
+                  //     : drawerColor,
+                  statusBarIconBrightness:
+                      isHomeOpen ? Brightness.dark : Brightness.light,
+                  systemNavigationBarColor:
+                      isHomeOpen ? backgroundColor : drawerColor,
+                  systemNavigationBarIconBrightness:
+                      isHomeOpen ? Brightness.dark : Brightness.light,
+                  systemNavigationBarDividerColor:
+                      isHomeOpen ? backgroundColor : drawerColor,
+                ));
               }
             }),
-            onHorizontalDragEnd: ((_) {
-              if (!isHomeOpen && indexOfMenu.value == 0) {
-                setState(() {
-                  xOffset = 0;
-                  yOffset = 0;
-                  scaleFactor = 1;
-                  isDrawerOpen = false;
-                  isHomeOpen = true;
-                });
-              }
-            }),
-            child: AnimatedOpacity(
-              duration: Duration(milliseconds: 200),
-              opacity: _opacity,
-              child: AbsorbPointer(
-                absorbing: !isHomeOpen,
-                child: Column(
-                  // mainAxisAlignment:MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 6,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.only(left: 27),
-                                    child: ValueListenableBuilder<String>(
-                                      valueListenable: _titleName,
-                                      builder: (context, value, child) {
-                                        return Text(
-                                          _titleName.value,
-                                  style: TextStyle(
+            decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(isHomeOpen ? 0 : 28),
+            ),
+            child: GestureDetector(
+              onTap: (() {
+                if (!isHomeOpen && indexOfMenu.value == 0) {
+                  setState(() {
+                    xOffset = 0;
+                    yOffset = 0;
+                    scaleFactor = 1;
+                    isDrawerOpen = false;
+                    isHomeOpen = true;
+                  });
+                }
+              }),
+              onHorizontalDragEnd: ((_) {
+                if (!isHomeOpen && indexOfMenu.value == 0) {
+                  setState(() {
+                    xOffset = 0;
+                    yOffset = 0;
+                    scaleFactor = 1;
+                    isDrawerOpen = false;
+                    isHomeOpen = true;
+                  });
+                }
+              }),
+              child: AnimatedOpacity(
+                duration: Duration(milliseconds: 200),
+                opacity: _opacity,
+                child: AbsorbPointer(
+                  absorbing: !isHomeOpen,
+                  child: Column(
+                    // mainAxisAlignment:MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 6,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              padding: EdgeInsets.only(left: 27),
+                              child: ValueListenableBuilder<String>(
+                                valueListenable: _titleName,
+                                builder: (context, value, child) {
+                                  return Text(
+                                    _titleName.value,
+                                    style: TextStyle(
+                                      color: textColor,
+                                      letterSpacing: 2.0,
+                                      fontSize: 30,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            Stack(
+                              children: [
+                                NeuButton(
+                                  ico: Icon(
+                                    Icons.menu_rounded,
+                                    size: 30,
                                     color: textColor,
-                                    letterSpacing: 2.0,
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                );
-                              },
-                            ),
-                          ),
-                          Stack(
-                            children: [
-                              NeuButton(
-                                ico: Icon(
-                                  Icons.menu_rounded,
-                                  size: 30,
-                                  color: textColor,
+                                  onPress: (() {
+                                    setState(() {
+                                      FocusScope.of(context).unfocus();
+                                      isBackPressed = true;
+                                      xOffset = 250;
+                                      yOffset = 140;
+                                      scaleFactor = 0.7;
+                                      isDrawerOpen = true;
+                                      isHomeOpen = false;
+                                      SystemChrome.setSystemUIOverlayStyle(
+                                          SystemUiOverlayStyle(
+                                        statusBarColor: Colors.transparent,
+                                        // isHomeOpen
+                                        //     ? backgroundColor
+                                        //     : drawerColor,
+                                        statusBarIconBrightness: isHomeOpen
+                                            ? Brightness.dark
+                                            : Brightness.light,
+                                        systemNavigationBarColor: isHomeOpen
+                                            ? backgroundColor
+                                            : drawerColor,
+                                        systemNavigationBarIconBrightness:
+                                            isHomeOpen
+                                                ? Brightness.dark
+                                                : Brightness.light,
+                                        systemNavigationBarDividerColor:
+                                            isHomeOpen
+                                                ? backgroundColor
+                                                : drawerColor,
+                                      ));
+                                    });
+                                  }),
                                 ),
-                                onPress: (() {
-                                  setState(() {
-                                    FocusScope.of(context).unfocus();
-                                    isBackPressed = true;
-                                    xOffset = 250;
-                                    yOffset = 140;
-                                    scaleFactor = 0.7;
-                                    isDrawerOpen = true;
-                                    isHomeOpen = false;
-                                    SystemChrome.setSystemUIOverlayStyle(
-                                        SystemUiOverlayStyle(
-                                      statusBarColor: Colors.transparent,
-                                      // isHomeOpen
-                                      //     ? backgroundColor
-                                      //     : drawerColor,
-                                      statusBarIconBrightness: isHomeOpen
-                                          ? Brightness.dark
-                                          : Brightness.light,
-                                      systemNavigationBarColor: isHomeOpen
-                                          ? backgroundColor
-                                          : drawerColor,
-                                      systemNavigationBarIconBrightness:
-                                          isHomeOpen
-                                              ? Brightness.dark
-                                              : Brightness.light,
-                                      systemNavigationBarDividerColor:
-                                          isHomeOpen
-                                              ? backgroundColor
-                                              : drawerColor,
-                                    ));
-                                  });
-                                }),
-                              ),
-                              if (!openedAfterDbUpdate)
-                                Positioned(
-                                  // draw a red marble
-                                  top: 0.0,
-                                  right: 15.0,
-                                  child: new Icon(Icons.brightness_1_rounded,
-                                      size: 15.0, color: Colors.redAccent),
-                                )
-                            ],
-                          ),
-                                ],
-                              ),
+                                if (!openedAfterDbUpdate)
+                                  Positioned(
+                                    // draw a red marble
+                                    top: 0.0,
+                                    right: 15.0,
+                                    child: new Icon(Icons.brightness_1_rounded,
+                                        size: 15.0, color: Colors.redAccent),
+                                  )
+                              ],
                             ),
-                            Expanded(
-                              flex: 0,
-                              child: SizedBox(),
-                            ),
-                            Expanded(
-                              flex: 6,
-                              child: Column(
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 0,
+                        child: SizedBox(),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          children: [
+                            Container(
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'TIME / SET',
+                                  style: kTextStyle.copyWith(
+                                    color: isDark ? Colors.white : Colors.black,
+                                  ),
+                                )),
+                            Container(
+                              margin: EdgeInsets.only(top: 10),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.remove_rounded,
+                                      size: 30,
+                                      color: textColor,
+                                    ),
+                                    onPress: (() {
+                                      addRemove(false, 'periodSec');
+                                    }),
+                                  ),
                                   Container(
-                                      alignment: Alignment.center,
+                                    padding: EdgeInsets.only(left: 5),
+                                    width: 60,
+                                    alignment: Alignment.center,
+                                    child: myTextField(
+                                      controllerName: 'periodMin',
+                                      isStringName: true,
+                                      func: (val) {
+                                        setState(() {
+                                          retain['periodMin'] = val;
+                                          controller['periodMin'].text = val;
+                                        });
+                                      },
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ),
+                                  Container(
                                       child: Text(
-                                        'TIME / SET',
-                                        style: kTextStyle.copyWith(
-                                          color: isDark.value!
-                                      ? Colors.white
-                                      : Colors.black,
-                                        ),
-                                      )),
-                                  Container(
-                                    margin: EdgeInsets.only(top: 10),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.remove_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(false, 'periodSec');
-                                          }),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.only(left: 5),
-                                  width: 60,
-                                  alignment: Alignment.center,
-                                  child: myTextField(
-                                    controllerName: 'periodMin',
-                                    isStringName: true,
-                                    func: (val) {
-                                      setState(() {
-                                        retain['periodMin'] = val;
-                                        controller['periodMin'].text = val;
-                                      });
-                                    },
-                                    keyboardType: TextInputType.number,
-                                  ),
-                                ),
-                                        Container(
-                                            child: Text(
-                                          ':',
-                                          style: kTextStyle.copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 25,
-                                            color: textColor,
-                                          ),
-                                        )),
-                                        Container(
-                                          padding: EdgeInsets.only(right: 5),
-                                  width: 60,
-                                  alignment: Alignment.center,
-                                  child: myTextField(
-                                    keyboardType: TextInputType.number,
-                                    controllerName: 'periodSec',
-                                    isStringName: true,
-                                    func: (val) {
-                                      setState(() {
-                                        retain['periodSec'] = val;
-                                        controller['periodSec'].text = val;
-                                      });
-                                    },
-                                  ),
-                                ),
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.add_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(true, 'periodSec');
-                                          }),
-                                        ),
-                                      ],
+                                    ':',
+                                    style: kTextStyle.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 25,
+                                      color: textColor,
                                     ),
+                                  )),
+                                  Container(
+                                    padding: EdgeInsets.only(right: 5),
+                                    width: 60,
+                                    alignment: Alignment.center,
+                                    child: myTextField(
+                                      keyboardType: TextInputType.number,
+                                      controllerName: 'periodSec',
+                                      isStringName: true,
+                                      func: (val) {
+                                        setState(() {
+                                          retain['periodSec'] = val;
+                                          controller['periodSec'].text = val;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.add_rounded,
+                                      size: 30,
+                                      color: textColor,
+                                    ),
+                                    onPress: (() {
+                                      addRemove(true, 'periodSec');
+                                    }),
                                   ),
                                 ],
                               ),
                             ),
-                            Expanded(
-                              flex: 6,
-                              child: Column(
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'BREAK',
+                                style: kTextStyle.copyWith(
+                                  color: isDark ? Colors.white : Colors.black,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 10),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Container(
-                                    alignment: Alignment.center,
-                                    child: Text(
-                                      'BREAK',
-                                      style: kTextStyle.copyWith(
-                                        color:
-                                    isDark.value! ? Colors.white : Colors.black,
-                                      ),
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.remove_rounded,
+                                      size: 30,
+                                      color: textColor,
                                     ),
+                                    onPress: (() {
+                                      addRemove(false, 'breakSec');
+                                    }),
                                   ),
                                   Container(
-                                    margin: EdgeInsets.only(top: 10),
+                                    width: 60,
+                                    padding: EdgeInsets.only(left: 5),
                                     alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.remove_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(false, 'breakSec');
-                                          }),
-                                        ),
-                                        Container(
-                                          width: 60,
-                                          padding: EdgeInsets.only(left: 5),
-                                          alignment: Alignment.center,
-                                          child: myTextField(
-                                            controllerName: 'breakMin',
-                                    keyboardType: TextInputType.number,
-                                    isStringName: true,
-                                    func: (val) {
-                                      setState(() {
-                                        retain['breakMin'] = val;
-                                        controller['breakMin'].text = val;
-                                      });
-                                    },
-                                  ),
-                                        ),
-                                        Container(
-                                          child: Text(
-                                            ':',
-                                            style: kTextStyle.copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 25,
-                                              color: textColor,
-                                            ),
-                                          ),
-                                        ),
-                                        Container(
-                                            width: 60,
-                                            padding: EdgeInsets.only(right: 5),
-                                            alignment: Alignment.center,
-                                            child: myTextField(
-                                              controllerName: 'breakSec',
+                                    child: myTextField(
+                                      controllerName: 'breakMin',
                                       keyboardType: TextInputType.number,
                                       isStringName: true,
                                       func: (val) {
                                         setState(() {
-                                          retain['breakSec'] = val;
-                                          controller['breakSec'].text = val;
+                                          retain['breakMin'] = val;
+                                          controller['breakMin'].text = val;
                                         });
                                       },
-                                    )),
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.add_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(true, 'breakSec');
-                                          }),
-                                        ),
-                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 6,
-                              child: Column(
-                                children: [
                                   Container(
-                                    alignment: Alignment.center,
                                     child: Text(
-                                      'SETS',
+                                      ':',
                                       style: kTextStyle.copyWith(
-                                        color:
-                                    isDark.value! ? Colors.white : Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    margin: EdgeInsets.only(top: 10),
-                                    alignment: Alignment.center,
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.remove_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(false, 'sets');
-                                          }),
-                                        ),
-                                        Container(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 5),
-                                          width: 130,
-                                          child: myTextField(
-                                            controllerName: 'sets',
-                                    keyboardType: TextInputType.number,
-                                    isStringName: true,
-                                    func: (val) {
-                                      setState(() {
-                                        retain['sets'] = val;
-                                        controller['sets'].text = val;
-                                      });
-                                    },
-                                  ),
-                                        ),
-                                        NeuButton(
-                                          ico: Icon(
-                                            Icons.add_rounded,
-                                            size: 30,
-                                            color: textColor,
-                                          ),
-                                          onPress: (() {
-                                            addRemove(true, 'sets');
-                                          }),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Expanded(
-                              flex: 5,
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Hero(
-                                    tag: 'leftButton',
-                                    child: NeuButton(
-                                      ico: Icon(
-                                        Icons.bookmark_border_rounded,
-                                        size: 30,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
                                         color: textColor,
                                       ),
-                                      onPress: (() async {
-                                        await Navigator.push(
-                                            context,
-                                            PageRouteBuilder(
-                                                transitionDuration:
-                                                Duration(milliseconds: 250),
-                                                reverseTransitionDuration:
-                                                Duration(milliseconds: 150),
-                                                transitionsBuilder:
-                                                    (BuildContext context,
-                                                    Animation<double>
-                                                    animation,
-                                                    Animation<double>
-                                                    secAnimation,
-                                                    Widget child) {
-                                                  return FadeTransition(
-                                                    opacity: animation,
-                                                    child: child,
-                                                  );
-                                                },
-                                                pageBuilder: (BuildContext
-                                                        context,
-                                            Animation<double> animation,
-                                            Animation<double> secAnimation) {
-                                          return savedPage();
-                                        }));
-                              }),
+                                    ),
+                                  ),
+                                  Container(
+                                      width: 60,
+                                      padding: EdgeInsets.only(right: 5),
+                                      alignment: Alignment.center,
+                                      child: myTextField(
+                                        controllerName: 'breakSec',
+                                        keyboardType: TextInputType.number,
+                                        isStringName: true,
+                                        func: (val) {
+                                          setState(() {
+                                            retain['breakSec'] = val;
+                                            controller['breakSec'].text = val;
+                                          });
+                                        },
+                                      )),
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.add_rounded,
+                                      size: 30,
+                                      color: textColor,
+                                    ),
+                                    onPress: (() {
+                                      addRemove(true, 'breakSec');
+                                    }),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ),
-                          AnimatedBuilder(
-                            animation: playGradientControl,
-                            builder: (BuildContext context, Widget? child) {
-                              return NeuButton(
-                                ico: GradientIcon(
-                                  icon: Icons.play_arrow_rounded,
-                                  size: 55,
-                                  gradient: RadialGradient(colors: [
-                                    colAnim1.value!,
-                                    colAnim2.value!,
-                                  ], focal: Alignment.center),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 6,
+                        child: Column(
+                          children: [
+                            Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                'SETS',
+                                style: kTextStyle.copyWith(
+                                  color: isDark ? Colors.white : Colors.black,
                                 ),
-                                length: screenWidth / 4.6,
-                                breadth: screenWidth / 4.6,
-                                radii: 50,
+                              ),
+                            ),
+                            Container(
+                              margin: EdgeInsets.only(top: 10),
+                              alignment: Alignment.center,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.remove_rounded,
+                                      size: 30,
+                                      color: textColor,
+                                    ),
+                                    onPress: (() {
+                                      addRemove(false, 'sets');
+                                    }),
+                                  ),
+                                  Container(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 5),
+                                    width: 130,
+                                    child: myTextField(
+                                      controllerName: 'sets',
+                                      keyboardType: TextInputType.number,
+                                      isStringName: true,
+                                      func: (val) {
+                                        setState(() {
+                                          retain['sets'] = val;
+                                          controller['sets'].text = val;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  NeuButton(
+                                    ico: Icon(
+                                      Icons.add_rounded,
+                                      size: 30,
+                                      color: textColor,
+                                    ),
+                                    onPress: (() {
+                                      addRemove(true, 'sets');
+                                    }),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Expanded(
+                        flex: 5,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Hero(
+                              tag: 'leftButton',
+                              child: NeuButton(
+                                ico: Icon(
+                                  Icons.bookmark_border_rounded,
+                                  size: 30,
+                                  color: textColor,
+                                ),
                                 onPress: (() async {
-                                  FocusScopeNode currentFocus =
-                                      FocusScope.of(context);
-                                  if (!currentFocus.hasPrimaryFocus) {
-                                    currentFocus.unfocus();
-                                  }
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['periodMin'] == '') {
-                                    controller['periodMin'] = '0';
-                                  }
-                                  if (controller['periodSec'] == '') {
-                                    controller['periodSec'] = '30';
-                                  }
-                                  if (controller['breakMin'] == '') {
-                                    controller['breakMin'] = '0';
-                                  }
-                                  if (controller['breakSec'] == '') {
-                                    controller['breakSec'] = '30';
-                                  }
-                                  if (controller['sets'] == '') {
-                                    controller['sets'] = '3';
-                                  }
-                                  final periodTime = TimeClass(
-                                    name: 'Workout',
-                                    isWork: true,
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['periodMin'].text),
-                                      seconds: int.parse(
-                                          controller['periodSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  final breakTime = TimeClass(
-                                    name: 'Break',
-                                    isWork: false,
-                                    sec: Duration(
-                                      minutes: int.parse(
-                                          controller['breakMin'].text),
-                                      seconds: int.parse(
-                                          controller['breakSec'].text),
-                                    ).inSeconds,
-                                  );
-                                  final set1 = SetClass(
-                                    grpName: '',
-                                    timeList: [
-                                      periodTime,
-                                    ],
-                                    sets: int.parse(controller['sets'].text),
-                                  );
-                                  final page = TimerPage(
-                                    isRest: true,
-                                    args: [set1],
-                                    breakTime: breakTime,
-                                  );
-                                  // await Future.delayed(Duration(microseconds: 1));
                                   await Navigator.push(
                                       context,
                                       PageRouteBuilder(
@@ -673,65 +565,176 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                                           pageBuilder: (BuildContext context,
                                               Animation<double> animation,
                                               Animation<double> secAnimation) {
-                                            return page;
+                                            return savedPage();
                                           }));
                                 }),
-                              );
-                            },
-                          ),
-                          Hero(
-                            tag: 'rightButton',
-                            child: NeuButton(
-                              ico: Icon(
-                                Icons.save_outlined,
-                                size: 30,
-                                color: textColor,
                               ),
-                              onPress: (() async {
-                                await createDialog(context);
-                                if (controller['periodSec'] == '') {
-                                          controller['periodSec'] = '30';
-                                        }
-                                        if (controller['periodMin'] == '') {
-                                          controller['periodMin'] = '0';
-                                        }
-                                        if (controller['periodSec'] == '') {
-                                          controller['periodSec'] = '30';
-                                }
-                                if (controller['breakMin'] == '') {
-                                  controller['breakMin'] = '0';
-                                }
-                                if (controller['breakSec'] == '') {
-                                  controller['breakSec'] = '30';
-                                }
-                                if (controller['sets'] == '') {
-                                  controller['sets'] = '3';
-                                }
-                                savedList = await savedData.read('List');
-                                SavedWorkout _data = SavedWorkout(
-                                  name: stringFormatter(dialogController.text),
-                                  pSec: int.parse(controller['periodSec'].text),
-                                  pMin: int.parse(controller['periodMin'].text),
-                                  bSec: int.parse(controller['breakSec'].text),
-                                  bMin: int.parse(controller['breakMin'].text),
-                                  setsCount: int.parse(controller['sets'].text),
-                                );
-                                // print('Encoded ${jsonEncode(_data.toMap())}');
-                                savedList!.add(jsonEncode(_data.toMap()));
-                                await savedData.save('List', savedList!);
-                              }),
-                                    ),
+                            ),
+                            AnimatedBuilder(
+                              animation: playGradientControl,
+                              builder: (BuildContext context, Widget? child) {
+                                return NeuButton(
+                                  ico: GradientIcon(
+                                    icon: Icons.play_arrow_rounded,
+                                    size: 55,
+                                    gradient: RadialGradient(colors: [
+                                      colAnim1.value!,
+                                      colAnim2.value!,
+                                    ], focal: Alignment.center),
                                   ),
-                                ],
+                                  length: screenWidth / 4.6,
+                                  breadth: screenWidth / 4.6,
+                                  radii: 50,
+                                  onPress: (() async {
+                                    FocusScopeNode currentFocus =
+                                        FocusScope.of(context);
+                                    if (!currentFocus.hasPrimaryFocus) {
+                                      currentFocus.unfocus();
+                                    }
+                                    if (controller['periodSec'] == '') {
+                                      controller['periodSec'] = '30';
+                                    }
+                                    if (controller['periodMin'] == '') {
+                                      controller['periodMin'] = '0';
+                                    }
+                                    if (controller['periodSec'] == '') {
+                                      controller['periodSec'] = '30';
+                                    }
+                                    if (controller['breakMin'] == '') {
+                                      controller['breakMin'] = '0';
+                                    }
+                                    if (controller['breakSec'] == '') {
+                                      controller['breakSec'] = '30';
+                                    }
+                                    if (controller['sets'] == '') {
+                                      controller['sets'] = '3';
+                                    }
+                                    final periodTime = TimeClass(
+                                      name: 'Workout',
+                                      isWork: true,
+                                      sec: Duration(
+                                        minutes: int.parse(
+                                            controller['periodMin'].text),
+                                        seconds: int.parse(
+                                            controller['periodSec'].text),
+                                      ).inSeconds,
+                                    );
+                                    final breakTime = TimeClass(
+                                      name: 'Break',
+                                      isWork: false,
+                                      sec: Duration(
+                                        minutes: int.parse(
+                                            controller['breakMin'].text),
+                                        seconds: int.parse(
+                                            controller['breakSec'].text),
+                                      ).inSeconds,
+                                    );
+                                    final set1 = SetClass(
+                                      grpName: '',
+                                      timeList: [
+                                        periodTime,
+                                      ],
+                                      sets: int.parse(controller['sets'].text),
+                                    );
+                                    final page = TimerPage(
+                                      isRest: true,
+                                      args: [set1],
+                                      breakTime: breakTime,
+                                    );
+                                    // await Future.delayed(Duration(microseconds: 1));
+                                    await Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                            transitionDuration:
+                                                Duration(milliseconds: 250),
+                                            reverseTransitionDuration:
+                                                Duration(milliseconds: 150),
+                                            transitionsBuilder: (BuildContext
+                                                    context,
+                                                Animation<double> animation,
+                                                Animation<double> secAnimation,
+                                                Widget child) {
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: child,
+                                              );
+                                            },
+                                            pageBuilder: (BuildContext context,
+                                                Animation<double> animation,
+                                                Animation<double>
+                                                    secAnimation) {
+                                              return page;
+                                            }));
+                                  }),
+                                );
+                              },
+                            ),
+                            Hero(
+                              tag: 'rightButton',
+                              child: NeuButton(
+                                ico: Icon(
+                                  Icons.save_outlined,
+                                  size: 30,
+                                  color: textColor,
+                                ),
+                                onPress: (() async {
+                                  await createDialog(
+                                      context,
+                                      isDark,
+                                      backgroundColor,
+                                      textColor,
+                                      shadowColor,
+                                      lightShadowColor);
+                                  if (controller['periodSec'] == '') {
+                                    controller['periodSec'] = '30';
+                                  }
+                                  if (controller['periodMin'] == '') {
+                                    controller['periodMin'] = '0';
+                                  }
+                                  if (controller['periodSec'] == '') {
+                                    controller['periodSec'] = '30';
+                                  }
+                                  if (controller['breakMin'] == '') {
+                                    controller['breakMin'] = '0';
+                                  }
+                                  if (controller['breakSec'] == '') {
+                                    controller['breakSec'] = '30';
+                                  }
+                                  if (controller['sets'] == '') {
+                                    controller['sets'] = '3';
+                                  }
+                                  savedList = await savedData.read('List');
+                                  SavedWorkout _data = SavedWorkout(
+                                    name:
+                                        stringFormatter(dialogController.text),
+                                    pSec:
+                                        int.parse(controller['periodSec'].text),
+                                    pMin:
+                                        int.parse(controller['periodMin'].text),
+                                    bSec:
+                                        int.parse(controller['breakSec'].text),
+                                    bMin:
+                                        int.parse(controller['breakMin'].text),
+                                    setsCount:
+                                        int.parse(controller['sets'].text),
+                                  );
+                                  // print('Encoded ${jsonEncode(_data.toMap())}');
+                                  savedList!.add(jsonEncode(_data.toMap()));
+                                  await savedData.save('List', savedList!);
+                                }),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -766,7 +769,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     });
   }
 
-  Future<String?> createDialog(BuildContext context) {
+  Future<String?> createDialog(
+      BuildContext context,
+      bool isDark,
+      Color backgroundColor,
+      Color textColor,
+      Color shadowColor,
+      Color lightShadowColor) {
     return showDialog(
       context: context,
       builder: (context) {
@@ -815,7 +824,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     style: kTextStyle.copyWith(
                       fontWeight: FontWeight.bold,
                       fontSize: 40,
-                      color: isDark.value! ? Colors.white : Colors.black,
+                      color: isDark ? Colors.white : Colors.black,
                     ),
                     textAlign: TextAlign.center,
                     decoration: kInputDecor,
@@ -837,7 +846,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   'Save',
                   style: kTextStyle.copyWith(
                     fontSize: 25,
-                    color: isDark.value! ? Colors.white : Colors.black,
+                    color: isDark ? Colors.white : Colors.black,
                     fontFamily: 'MontserratBold',
                   ),
                 ),

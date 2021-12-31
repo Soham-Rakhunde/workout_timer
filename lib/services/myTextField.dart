@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workout_timer/providers.dart';
 
 import '../constants.dart';
 
-class myTextField extends StatelessWidget {
+class myTextField extends ConsumerWidget {
   late int temp;
   String? controllerName = ' ';
   TextEditingController? control;
@@ -19,14 +21,14 @@ class myTextField extends StatelessWidget {
       required this.keyboardType});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return TextField(
       controller: isStringName! ? controller[controllerName] : control,
       style: kTextStyle.copyWith(
         fontWeight: FontWeight.bold,
         fontSize: 25,
-        color: textColor,
-        decorationColor: textColor,
+        color: ref.read(textProvider),
+        decorationColor: ref.read(textProvider),
       ),
       inputFormatters: <TextInputFormatter>[
         FilteringTextInputFormatter.digitsOnly

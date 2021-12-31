@@ -40,20 +40,11 @@ List lightShadowC = [
   Color.fromRGBO(27, 27, 27, 1),
 ];
 
-List textC = [
+const List textC = [
   Color(0xFF707070),
   Color(0xFFF1F2F6),
 ];
 
-Color backgroundColor = backgroundC[0];
-Color shadowColor = shadowC[0];
-Color lightShadowColor = lightShadowC[0];
-Color textColor = textC[0];
-Color seekBarLightColor = Color(0xFFB8ECED);
-Color seekBarDarkColor = Color(0xFF37C8DF);
-Color lightGradient = Color(0xFFc2e9fb);
-Color darkGradient = Color(0xFFA1C4FD);
-Color drawerColor = Color.fromRGBO(10, 90, 85, 1);
 
 const turqoiseGradient = [
   Color.fromRGBO(91, 253, 199, 1),
@@ -94,3 +85,8 @@ final List<String> voiceModels = [
   'Olivia',
   'Salli'
 ];
+final drawerColor = Color.fromRGBO(10, 90, 85, 1);
+final seekBarLight = Color(0xFFB8ECED);
+final seekBarDark = Color(0xFF37C8DF);
+final lightGradient = Color(0xFFc2e9fb);
+final darkGradient = Color(0xFFA1C4FD);

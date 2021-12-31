@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:workout_timer/constants.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workout_timer/providers.dart';
 
 class NeuButton extends StatefulWidget {
   final ico;
@@ -75,39 +76,45 @@ class _NeuButtonState extends State<NeuButton> with SingleTickerProviderStateMix
         });
         widget.onPress!();
       }),
-      child: Stack(
-        children: <Widget>[
-          Container(
-            width: widget.breadth,
-            height: widget.length,
-            decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(widget.radii),
-              boxShadow: [
-                BoxShadow(
-                    color: shadowColor,
-                    offset: Offset((8) * offsetFactor, (6) * offsetFactor),
-                    blurRadius: 12),
-                BoxShadow(
-                    color: lightShadowColor,
-                    offset: Offset((-8) * offsetFactor, (-6) * offsetFactor),
-                    blurRadius: 12),
-              ],
+      child: Consumer(builder: (context, ref, child) {
+        Color backgroundColor = ref.watch(backgroundProvider);
+        Color shadowColor = ref.watch(shadowProvider);
+        Color lightShadowColor = ref.watch(lightShadowProvider);
+        Color textColor = ref.watch(textProvider);
+        return Stack(
+          children: <Widget>[
+            Container(
+              width: widget.breadth,
+              height: widget.length,
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(widget.radii),
+                boxShadow: [
+                  BoxShadow(
+                      color: shadowColor,
+                      offset: Offset((8) * offsetFactor, (6) * offsetFactor),
+                      blurRadius: 12),
+                  BoxShadow(
+                      color: lightShadowColor,
+                      offset: Offset((-8) * offsetFactor, (-6) * offsetFactor),
+                      blurRadius: 12),
+                ],
+              ),
             ),
-          ),
-          Positioned.fill(
-              child: widget.animated
-                  ? Center(
-                      child: AnimatedIcon(
-                        icon: widget.ico,
-                        size: 30,
-                        color: textColor,
-                        progress: playPauseController,
-                      ),
-                    )
-                  : Center(child: widget.ico)),
-        ],
-      ),
+            Positioned.fill(
+                child: widget.animated
+                    ? Center(
+                        child: AnimatedIcon(
+                          icon: widget.ico,
+                          size: 30,
+                          color: textColor,
+                          progress: playPauseController,
+                        ),
+                      )
+                    : Center(child: widget.ico)),
+          ],
+        );
+      }),
       padding: EdgeInsets.all(1.0),
       shape: CircleBorder(),
     );

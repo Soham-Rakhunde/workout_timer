@@ -3,18 +3,20 @@ import 'dart:convert';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:workout_timer/constants.dart';
 import 'package:workout_timer/main.dart';
 import 'package:workout_timer/pages/timerpage.dart';
+import 'package:workout_timer/providers.dart';
 import 'package:workout_timer/services/timeValueHandler.dart';
 
-class savedPage extends StatefulWidget {
+class savedPage extends ConsumerStatefulWidget {
   @override
   _savedPageState createState() => _savedPageState();
 }
 
-class _savedPageState extends State<savedPage> {
+class _savedPageState extends ConsumerState<savedPage> {
   SharedPref _data = SharedPref();
   List<SavedWorkout>? savedListObjs;
   List<SavedAdvanced>? savedAdvListObjs;
@@ -36,13 +38,11 @@ class _savedPageState extends State<savedPage> {
   }
 
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
+    Color backgroundColor = ref.watch(backgroundProvider);
+    Color shadowColor = ref.watch(shadowProvider);
+    Color lightShadowColor = ref.watch(lightShadowProvider);
+    Color textColor = ref.watch(textProvider);
     return Scaffold(
       backgroundColor: backgroundColor,
       bottomNavigationBar: BottomNavigationBar(
@@ -145,7 +145,7 @@ class _savedPageState extends State<savedPage> {
                                       )),
                                       Center(
                                           child: Text(
-                                            'Save data from homescreen',
+                                        'Save data from homescreen',
                                         style: TextStyle(
                                           fontSize: 20,
                                           color: textColor,
@@ -155,7 +155,7 @@ class _savedPageState extends State<savedPage> {
                                   ),
                                 )
                               : ListView.builder(
-                            itemCount: snapshot.data!.length,
+                                  itemCount: snapshot.data!.length,
                                   physics: BouncingScrollPhysics(),
                                   itemBuilder:
                                       (BuildContext context, int index) {
@@ -450,7 +450,7 @@ class _savedPageState extends State<savedPage> {
                                       ),
                                       Center(
                                           child: Text(
-                                            'No Data Saved',
+                                        'No Data Saved',
                                         style: TextStyle(
                                           fontSize: 25,
                                           color: textColor,
@@ -468,7 +468,7 @@ class _savedPageState extends State<savedPage> {
                                   ),
                                 )
                               : ListView.builder(
-                            itemCount: savedAdvListObjs!.length,
+                                  itemCount: savedAdvListObjs!.length,
                                   physics: BouncingScrollPhysics(),
                                   itemBuilder:
                                       (BuildContext context, int index) {
@@ -489,7 +489,7 @@ class _savedPageState extends State<savedPage> {
                                                   quarterTurns: 3,
                                                   child: Center(
                                                     child: Text(
-                                                          'Delete',
+                                                      'Delete',
                                                       style:
                                                           kTextStyle.copyWith(
                                                         color: textColor,
@@ -512,7 +512,7 @@ class _savedPageState extends State<savedPage> {
                                         await _data.save('Adv', savedList!);
                                       },
                                       child: GestureDetector(
-                                            onTap: (() async {
+                                        onTap: (() async {
                                           final page = TimerPage(
                                             isRest: false,
                                             args:
@@ -551,8 +551,8 @@ class _savedPageState extends State<savedPage> {
                                                     return page;
                                                   }));
                                         }),
-                                            child: Container(
-                                              margin: EdgeInsets.symmetric(
+                                        child: Container(
+                                          margin: EdgeInsets.symmetric(
                                               vertical: 15, horizontal: 20),
                                           height: 140,
                                           width: double.infinity,
@@ -748,22 +748,22 @@ class _savedPageState extends State<savedPage> {
                                                 BorderRadius.circular(25),
                                             boxShadow: [
                                               BoxShadow(
-                                                      color: gradientList[4 -
+                                                  color: gradientList[4 -
                                                           ((index - 4) % 5)][1]
                                                       .withOpacity(0.22),
-                                                      offset: Offset(8, 6),
-                                                      blurRadius: 15),
-                                                  BoxShadow(
-                                                      color: gradientList[4 -
+                                                  offset: Offset(8, 6),
+                                                  blurRadius: 15),
+                                              BoxShadow(
+                                                  color: gradientList[4 -
                                                           ((index - 4) % 5)][0]
                                                       .withOpacity(0.22),
-                                                      offset: Offset(-8, -6),
-                                                      blurRadius: 15),
-                                                ],
-                                              ),
-                                            ),
+                                                  offset: Offset(-8, -6),
+                                                  blurRadius: 15),
+                                            ],
                                           ),
-                                        );
+                                        ),
+                                      ),
+                                    );
                                   },
                                 );
                         }
