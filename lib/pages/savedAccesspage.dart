@@ -28,12 +28,21 @@ class _savedPageState extends ConsumerState<savedPage> {
     savedListObjs = savedList!
         .map((item) => SavedWorkout.fromMap(jsonDecode(item)))
         .toList();
-    print('savedListObjs $savedList');
+    debugPrint('savedListObjs $savedList');
+    debugPrint('a');
     savedList = await _data.read('Adv');
-    savedAdvListObjs = savedList!
-        .map((item) => SavedAdvanced.fromJson(jsonDecode(item)))
-        .toList();
+    debugPrint('b');
+    print(savedList);
+    try {
+      savedAdvListObjs = savedList!
+          .map<SavedAdvanced>((item) => SavedAdvanced.fromMap(jsonDecode(item)))
+          .toList();
+    } catch (e) {
+      print("\nerrrorr $e");
+    }
+    debugPrint('c');
     print('AdvListObjs $savedList');
+    debugPrint('d');
     return savedListObjs;
   }
 
@@ -64,12 +73,7 @@ class _savedPageState extends ConsumerState<savedPage> {
               size: 20,
               color: isSimpleOpen.value ? Colors.blue : null,
             ),
-            title: Text(
-              'Simple',
-              style: TextStyle(
-                color: isSimpleOpen.value ? Colors.blue : null,
-              ),
-            ),
+            label: 'Simple',
             backgroundColor: Colors.transparent,
           ),
           BottomNavigationBarItem(
@@ -78,12 +82,7 @@ class _savedPageState extends ConsumerState<savedPage> {
               size: 20,
               color: !isSimpleOpen.value ? Colors.blue : null,
             ),
-            title: Text(
-              'Advanced',
-              style: TextStyle(
-                color: !isSimpleOpen.value ? Colors.blue : null,
-              ),
-            ),
+            label: 'Advanced',
             backgroundColor: Colors.transparent,
           ),
         ],
@@ -118,7 +117,7 @@ class _savedPageState extends ConsumerState<savedPage> {
                     builder: (BuildContext context,
                         AsyncSnapshot<List<dynamic>?> snapshot) {
                       if (isSimple) {
-                        if (snapshot.data == null) {
+                        if (!snapshot.hasData) {
                           return Center(child: Text('Loading'));
                         } else {
                           return snapshot.data!.length == 0
@@ -431,6 +430,8 @@ class _savedPageState extends ConsumerState<savedPage> {
                                 );
                         }
                       } else {
+                        print("adv");
+                        print(savedAdvListObjs);
                         if (savedAdvListObjs == null) {
                           return Center(child: Text('Loading'));
                         } else {
@@ -442,330 +443,330 @@ class _savedPageState extends ConsumerState<savedPage> {
                                       Center(
                                           child: FaIcon(
                                         FontAwesomeIcons.puzzlePiece,
-                                        size: 100,
-                                        color: Colors.teal,
-                                      )),
-                                      SizedBox(
-                                        height: 40,
+                                      size: 100,
+                                      color: Colors.teal,
+                                    )),
+                                SizedBox(
+                                  height: 40,
+                                ),
+                                Center(
+                                    child: Text(
+                                      'No Data Saved',
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                        color: textColor,
                                       ),
-                                      Center(
-                                          child: Text(
-                                        'No Data Saved',
-                                        style: TextStyle(
-                                          fontSize: 25,
-                                          color: textColor,
-                                        ),
-                                      )),
-                                      Center(
-                                          child: Text(
-                                        'Save data from Advanced Mode',
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: textColor,
-                                        ),
-                                      )),
-                                    ],
-                                  ),
-                                )
+                                    )),
+                                Center(
+                                    child: Text(
+                                      'Save data from Advanced Mode',
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: textColor,
+                                      ),
+                                    )),
+                              ],
+                            ),
+                          )
                               : ListView.builder(
-                                  itemCount: savedAdvListObjs!.length,
-                                  physics: BouncingScrollPhysics(),
-                                  itemBuilder:
-                                      (BuildContext context, int index) {
-                                    int setsCount = 0;
-                                    savedAdvListObjs![index]
-                                        .groups!
-                                        .forEach((element) {
-                                      setsCount += element.sets!;
-                                    });
-                                    return Dismissible(
-                                      background: Container(
-                                        padding: EdgeInsets.only(left: 30),
-                                        alignment: Alignment.centerLeft,
-                                        child: Wrap(
-                                            direction: Axis.vertical,
-                                            children: [
-                                              RotatedBox(
-                                                  quarterTurns: 3,
-                                                  child: Center(
-                                                    child: Text(
-                                                      'Delete',
-                                                      style:
-                                                          kTextStyle.copyWith(
-                                                        color: textColor,
-                                                        fontSize: 25,
-                                                      ),
-                                                    ),
-                                                  )),
-                                            ]),
-                                        // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
-                                      ),
-                                      direction: DismissDirection.horizontal,
-                                      key: UniqueKey(),
-                                      onDismissed: (direction) async {
-                                        savedAdvListObjs!.removeAt(index);
-                                        savedList = [];
-                                        savedList = savedAdvListObjs!
-                                            .map((item) =>
-                                                (jsonEncode(item.toJson())))
-                                            .toList();
-                                        await _data.save('Adv', savedList!);
-                                      },
-                                      child: GestureDetector(
-                                        onTap: (() async {
-                                          final page = TimerPage(
-                                            isRest: false,
-                                            args:
-                                                savedAdvListObjs![index].groups,
-                                            breakTime: TimeClass(sec: 0),
-                                            totalTime: savedAdvListObjs![index]
-                                                .totalTime,
-                                          );
-                                          // await Future.delayed(Duration(microseconds: 1));
-                                          await Navigator.push(
-                                              context,
-                                              PageRouteBuilder(
-                                                  transitionDuration: Duration(
-                                                      milliseconds: 250),
-                                                  reverseTransitionDuration:
-                                                      Duration(
-                                                          milliseconds: 150),
-                                                  transitionsBuilder:
-                                                      (BuildContext context,
-                                                          Animation<double>
-                                                              animation,
-                                                          Animation<double>
-                                                              secAnimation,
-                                                          Widget child) {
-                                                    return FadeTransition(
-                                                      opacity: animation,
-                                                      child: child,
-                                                    );
-                                                  },
-                                                  pageBuilder:
-                                                      (BuildContext context,
-                                                          Animation<double>
-                                                              animation,
-                                                          Animation<double>
-                                                              secAnimation) {
-                                                    return page;
-                                                  }));
-                                        }),
-                                        child: Container(
-                                          margin: EdgeInsets.symmetric(
-                                              vertical: 15, horizontal: 20),
-                                          height: 140,
-                                          width: double.infinity,
-                                          child: Column(
+                            itemCount: savedAdvListObjs!.length,
+                            physics: BouncingScrollPhysics(),
+                            itemBuilder:
+                                (BuildContext context, int index) {
+                              int setsCount = 0;
+                              savedAdvListObjs![index]
+                                  .groups!
+                                  .forEach((element) {
+                                setsCount += element.sets!;
+                              });
+                              return Dismissible(
+                                background: Container(
+                                  padding: EdgeInsets.only(left: 30),
+                                  alignment: Alignment.centerLeft,
+                                  child: Wrap(
+                                      direction: Axis.vertical,
+                                      children: [
+                                        RotatedBox(
+                                            quarterTurns: 3,
+                                            child: Center(
+                                              child: Text(
+                                                'Delete',
+                                                style:
+                                                kTextStyle.copyWith(
+                                                  color: textColor,
+                                                  fontSize: 25,
+                                                ),
+                                              ),
+                                            )),
+                                      ]),
+                                  // child: Icon(Icons.delete_outline_rounded,size: 40,color: textColor,)
+                                ),
+                                direction: DismissDirection.horizontal,
+                                key: UniqueKey(),
+                                onDismissed: (direction) async {
+                                  savedAdvListObjs!.removeAt(index);
+                                  savedList = [];
+                                  savedList = savedAdvListObjs!
+                                      .map((item) =>
+                                  (jsonEncode(item.toJson())))
+                                      .toList();
+                                  await _data.save('Adv', savedList!);
+                                },
+                                child: GestureDetector(
+                                  onTap: (() async {
+                                    final page = TimerPage(
+                                      isRest: false,
+                                      args:
+                                      savedAdvListObjs![index].groups,
+                                      breakTime: TimeClass(sec: 0),
+                                      totalTime: savedAdvListObjs![index]
+                                          .totalTime,
+                                    );
+                                    // await Future.delayed(Duration(microseconds: 1));
+                                    await Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                            transitionDuration: Duration(
+                                                milliseconds: 250),
+                                            reverseTransitionDuration:
+                                            Duration(
+                                                milliseconds: 150),
+                                            transitionsBuilder:
+                                                (BuildContext context,
+                                                Animation<double>
+                                                animation,
+                                                Animation<double>
+                                                secAnimation,
+                                                Widget child) {
+                                              return FadeTransition(
+                                                opacity: animation,
+                                                child: child,
+                                              );
+                                            },
+                                            pageBuilder:
+                                                (BuildContext context,
+                                                Animation<double>
+                                                animation,
+                                                Animation<double>
+                                                secAnimation) {
+                                              return page;
+                                            }));
+                                  }),
+                                  child: Container(
+                                    margin: EdgeInsets.symmetric(
+                                        vertical: 15, horizontal: 20),
+                                    height: 140,
+                                    width: double.infinity,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                          MainAxisAlignment
+                                              .spaceBetween,
+                                          children: [
+                                            Container(
+                                              padding: EdgeInsets.only(
+                                                  top: 20, left: 25),
+                                              margin: EdgeInsets.only(
+                                                  left: 10),
+                                              child: FittedBox(
+                                                fit: BoxFit.fitWidth,
+                                                child: Text(
+                                                  savedAdvListObjs![index]
+                                                      .name ==
+                                                      ''
+                                                      ? 'Name'
+                                                      : '${savedAdvListObjs![index].name}',
+                                                  style:
+                                                  kTextStyle.copyWith(
+                                                    color:
+                                                    backgroundColor,
+                                                    fontWeight:
+                                                    FontWeight.bold,
+                                                    fontSize: 26.5,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: EdgeInsets.only(
+                                                  top: 14),
+                                              child: FlatButton(
+                                                shape: CircleBorder(),
+                                                color: Colors.transparent,
+                                                child: FaIcon(
+                                                  FontAwesomeIcons.edit,
+                                                  color: backgroundColor,
+                                                ),
+                                                onPressed: () {
+                                                  editGroups =
+                                                      savedAdvListObjs![
+                                                      index]
+                                                          .groups;
+                                                  indexOfMenu.value = 5;
+                                                  Navigator.pop(context);
+                                                },
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                        SizedBox(
+                                          height: 15,
+                                        ),
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: 15,
+                                              left: 25,
+                                              right: 25),
+                                          child: Row(
                                             mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
+                                            MainAxisAlignment
+                                                .spaceEvenly,
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.center,
                                             children: [
-                                              Row(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .spaceBetween,
+                                              Column(
                                                 children: [
-                                                  Container(
-                                                    padding: EdgeInsets.only(
-                                                        top: 20, left: 25),
-                                                    margin: EdgeInsets.only(
-                                                        left: 10),
-                                                    child: FittedBox(
-                                                      fit: BoxFit.fitWidth,
-                                                      child: Text(
-                                                        savedAdvListObjs![index]
-                                                                    .name ==
-                                                                ''
-                                                            ? 'Name'
-                                                            : '${savedAdvListObjs![index].name}',
-                                                        style:
-                                                            kTextStyle.copyWith(
-                                                          color:
-                                                              backgroundColor,
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                          fontSize: 26.5,
-                                                        ),
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      'Time',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontSize: 20,
                                                       ),
                                                     ),
                                                   ),
-                                                  Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 14),
-                                                    child: FlatButton(
-                                                      shape: CircleBorder(),
-                                                      color: Colors.transparent,
-                                                      child: FaIcon(
-                                                        FontAwesomeIcons.edit,
-                                                        color: backgroundColor,
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      '${Duration(seconds: savedAdvListObjs![index].totalTime!).inMinutes}:'
+                                                          '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60 < 10 ? '0' : ''}'
+                                                          '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60}',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .bold,
+                                                        fontSize: 20,
                                                       ),
-                                                      onPressed: () {
-                                                        editGroups =
-                                                            savedAdvListObjs![
-                                                                    index]
-                                                                .groups;
-                                                        indexOfMenu.value = 5;
-                                                        Navigator.pop(context);
-                                                      },
                                                     ),
-                                                  )
+                                                  ),
                                                 ],
                                               ),
-                                              SizedBox(
-                                                height: 15,
+                                              Container(
+                                                height: 45,
+                                                width: 1.3,
+                                                color: backgroundColor,
                                               ),
-                                              Padding(
-                                                padding: EdgeInsets.only(
-                                                    bottom: 15,
-                                                    left: 25,
-                                                    right: 25),
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceEvenly,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Column(
-                                                      children: [
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            'Time',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inMinutes}:'
-                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60 < 10 ? '0' : ''}'
-                                                            '${Duration(seconds: savedAdvListObjs![index].totalTime!).inSeconds % 60}',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
+                                              Column(
+                                                children: [
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      'Groups',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontSize: 20,
+                                                      ),
                                                     ),
-                                                    Container(
-                                                      height: 45,
-                                                      width: 1.3,
-                                                      color: backgroundColor,
+                                                  ),
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      '${savedAdvListObjs![index].groups!.length}',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .bold,
+                                                        fontSize: 20,
+                                                      ),
                                                     ),
-                                                    Column(
-                                                      children: [
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            'Groups',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            '${savedAdvListObjs![index].groups!.length}',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                    Container(
-                                                      height: 45,
-                                                      width: 1.3,
-                                                      color: backgroundColor,
-                                                    ),
-                                                    Column(
-                                                      children: [
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            'Sets',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        FittedBox(
-                                                          fit: BoxFit.fitWidth,
-                                                          child: Text(
-                                                            '$setsCount',
-                                                            style: kTextStyle
-                                                                .copyWith(
-                                                              color:
-                                                                  backgroundColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize: 20,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
+                                                  ),
+                                                ],
                                               ),
-                                            ],
-                                          ),
-                                          decoration: BoxDecoration(
-                                            gradient: LinearGradient(
-                                                colors: gradientList[
-                                                    4 - ((index - 4) % 5)],
-                                                begin: Alignment.centerLeft,
-                                                end: Alignment.centerRight),
-                                            borderRadius:
-                                                BorderRadius.circular(25),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: gradientList[4 -
-                                                          ((index - 4) % 5)][1]
-                                                      .withOpacity(0.22),
-                                                  offset: Offset(8, 6),
-                                                  blurRadius: 15),
-                                              BoxShadow(
-                                                  color: gradientList[4 -
-                                                          ((index - 4) % 5)][0]
-                                                      .withOpacity(0.22),
-                                                  offset: Offset(-8, -6),
-                                                  blurRadius: 15),
+                                              Container(
+                                                height: 45,
+                                                width: 1.3,
+                                                color: backgroundColor,
+                                              ),
+                                              Column(
+                                                children: [
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      'Sets',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  FittedBox(
+                                                    fit: BoxFit.fitWidth,
+                                                    child: Text(
+                                                      '$setsCount',
+                                                      style: kTextStyle
+                                                          .copyWith(
+                                                        color:
+                                                        backgroundColor,
+                                                        fontWeight:
+                                                        FontWeight
+                                                            .bold,
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ],
                                           ),
                                         ),
-                                      ),
-                                    );
-                                  },
-                                );
+                                      ],
+                                    ),
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                          colors: gradientList[
+                                          4 - ((index - 4) % 5)],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight),
+                                      borderRadius:
+                                      BorderRadius.circular(25),
+                                      boxShadow: [
+                                        BoxShadow(
+                                            color: gradientList[4 -
+                                                ((index - 4) % 5)][1]
+                                                .withOpacity(0.22),
+                                            offset: Offset(8, 6),
+                                            blurRadius: 15),
+                                        BoxShadow(
+                                            color: gradientList[4 -
+                                                ((index - 4) % 5)][0]
+                                                .withOpacity(0.22),
+                                            offset: Offset(-8, -6),
+                                            blurRadius: 15),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          );
                         }
                       }
                     },

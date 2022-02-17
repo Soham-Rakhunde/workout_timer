@@ -38,10 +38,13 @@ class SetClass {
   //   };
   // }
   //
-  // SetClass.fromMap(Map map)
-  //     : grpName = map['grpName'],
-  //       sets = map['sets'],
-  //       timeList = map['timeList'].map((ele) => TimeClass.fromMap(ele)).toList();
+  SetClass.fromMap(Map map)
+      : grpName = map['grpName'],
+        sets = map['sets'],
+        timeList = map['timeList'].map<TimeClass>((ele) {
+          print('\nele $ele');
+          return TimeClass.fromMap(ele);
+        }).toList();
 
   void addRemove(bool flag) {
     int intValue = int.parse(textController.text);
@@ -150,10 +153,10 @@ class TimeClass {
   //   };
   // }
   //
-  // TimeClass.fromMap(Map map)
-  //     : name = map['name'],
-  //       sec = map['sec'],
-  //       isWork = map['isWork'];
+  TimeClass.fromMap(Map map)
+      : name = map['name'],
+        sec = map['sec'],
+        isWork = map['isWork'];
 
   factory TimeClass.fromJson(Map<String, dynamic> json) =>
       _$TimeClassFromJson(json);
@@ -197,9 +200,12 @@ class SavedAdvanced {
 //   }
 // }
 //
-// SavedAdvanced.fromMap(Map map)
-//     : name = map['name'],
-//       groups = map['groups'].map((tagJson) => SetClass.fromMap(tagJson)).toList();
+  SavedAdvanced.fromMap(Map map)
+      : name = map['name'],
+        groups = map['groups'].map<SetClass>((tagJson) {
+          print('tagJson $tagJson');
+          return SetClass.fromMap(tagJson);
+        }).toList();
 }
 
 class SavedWorkout {

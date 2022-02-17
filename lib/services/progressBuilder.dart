@@ -245,7 +245,7 @@ class _buildStackState extends State<buildStack> {
                                 key: ValueKey<String>(
                                     '${widget.timeInSec!.value}'),
                                 style: kTextStyle.copyWith(
-                                  color: isDark! ? Colors.white : Colors.black,
+                                  color: isDark ? Colors.white : Colors.black,
                                   fontWeight: FontWeight.bold,
                                   fontSize: 50,
                                 ),

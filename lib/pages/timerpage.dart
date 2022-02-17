@@ -459,7 +459,7 @@ class _TimerPageState extends State<TimerPage> {
                                               'Progress',
                                               style: kTextStyle.copyWith(
                                                 letterSpacing: 0.5,
-                                                color: isDark!
+                                                color: isDark
                                                     ? Colors.white
                                                     : Colors.black,
                                               ),
@@ -565,7 +565,7 @@ class _TimerPageState extends State<TimerPage> {
                                                       style:
                                                           kTextStyle.copyWith(
                                                         letterSpacing: 0.1,
-                                                        color: isDark!
+                                                            color: isDark
                                                             ? Colors.white
                                                             : Colors.black,
                                                       ),
@@ -661,7 +661,7 @@ class _TimerPageState extends State<TimerPage> {
                 'Yes',
                 style: kTextStyle.copyWith(
                   fontSize: 25,
-                  color: isDark! ? Colors.white : Colors.black,
+                  color: isDark ? Colors.white : Colors.black,
                   fontFamily: 'MontserratBold',
                 ),
               ),

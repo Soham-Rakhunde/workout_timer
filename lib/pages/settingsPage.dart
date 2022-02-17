@@ -1012,7 +1012,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                                           child: Text(
                                                             'Dark',
                                                             style: TextStyle(
-                                                              color: isDark!
+                                                              color: isDark
                                                                   ? backgroundColor
                                                                   : textColor,
                                                               letterSpacing:
